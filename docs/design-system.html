@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灵犀 · 空间感知设计系统 v1</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:system-ui,sans-serif;padding:16px}
+h1{font-size:20px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+.sub{color:#64748b;font-size:11px;margin-bottom:12px}
+.tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.tab{background:#1e293b;border:1px solid #334155;border-radius:6px;padding:5px 12px;font-size:10px;color:#94a3b8;cursor:pointer;transition:all .15s}
+.tab.active{background:#3b82f622;border-color:#3b82f666;color:#60a5fa}
+.tab .count{color:#64748b;margin-left:4px;font-size:8px}
+.tab:hover{border-color:#3b82f6}
+.stats{font-size:9px;color:#64748b;margin-bottom:10px;display:flex;gap:12px}
+.stats span{display:flex;align-items:center;gap:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.sc-card{background:#1e293b;border:1px solid #334155;border-radius:10px;overflow:hidden;cursor:pointer;transition:all .2s}
+.sc-card:hover{transform:translateY(-2px);border-color:#6366f1;box-shadow:0 4px 20px #6366f122}
+.sc-card .label{padding:6px 10px;font-size:9px;color:#94a3b8;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center}
+.sc-card .label .tags{display:flex;gap:3px;flex-wrap:wrap}
+.sc-card .label .tag{padding:1px 5px;border-radius:3px;font-size:7px;background:#334155;color:#94a3b8}
+.sc-card .label .tag.eco{background:#22c55e22;color:#22c55e}
+.sc-card .label .tag.sec{background:#ef444422;color:#ef4444}
+.sc-card .label .tag.space{background:#8b5cf622;color:#a78bfa}
+.sc-card .label .tag.front{background:#f59e0b22;color:#f59e0b}
+.sc-card .label .tag.back{background:#60a5fa22;color:#60a5fa}
+.sc-card .label .tag.home{background:#ec489922;color:#f472b6}
+.sc-card .label .tagid{color:#475569;font-family:monospace;font-size:7px}
+.ips{width:100%;aspect-ratio:4/3;padding:6px;display:flex;flex-direction:column;overflow:hidden;position:relative;font-size:7px}
+.ips *{font-size:inherit}
+</style>
+</head>
+<body>
+<h1>🌌 灵犀 · 空间感知设计系统</h1>
+<p class="sub">每种屏都在讲同一个故事："空间知道你在做什么" · 点击全屏预览 · 贴标签记录好设计</p>
+<div class="stats"><span>📐 布局模板 10种</span><span>🔖 设计总数 <b id="totalCount">0</b></span><span>📁 覆盖领域 6个</span><span>🏷️ 点击标记喜欢的设计</span></div>
+<div class="tabs" id="tabBar"></div>
+<div class="grid" id="gallery"></div>
+
+<!-- Preview -->
+<div id="preview" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#000000dd;z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+<div style="background:#0b1120;border:1px solid #334155;border-radius:12px;padding:16px;max-width:420px;width:100%">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+<div><div id="pname" style="font-size:14px;font-weight:600"></div>
+<div style="display:flex;gap:4px;margin-top:3px" id="ptags"></div>
+<div style="font-size:8px;color:#64748b;margin-top:3px;font-family:monospace" id="pid"></div>
+</div>
+<div style="display:flex;gap:4px">
+<button onclick="toggleFavorite()" id="pfavBtn" style="background:transparent;border:1px solid #dc262666;color:#dc2626;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:9px">♡ 标记</button>
+<button onclick="closePreview()" style="background:transparent;border:none;color:#64748b;font-size:18px;cursor:pointer">✕</button>
+</div>
+</div>
+<div id="pbody" style="margin-bottom:6px"></div>
+<div id="pdata" style="font-size:8px;color:#64748b;margin-bottom:8px;padding:6px;background:#1e293b;border-radius:6px"></div>
+<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center">
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="日间" checked onchange="showPreview()"> ☀️</label>
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="夜间" onchange="showPreview()"> 🌙</label>
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="高峰" onchange="showPreview()"> 🔥</label>
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="屏保" onchange="showPreview()"> 💤</label>
+</div>
+<div style="display:flex;gap:8px;justify-content:center;margin-top:6px">
+<button onclick="prevDesign()" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:9px">◀ 上一</button>
+<button onclick="nextDesign()" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:9px">下一 ▶</button>
+</div>
+</div>
+</div>
+
+<script>
+// ===================================================================
+// 设计系统引擎 — 10种核心布局模板 + 200+参数化设计
+// ===================================================================
+
+// ----- 工具函数 -----
+function rand(n,m){return Math.floor(Math.random()*(m-n+1))+n}
+function pick(arr){return arr[rand(0,arr.length-1)]}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+
+// ----- 颜色系统 -----
+var C = {
+  eco: {bg:'#064e3b',accent:'#22c55e',accent2:'#4ade80',dim:'#166534',text:'#bbf7d0'},
+  sec: {bg:'#1a0a0a',accent:'#ef4444',accent2:'#f87171',dim:'#450a0a',text:'#fca5a5'},
+  space: {bg:'#1e1b4b',accent:'#8b5cf6',accent2:'#a78bfa',dim:'#2e1b5b',text:'#c4b5fd'},
+  front: {bg:'#1a2a0a',accent:'#f59e0b',accent2:'#fbbf24',dim:'#2a1a0a',text:'#fde68a'},
+  back: {bg:'#0a1a2a',accent:'#60a5fa',accent2:'#93c5fd',dim:'#0a1a3a',text:'#bfdbfe'},
+  home: {bg:'#2a0a1a',accent:'#ec4899',accent2:'#f472b6',dim:'#3a0a2a',text:'#fbcfe8'}
+};
+var catColors = {eco:C.eco,sec:C.sec,space:C.space,front:C.front,back:C.back,home:C.home};
+
+// ----- 布局模板 (10种) -----
+// 每种模板是一个函数: (design, mode, big) => HTML string
+// design = {name, cat, data, story, ...}
+// mode = '日间'|'夜间'|'高峰'|'屏保'
+// big = true 预览模式
+
+var layouts = {};
+
+// T1: 卡片瀑布 — 多卡片不等高
+layouts.masonry = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var sz = big?'14px':'10px'; var h = big?'':'7px';
+  var n = d.data.metrics || [{v:'26°',l:'温度',c:'cool'},{v:'42dB',l:'噪音',c:''},{v:'58%',l:'湿度',c:''}];
+  var mc = d.data.mainCard;
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;flex:1;font-size:'+h+'">'+
+    '<div style="grid-column:1/-1;background:#00000044;border-radius:5px;padding:5px;display:flex;align-items:center;justify-content:space-between">'+
+    '<div><div style="font-size:'+sz+';font-weight:700;color:'+(d.cat==='eco'?C.eco.accent:C.sec.accent)+'">'+(mc?mc.v:'')+'</div>'+
+    '<div style="font-size:6px;color:#64748b">'+(mc?mc.l:'')+'</div></div>'+
+    '<div style="font-size:7px;color:#94a3b8;text-align:right;line-height:1.3">'+(mc?mc.sub:'')+'</div></div>'+
+    n.map(function(x){return '<div style="background:#1e293b;border-radius:4px;padding:4px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:'+(big?'12px':'8px')+';font-weight:600;color:'+(x.c==='good'?C.eco.accent:x.c==='warn'?C.sec.accent:x.c==='cool'?'#60a5fa':x.c==='warm'?'#f59e0b':'#e2e8f0')+'">'+x.v+'</div><div style="font-size:6px;color:#64748b">'+x.l+'</div></div>';}).join('')+
+  '</div><div style="display:flex;gap:4px;font-size:5px;color:#64748b;margin-top:2px;justify-content:space-between"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div>';
+};
+
+// T2: 时间线 — 事件流
+layouts.timeline = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var ev = d.data.events||[{t:'08:00',txt:'事件1',c:''}];
+  var sz = big?'1':'';
+  return '<div style="display:flex;justify-content:space-between;font-size:6px;color:#64748b;margin-bottom:3px"><span>'+(d.data.header||'')+'</span><span>'+(d.data.subhead||'')+'</span></div>'+
+    '<div style="flex:1;display:flex;flex-direction:column;gap:2px;overflow:hidden">'+
+    ev.map(function(e){return '<div style="display:flex;align-items:center;gap:3px;padding:2px 4px;background:#1e293b;border-radius:3px;font-size:'+(big?'8px':'6px')+';border-left:2px solid '+(e.c||catColors[d.cat].accent)+'"><span style="color:#94a3b8;font-family:monospace;min-width:24px;font-size:'+(big?'7px':'5px')+'">'+e.t+'</span><span style="flex:1;color:#e2e8f0">'+e.txt+'</span>'+(e.v?'<span style="color:#64748b;font-size:5px">'+e.v+'</span>':'')+'</div>';}).join('')+
+  '</div><div style="display:flex;gap:4px;font-size:5px;color:#64748b;margin-top:2px;justify-content:space-between"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div>';
+};
+
+// T3: 环形/仪表 — 圆形可视化
+layouts.gauge = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var sz = big?'14px':'10px';
+  var g = d.data.gauges||[{v:75,l:'指标'}];
+  var c = catColors[d.cat];
+  return '<div style="flex:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px;position:relative">'+
+    g.map(function(g2,i){return '<svg viewBox="0 0 60 50" style="width:55px;height:45px"><path d="M5,45 A25,25 0 0,1 55,45" stroke="#1e293b" stroke-width="5" fill="none"/><path d="M5,45 A25,25 0 0,1 55,45" stroke="'+(g2.c||c.accent)+'" stroke-dasharray="78.5" stroke-dashoffset="'+(78.5-g2.v/100*78.5)+'" stroke-width="5" fill="none"/><text x="30" y="42" text-anchor="middle" font-size="'+(big?'9px':'7px')+'" font-weight="600" fill="'+(g2.c||c.accent)+'">'+g2.v+(g2.u||'')+'</text><text x="30" y="48" text-anchor="middle" font-size="'+(big?'6px':'4px')+'" fill="#64748b">'+g2.l+'</text></svg>';}).join('')+
+    (d.data.center?('<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center"><div style="font-size:'+(big?'16px':'12px')+';font-weight:700;color:'+c.accent+'">'+d.data.center.v+'</div><div style="font-size:6px;color:#64748b">'+d.data.center.l+'</div></div>'):'')+
+  '</div><div style="display:flex;gap:4px;font-size:5px;color:#64748b;margin-top:2px;justify-content:space-between"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div>';
+};
+
+// T4: 双屏对比
+layouts.split = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var c = catColors[d.cat];
+  var l = d.data.left||{title:'左',items:[]};
+  var r = d.data.right||{title:'右',items:[]};
+  return '<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:3px">'+
+    '<div style="background:'+c.accent+'11;border:1px solid '+c.accent+'33;border-radius:5px;padding:4px;display:flex;flex-direction:column;gap:2px"><div style="font-size:6px;color:'+c.accent+';text-align:center;letter-spacing:1px;text-transform:uppercase">'+l.title+'</div>'+
+    (l.big?'<div style="font-size:'+(big?'18px':'14px')+';font-weight:700;color:'+c.accent+';flex:1;display:flex;align-items:center;justify-content:center">'+l.big+'</div>':'')+
+    (l.items?l.items.map(function(x){return '<div style="display:flex;justify-content:space-between;font-size:'+(big?'7px':'5px')+';padding:1px 3px;background:#00000022;border-radius:2px"><span>'+x.l+'</span><span style="font-weight:600">'+x.v+'</span></div>';}).join(''):'')+
+    '</div>'+
+    '<div style="background:'+C.space.accent+'11;border:1px solid '+C.space.accent+'33;border-radius:5px;padding:4px;display:flex;flex-direction:column;gap:2px"><div style="font-size:6px;color:'+C.space.accent+';text-align:center;letter-spacing:1px;text-transform:uppercase">'+r.title+'</div>'+
+    (r.big?'<div style="font-size:'+(big?'18px':'14px')+';font-weight:700;color:'+C.space.accent+';flex:1;display:flex;align-items:center;justify-content:center">'+r.big+'</div>':'')+
+    (r.items?r.items.map(function(x){return '<div style="display:flex;justify-content:space-between;font-size:'+(big?'7px':'5px')+';padding:1px 3px;background:#00000022;border-radius:2px"><span>'+x.l+'</span><span style="font-weight:600">'+x.v+'</span></div>';}).join(''):'')+
+    '</div>'+
+  '</div><div style="display:flex;gap:4px;font-size:5px;color:#64748b;margin-top:2px;justify-content:space-between"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div>';
+};
+
+// T5: 雷达图 — 多维能力
+layouts.radar = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var c = catColors[d.cat];
+  var dims = d.data.dims||[{l:'维度1',v:80}];
+  var angles = dims.map(function(_,i){return 2*Math.PI*i/dims.length - Math.PI/2;});
+  var cx = 50, cy = 50, r = 35;
+  var path = angles.map(function(a,i){var x=cx+r*dims[i].v/100*Math.cos(a),y=cy+r*dims[i].v/100*Math.sin(a);return (i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);}).join('')+'Z';
+  return '<div style="flex:1;display:flex;align-items:center;justify-content:center;position:relative">'+
+    '<svg viewBox="0 0 100 100" style="width:'+(big?'120px':'80px')+';height:'+(big?'120px':'80px')+'"><polygon points="'+[1,2,3,4,5].map(function(l){var lr=r*l/5;return angles.map(function(a){return (cx+lr*Math.cos(a)).toFixed(1)+','+(cy+lr*Math.sin(a)).toFixed(1);}).join(' ');}).join(' ')+'" fill="none" stroke="#1e293b" stroke-width="0.5"/>'+
+    dims.map(function(d2,i){var a=angles[i];return '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a)).toFixed(1)+'" y2="'+(cy+r*Math.sin(a)).toFixed(1)+'" stroke="#1e293b" stroke-width="0.3"/>';}).join('')+
+    '<path d="'+path+'" fill="'+c.accent+'33" stroke="'+c.accent+'" stroke-width="1"/>'+
+    dims.map(function(d2,i){var a=angles[i];var lx=cx+(r+12)*Math.cos(a),ly=cy+(r+12)*Math.sin(a);return '<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="middle" font-size="4" fill="#94a3b8">'+d2.l+'</text>';}).join('')+
+    '</svg>'+
+    (d.data.center?'<div style="position:absolute;text-align:center"><div style="font-size:'+(big?'14px':'10px')+';font-weight:700;color:'+c.accent+'">'+d.data.center.v+'</div><div style="font-size:5px;color:#64748b">'+d.data.center.l+'</div></div>':'')+
+  '</div><div style="display:flex;gap:4px;font-size:5px;color:#64748b;margin-top:2px;justify-content:space-between"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div>';
+};
+
+// T6: 信息流 — 滚动通知
+layouts.feed = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var c = catColors[d.cat];
+  var feeds = d.data.feeds||[{icon:'ℹ️',txt:'消息'}];
+  return '<div style="display:flex;justify-content:space-between;font-size:6px;color:#64748b;margin-bottom:2px"><span>'+(d.data.header||'')+'</span><span>'+(d.data.subhead||'')+'</span></div>'+
+    '<div style="flex:1;display:flex;flex-direction:column;gap:2px;overflow:hidden">'+
+    feeds.map(function(f,i){return '<div style="display:flex;align-items:center;gap:3px;padding:2px 4px;background:#1e293b;border-radius:3px;font-size:'+(big?'7px':'5px')+';border-left:2px solid '+(f.c||c.accent)+'"><span style="font-size:7px">'+f.icon+'</span><span style="flex:1;color:#e2e8f0">'+f.txt+'</span>'+(f.v?'<span style="color:'+(f.vc||'#64748b')+';font-weight:600;font-size:5px">'+f.v+'</span>':'')+'</div>';}).join('')+
+  '</div><div style="display:flex;gap:4px;font-size:5px;color:#64748b;margin-top:2px;justify-content:space-between"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div>';
+};
+
+// T7: 矩阵/网格
+layouts.matrix = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var c = catColors[d.cat];
+  var cells = d.data.cells||[{v:'--',l:'',s:'empty'}];
+  var cols = d.data.cols||5;
+  return '<div style="display:flex;justify-content:space-between;font-size:6px;color:#64748b;margin-bottom:2px"><span>'+(d.data.header||'')+'</span><span>'+(d.data.subhead||'')+'</span></div>'+
+    '<div style="flex:1;display:grid;grid-template-columns:repeat('+cols+',1fr);gap:2px;align-content:start">'+
+    cells.map(function(c2){return '<div style="aspect-ratio:1;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:'+
+      (c2.s==='occ'?c.accent+'22':c2.s==='alert'?C.sec.accent+'22':c2.s==='eco'?C.eco.accent+'22':c2.s==='clean'?C.eco.accent+'22':'#1e293b')+
+      ';border:1px solid '+(c2.s==='occ'?c.accent+'44':c2.s==='alert'?C.sec.accent+'44':c2.s==='eco'?C.eco.accent+'44':c2.s==='clean'?C.eco.accent+'44':'#334155')+
+      ';font-size:'+(big?'9px':'6px')+';font-weight:600;color:'+(c2.s==='occ'?c.accent:c2.s==='alert'?C.sec.accent:C.eco.accent)+'"><div>'+(c2.v||'')+'</div>'+(c2.l?'<div style="font-size:4px;color:#475569;margin-top:1px">'+c2.l+'</div>':'')+'</div>';}).join('')+
+  '</div><div style="display:flex;gap:4px;font-size:5px;color:#64748b;margin-top:2px;justify-content:space-between"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div>';
+};
+
+// T8: HUD全息
+layouts.hud = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var c = catColors[d.cat];
+  var sz = big?'12px':'8px';
+  var main = d.data.main||{v:'--',l:'',sub:[]};
+  return '<div style="flex:1;display:flex;flex-direction:column;position:relative">'+
+    '<div style="display:flex;justify-content:space-between;font-size:5px;color:'+c.accent+'44;margin-bottom:auto">'+
+    '<span>'+(d.data.header||'')+'</span><span>'+(d.data.subhead||'')+'</span></div>'+
+    '<div style="display:flex;flex:1;gap:3px;align-items:center"><div style="flex:1"><div style="font-size:'+(big?'18px':'14px')+';font-weight:300;text-shadow:"0 0 15px '+c.accent+'44";color:'+c.accent+'">'+main.v+'</div><div style="font-size:6px;color:'+c.accent+'44;text-transform:uppercase;letter-spacing:1px">'+main.l+'</div></div>'+
+    (main.sub?('<div style="width:'+(big?'50%':'40%')+';display:grid;grid-template-columns:1fr 1fr;gap:2px">'+main.sub.map(function(s){return '<div style="background:'+c.accent+'08;border:1px solid '+c.accent+'22;border-radius:3px;padding:3px;text-align:center"><div style="font-size:'+(big?'8px':'6px')+';font-weight:600;color:#94a3b8">'+s.v+'</div><div style="font-size:'+(big?'5px':'3px')+';color:'+c.accent+'44">'+s.l+'</div></div>';}).join('')+'</div>'):'')+
+    '</div><div style="font-size:4px;color:'+c.accent+'44;display:flex;gap:3px;margin-top:auto"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div></div>';
+};
+
+// T9: 图表柱状
+layouts.chart = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var c = catColors[d.cat];
+  var bars = d.data.bars||[{l:'A',v:50}];
+  var maxV = Math.max.apply(null,bars.map(function(b){return b.v;}));
+  return '<div style="display:flex;justify-content:space-between;font-size:6px;color:#64748b;margin-bottom:2px"><span>'+(d.data.header||'')+'</span><span>'+(d.data.subhead||'')+'</span></div>'+
+    '<div style="flex:1;display:flex;align-items:flex-end;gap:4px;padding:'+(big?'0 8px':'0 4px')+'">'+
+    bars.map(function(b,i){var pct = b.v/maxV*100; return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%"><div style="flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end"><div style="width:'+(big?'70%':'60%')+';margin:0 auto;border-radius:3px 3px 0 0;height:'+pct+'%;background:'+(b.c||c.accent)+'55;border:1px solid '+(b.c||c.accent)+'"></div></div><div style="font-size:'+(big?'8px':'6px')+';font-weight:600;margin-top:3px;color:'+(b.c||c.accent)+'">'+b.v+'</div><div style="font-size:'+(big?'5px':'4px')+';color:#64748b">'+b.l+'</div></div>';}).join('')+
+  '</div><div style="display:flex;gap:4px;font-size:5px;color:#64748b;margin-top:2px;justify-content:space-between"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div>';
+};
+
+// T10: 大数全屏
+layouts.hero = function(d,m,big){
+  if(m==='屏保') return ecoScreen(d);
+  var c = catColors[d.cat];
+  var h = d.data.hero||{v:'--',l:'',sub:''};
+  return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative">'+
+    '<div style="font-size:'+(big?'24px':'18px')+';font-weight:100;color:'+c.accent+';text-shadow:0 0 20px '+c.accent+'44">'+h.v+'</div>'+
+    '<div style="font-size:'+(big?'8px':'6px')+';color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:2px">'+h.l+'</div>'+
+    (h.sub?'<div style="font-size:6px;color:#475569;margin-top:5px;display:flex;gap:8px">'+h.sub.map(function(s){return '<span>'+s+'</span>';}).join('')+'</div>':'')+
+    '<div style="position:absolute;bottom:4px;left:6px;right:6px;display:flex;justify-content:space-between;font-size:5px;color:#334155"><span>'+(d.data.footer||'')+'</span><span>'+(d.data.footer2||'')+'</span></div></div>';
+};
+
+function ecoScreen(d){ return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:6px;color:#64748b">⏻ 空间感知 · '+(d.data.ecoLabel||'待机')+'</div><div style="font-size:'+(true?'20px':'14px')+';font-weight:300;color:'+catColors[d.cat].accent+';margin:4px 0">'+(d.data.ecoVal||'--')+'</div><div style="font-size:6px;color:#64748b">'+(d.data.ecoSub||'')+'</div></div>'; }
+
+// ===================================================================
+// 200+ 设计配置
+// ===================================================================
+
+var CAT = {ECO:'eco',SEC:'sec',SPACE:'space',FRONT:'front',BACK:'back',HOME:'home'};
+
+function d(name,cat,tpl,data,story,layout){
+  return {name:name,cat:cat,tpl:tpl,data:data,story:story,layout:layout||''};
+}
+
+// Helper to build different mode variants
+function modes4(base){return base;}
+
+var designs = [];
+
+// ========== 节能感知 (40屏) ==========
+var ecoCat = CAT.ECO;
+designs.push(d('能耗时钟：深睡节能曲线',ecoCat,'chart',{
+  header:'🌙 深睡节能曲线',subhead:'301房',
+  bars:[{l:'21时',v:22,c:'#60a5fa'},{l:'22时',v:24,c:'#60a5fa'},{l:'23时',v:26,c:catColors.eco.accent},{l:'00时',v:26.5,c:catColors.eco.accent},{l:'01时',v:26,c:catColors.eco.accent},{l:'02时',v:25.5,c:catColors.eco.accent},{l:'03时',v:25,c:catColors.eco.accent},{l:'04时',v:24.5,c:'#60a5fa'},{l:'05时',v:24,c:'#60a5fa'},{l:'06时',v:23,c:'#60a5fa'}],
+  footer:'⛰ 深睡段(23:00-02:00)温度+4°C',footer2:'省电 1.4kWh · ¥2.5',
+  ecoLabel:'节能曲线',ecoVal:'1.4kWh',ecoSub:'深睡节能 · 已省¥2.5'
+},'空间感知到客人进入深睡 → 自动缓调温度，展示一整夜的节能曲线'));
+
+designs.push(d('WiFi感知：出门自动节能',ecoCat,'timeline',{
+  header:'📶 WiFi感知 · 出门节能',subhead:'301房',
+  events:[{t:'08:15',txt:'📱 连接WiFi离开区域',c:catColors.space.accent},{t:'08:16',txt:'⚡ 空间确认无人',c:catColors.eco.accent},{t:'08:17',txt:'🌡️ 温度从22°调至26°C',v:'+4°C',c:catColors.eco.accent},{t:'11:05',txt:'📱 WiFi重连 · 客人返回',c:catColors.space.accent},{t:'11:06',txt:'🌡️ 恢复22°C',c:catColors.eco.accent}],
+  footer:'⏱ 外出 2h50m ⛰ 省电 0.9kWh',footer2:'自动识别 · 客人无感',
+  ecoLabel:'WiFi感知',ecoVal:'0.9kWh',ecoSub:'外出节能 · 自动恢复'
+},'空间通过WiFi信号感知到客人离开 → 自动节能 → 感知到回来 → 自动恢复'));
+
+designs.push(d('蓝牙感知：手机靠近自动解节能',ecoCat,'gauge',{
+  header:'🔵 BLE设备感知',subhead:'301房 · 节能状态',
+  gauges:[{v:94,l:'蓝牙信号',c:'#8b5cf6',u:'%'},{v:100,l:'节能激活',c:catColors.eco.accent,u:'%'},{v:26,l:'当前温度',c:'#f59e0b',u:'°C'}],
+  center:{v:'节能中',l:'无人 2h'},
+  footer:'📱 检测设备：iPhone 15 Pro',footer2:'离开时自动升温+4°C',
+  ecoLabel:'蓝牙感知',ecoVal:'2h节能',ecoSub:'已检测到手机离开区域'
+},'空间通过BLE蓝牙信号感知到客人手机不在房间 → 自动节能'));
+
+designs.push(d('温度渐变：深睡/浅睡/清醒三段节能',ecoCat,'chart',{
+  header:'🌡️ 睡眠分段节能',subhead:'301房 · 昨夜',
+  bars:[{l:'浅睡',v:23,c:'#60a5fa'},{l:'深睡',v:26,c:catColors.eco.accent},{l:'浅睡',v:24,c:'#60a5fa'},{l:'REM',v:23.5,c:'#8b5cf6'},{l:'浅睡',v:24,c:'#60a5fa'},{l:'深睡',v:26.5,c:catColors.eco.accent},{l:'浅睡',v:25,c:'#60a5fa'},{l:'清醒',v:22,c:'#f59e0b'}],
+  footer:'深睡段累计节能 1.8kWh',footer2:'客人完全无感 · 睡得更舒服',
+  ecoLabel:'睡眠节能',ecoVal:'1.8kWh',ecoSub:'深睡/浅睡/REM分段调温'
+},'空间通过雷达感知到客人睡眠阶段 → 深睡段最多+4°C，浅睡段+2°C'));
+
+designs.push(d('外出节能报告：完整时间轴',ecoCat,'timeline',{
+  header:'⛰ 外出节能报告',subhead:'今日 · 301房',
+  events:[{t:'08:15',txt:'🔍 雷达检测：无活动',v:'开始',c:catColors.eco.accent},{t:'08:20',txt:'🌡️ 等待期（5min确认）',c:'#64748b'},{t:'08:25',txt:'⚡ 进入外出节能',v:'22°→26°C',c:catColors.eco.accent},{t:'10:30',txt:'🔍 检测到活动（清洁工）',v:'短暂中断',c:'#f59e0b'},{t:'10:35',txt:'⚡ 恢复节能',v:'26°C',c:catColors.eco.accent},{t:'11:05',txt:'🔍 雷达检测：客人回来',v:'退出节能',c:'#60a5fa'},{t:'11:06',txt:'🌡️ 温度恢复22°C',c:catColors.eco.accent}],
+  footer:'⛰ 节能时长 2h30m / 省电 1.1kWh',footer2:'含1次清洁中断',
+  ecoLabel:'外出节能',ecoVal:'1.1kWh',ecoSub:'节能2h30m · ¥1.9'
+},'空间完整记录每一次外出节能的前因后果，连清洁工进入都会标注'));
+
+designs.push(d('省电偏移对比：设定vs实际',ecoCat,'split',{
+  left:{title:'🎯 客人设定',big:'22°C',items:[{l:'入睡偏好',v:'轻度'},{l:'起床时间',v:'07:30'},{l:'温度敏感',v:'高'}]},
+  right:{title:'⚡ 空间优化',big:'24°C',items:[{l:'深睡偏移',v:'+4°C'},{l:'外出偏移',v:'无感'},{l:'省电/天',v:'2.4kWh'}]},
+  footer:'🎯 设定22°C vs 实际运行平均24°C',footer2:'偏移+2°C · 客人完全无感',
+  ecoLabel:'偏移对比',ecoVal:'+2°C',ecoSub:'设定vs实际 · 无感省电'
+},'左右对比：客人设22°C，空间实际运行24°C，中间差就是省电'));
+
+designs.push(d('省电金额：每度电的故事',ecoCat,'hero',{
+  hero:{v:'¥4.2',l:'今日省电金额',sub:['2.4kWh省电','¥1.75/kWh单价','≈一杯咖啡']},
+  footer:'📈 本月累计 ¥86.4',footer2:'📊 同比节省 +23%',
+  ecoLabel:'省电金额',ecoVal:'¥4.2',ecoSub:'今日省电金额'
+},'一个大字：¥4.2。今天省的电值一杯咖啡，老板一看就懂'));
+
+designs.push(d('分钟级节能：每段能耗都记录',ecoCat,'timeline',{
+  header:'⏱ 今日节能 · 分时记录',subhead:'301房',
+  events:[{t:'08:25',txt:'⚡ 外出节能启动',v:'26°C',c:catColors.eco.accent},{t:'09:00',txt:'省电 +0.15kWh',c:catColors.eco.accent},{t:'10:00',txt:'省电 +0.31kWh',c:catColors.eco.accent},{t:'11:05',txt:'客人回来·退出',c:'#60a5fa'},{t:'14:00',txt:'⚡ 午间节能（无人）',v:'26°C',c:catColors.eco.accent},{t:'15:00',txt:'省电 +0.22kWh',c:catColors.eco.accent},{t:'16:30',txt:'⚡ 维修进房·中断',c:'#f59e0b'},{t:'16:35',txt:'⚡ 恢复节能',c:catColors.eco.accent}],
+  footer:'⛰ 累计节能 2.4kWh',footer2:'节能覆盖率 68%',
+  ecoLabel:'分时节能',ecoVal:'2.4kWh',ecoSub:'占今日 68%时间'
+},'空间每一分钟都在计算省了多少电，精确到0.01kWh'));
+
+designs.push(d('节能效率排行榜',ecoCat,'chart',{
+  header:'🏆 楼层节能排行',subhead:'3F · 今日',
+  bars:[{l:'301',v:2.4,c:catColors.eco.accent},{l:'302',v:1.8,c:catColors.eco.accent},{l:'303',v:0.6,c:'#60a5fa'},{l:'304',v:3.2,c:'#22c55e'},{l:'305',v:1.2,c:'#60a5fa'},{l:'306',v:2.1,c:catColors.eco.accent},{l:'307',v:0.3,c:'#ef4444'},{l:'308',v:2.8,c:catColors.eco.accent}],
+  footer:'🏆 304房省电冠军 3.2kWh',footer2:'🔴 307房需优化 0.3kWh',
+  ecoLabel:'节能排行',ecoVal:'304房',ecoSub:'今日省电冠军 3.2kWh'
+},'空间感知 → 节能效率排名，高亮冠军和重点优化对象'));
+
+designs.push(d('客房能耗分布：24小时热力图',ecoCat,'matrix',{
+  header:'🌡️ 24h能耗分布',subhead:'301房',
+  cols:8,cells:[
+    {v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},
+    {v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},
+    {v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'occ'},
+    {v:'',s:'occ'},{v:'',s:'occ'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},{v:'',s:'eco'},
+  ],
+  footer:'🟢 节能时段 18h(75%)',footer2:'🟦 有人时段 6h(25%)',
+  ecoLabel:'能耗热力',ecoVal:'75%',ecoSub:'节能时段占比'
+},'24小时能耗热力图——绿色=节能中，蓝色=有人在，一眼看出空间利用率'));
+
+designs.push(d('深睡/浅睡节能切换',ecoCat,'gauge',{
+  header:'💤 睡眠阶段 · 节能响应',subhead:'今夜 · 301房',
+  gauges:[{v:64,l:'深睡占比',c:catColors.eco.accent,u:'%'},{v:26,l:'睡眠分段',c:'#8b5cf6',u:'°C'},{v:28,l:'浅睡分段',c:'#60a5fa',u:'°C'}],
+  center:{v:'深睡 3h12m',l:'省电 0.9kWh'},
+  footer:'🌙 每90min一个睡眠周期',footer2:'空间自动切换节能深度',
+  ecoLabel:'睡眠节能',ecoVal:'深睡3h12m',ecoSub:'省电0.9kWh · 无感调温'
+},'空间感知到深睡→温度+4°C，感知到浅睡→温度+2°C，精准切换'));
+
+designs.push(d('多人vs单人节能策略差异',ecoCat,'split',{
+  left:{title:'👤 单人 · 301房',big:'26°C',items:[{l:'外出节能',v:'+4°C'},{l:'深睡节能',v:'+4°C'},{l:'日均省电',v:'2.4kWh'}]},
+  right:{title:'👥 双人 · 305房',big:'24°C',items:[{l:'外出节能',v:'+2°C'},{l:'深睡节能',v:'+2°C'},{l:'日均省电',v:'1.1kWh'}]},
+  footer:'空间根据人数智能调整节能策略',footer2:'单人更激进一步节省',
+  ecoLabel:'策略差异',ecoVal:'1 vs 2',ecoSub:'多人策略更温和'
+},'空间感知到1人vs2人→节能策略完全不同，单人更激进'));
+
+designs.push(d('零冷水感知：节能新维度',ecoCat,'timeline',{
+  header:'🚿 零冷水 · 空间感知',subhead:'301房 · 用水分析',
+  events:[{t:'07:35',txt:'🔍 雷达检测：浴室有活动',c:'#60a5fa'},{t:'07:36',txt:'🌡️ 预热循环启动',v:'准备热水',c:catColors.eco.accent},{t:'07:38',txt:'🚿 检测到淋浴开始',c:catColors.eco.accent},{t:'07:38',txt:'💧 减少循环泵能耗',v:'已知有人',c:catColors.eco.accent},{t:'07:50',txt:'🚶 离开浴室',c:catColors.eco.accent},{t:'07:51',txt:'⏹ 关闭循环泵',v:'节能+0.3kWh',c:catColors.eco.accent}],
+  footer:'⛰ 零冷水+空间感知 = 不浪费1度电',footer2:'无泵空转 · 节能 0.3kWh',
+  ecoLabel:'零冷水',ecoVal:'0.3kWh',ecoSub:'预热+空间感知'
+},'空间感知→精准热水循环→不等客人开龙头才出热水，也不空转'));
+
+designs.push(d('每月省电趋势：12月滚动',ecoCat,'chart',{
+  header:'📅 月度省电趋势',subhead:'3F · 2026',
+  bars:[{l:'1月',v:42,c:'#60a5fa'},{l:'2月',v:38,c:'#60a5fa'},{l:'3月',v:55,c:catColors.eco.accent},{l:'4月',v:62,c:catColors.eco.accent},{l:'5月',v:71,c:'#22c55e'},{l:'6月',v:68,c:catColors.eco.accent}],
+  footer:'📈 安装灵犀后省电持续上升',footer2:'5月峰值71kWh · ¥124/月',
+  ecoLabel:'月度趋势',ecoVal:'71kWh',ecoSub:'5月省电峰值'
+},'空间感知的长期价值——每个月省电都在涨'));
+
+designs.push(d('各设备能耗占比',ecoCat,'gauge',{
+  header:'⚡ 能耗占比',subhead:'301房 · 今日',
+  gauges:[{v:62,l:'空调',c:catColors.eco.accent,u:'%'},{v:18,l:'照明',c:'#f59e0b',u:'%'},{v:12,l:'插座',c:'#60a5fa',u:'%'},{v:8,l:'零冷水',c:'#8b5cf6',u:'%'}],
+  center:{v:'2.4kWh',l:'今日总耗'},
+  footer:'🔍 空间感知后空调占比从78%→62%',footer2:'照明节省最明显',
+  ecoLabel:'能耗构成',ecoVal:'2.4kWh',ecoSub:'空调占比62%'
+},'空间感知前后的能耗结构变化，空调占比从78%降到62%'));
+
+designs.push(d('WiFi感知：每格信号的节能贡献',ecoCat,'timeline',{
+  header:'📶 WiFi信号 · 节能决策',subhead:'301房',
+  events:[{t:'08:15',txt:'信号 -72dBm → 判定离开',v:'节能启动',c:catColors.eco.accent},{t:'08:16',txt:'⚡ 温度从22°升至26°C',v:'+4°C',c:catColors.eco.accent},{t:'09:30',txt:'信号 -45dBm → 判定靠近',v:'提前唤醒',c:'#f59e0b'},{t:'09:31',txt:'🌡️ 预降温至23°C',v:'提前准备',c:'#60a5fa'},{t:'11:05',txt:'信号 -38dBm → 已回房',v:'完全恢复',c:catColors.eco.accent}],
+  footer:'WiFi三格信号 = 三种节能策略',footer2:'弱(-70)外出 · 中(-50)预调 · 强(-35)正常',
+  ecoLabel:'WiFi节能',ecoVal:'3级',ecoSub:'信号强度驱动'
+},'WiFi信号越弱→空间判定越确定你走了→节能越激进'));
+
+designs.push(d('节能前后室温对比曲线',ecoCat,'chart',{
+  header:'📊 有vs无灵犀·室温对比',subhead:'模拟数据',
+  bars:[{l:'8时',v:26,c:catColors.eco.accent},{l:'9时',v:26.5,c:catColors.eco.accent},{l:'10时',v:27,c:catColors.eco.accent},{l:'11时',v:22,c:'#60a5fa'},{l:'12时',v:26.5,c:catColors.eco.accent},{l:'13时',v:27,c:catColors.eco.accent},{l:'14时',v:26,c:catColors.eco.accent},{l:'15时',v:27,c:catColors.eco.accent},{l:'16时',v:26.5,c:catColors.eco.accent},{l:'17时',v:22,c:'#60a5fa'}],
+  footer:'🟢 灵犀(智能调温) 🟦 传统(恒温22°C)',footer2:'日均温差+3.5°C · 省电42%',
+  ecoLabel:'对比曲线',ecoVal:'省电42%',ecoSub:'vs传统恒温'
+},'有灵犀的房间平均温度比传统高3.5°C，但客人完全感觉不到'));
+
+designs.push(d('每间房的节能人设',ecoCat,'hero',{
+  hero:{v:'🏆 节能标兵',l:'301房 · 陈先生',sub:['今日省电 2.4kWh','本月累计 47kWh','节能贡献分 92/100']},
+  footer:'💡 "完全没感觉到空调被调过"',footer2:'——来自客人的真实反馈',
+  ecoLabel:'节能标兵',ecoVal:'92分',ecoSub:'301房 · 陈先生'
+},'每间房都有自己的节能人设——荣誉感驱动酒店管理'));
+
+designs.push(d('节能vs舒适平衡',ecoCat,'radar',{
+  header:'⚖️ 节能vs舒适平衡',subhead:'301房 · 今日',
+  dims:[{l:'省电',v:92},{l:'安静',v:85},{l:'舒适度',v:78},{l:'响应',v:95},{l:'满意度',v:88}],
+  center:{v:'88%',l:'综合评分'},
+  footer:'客人满意度不受影响',footer2:'省电和舒适不冲突',
+  ecoLabel:'平衡雷达',ecoVal:'88%',ecoSub:'综合评分'
+},'五维雷达图：省电、安静、舒适度、响应速度、满意度——空间全都要'));
+
+designs.push(d('节能决策树：WiFi也连了/也断了',ecoCat,'gauge',{
+  header:'🌲 空间决策过程',subhead:'实时决策树',
+  gauges:[{v:100,l:'WiFi断开',c:'#ef4444',u:''},{v:100,l:'雷达无活动',c:'#f59e0b',u:''},{v:85,l:'确认无人',c:'#60a5fa',u:'%'},{v:100,l:'执行节能',c:catColors.eco.accent,u:''}],
+  center:{v:'已节能',l:'逻辑链条'},
+  footer:'WiFi断 + 雷达无活动 + BLE无设备 = 确认无人',footer2:'三重确认后才节能',
+  ecoLabel:'决策树',ecoVal:'三重确认',ecoSub:'WiFi+雷达+BLE'
+},'空间怎么决策的？三重感知确认无人后才节能，绝不误判'));
+
+designs.push(d('年化省电：¥4,400投入 vs ¥7.6万/年',ecoCat,'hero',{
+  hero:{v:'¥4.2 → ¥7.6万',l:'每房每天→整栋每年',sub:['50间房 × ¥4.2/天 = ¥210/天','¥210×365 = ¥76,650/年','硬件投入 ¥4,400 / 2个月回本']},
+  footer:'📊 投资回报率 1,742%',footer2:'2025/01-12 真实数据测算',
+  ecoLabel:'ROI',ecoVal:'1742%',ecoSub:'年投资回报率'
+},'这是给老板看的钱——不是功能，是投资回报'));
+
+designs.push(d('突发外出vs计划外出的节能策略',ecoCat,'split',{
+  left:{title:'⚡ 突发外出',big:'3min响应',items:[{l:'策略',v:'激进快速+4°C'},{l:'回温',v:'回到23°C 8min'},{l:'平均时长',v:'1.2h'}]},
+  right:{title:'📋 计划外出',big:'15min预判',items:[{l:'策略',v:'平缓节能+2°C'},{l:'回温',v:'预判提前5min'},{l:'平均时长',v:'3.5h'}]},
+  footer:'空间根据历史数据判断是"取快递"还是"去上班"',footer2:'突发 VS 计划，节能策略不同',
+  ecoLabel:'策略分级',ecoVal:'2种',ecoSub:'突发vs计划'
+},'突发外出（取外卖、倒垃圾）vs 计划外出（上班、旅游），空间策略完全不同'));
+
+designs.push(d('节能+安防融合：安全省电两不误',ecoCat,'feed',{
+  header:'🛡️ 节能 · 安防融合',subhead:'301房',
+  feeds:[{icon:'🔒',txt:'门磁已关闭',v:'安全',c:catColors.eco.accent},{icon:'⚡',txt:'外出节能启动',v:'26°C',c:catColors.eco.accent},{icon:'📶',txt:'WiFi已断开',v:'确认离开',c:'#8b5cf6'},{icon:'🚫',txt:'红外无触发',v:'已安防',c:catColors.sec.accent},{icon:'💤',txt:'深睡节能中',v:'+4°C',c:catColors.eco.accent}],
+  footer:'🟢 安全+节能双重保障',footer2:'离开时自动安防 + 节能启动',
+  ecoLabel:'融合屏',ecoVal:'安全+节能',ecoSub:'双重保障'
+},'一张屏同时展示节能和安防状态——空间做两件事，但不冲突'));
+
+// ========== 安防感知 (35屏) ==========
+var secCat = CAT.SEC;
+
+designs.push(d('门磁状态：24小时开关记录',secCat,'timeline',{
+  header:'🚪 门磁24h记录',subhead:'301房',
+  events:[{t:'07:30',txt:'🚪 开门',v:'客人',c:catColors.sec.accent},{t:'07:31',txt:'🔒 关门',c:catColors.eco.accent},{t:'08:15',txt:'🚪 开门',v:'外出',c:catColors.sec.accent},{t:'08:16',txt:'🔒 关门',c:catColors.eco.accent},{t:'11:05',txt:'🚪 开门',v:'回来',c:catColors.sec.accent},{t:'11:06',txt:'🔒 关门',c:catColors.eco.accent},{t:'14:30',txt:'🚪 开门',v:'清洁',c:'#f59e0b'},{t:'14:35',txt:'🔒 关门',c:catColors.eco.accent}],
+  footer:'今日开合 8次 · 异常 0次',footer2:'🔒 当前状态：已关闭',
+  ecoLabel:'门磁记录',ecoVal:'8次',ecoSub:'今日开合 · 0异常'
+},'空间记录每一次门窗开合——哪个门、谁开的、什么时候开的'));
+
+designs.push(d('空间入侵检测：多传感器融合',secCat,'radar',{
+  header:'🛡️ 入侵检测',subhead:'3F · 实时状态',
+  dims:[{l:'门磁',v:100},{l:'红外',v:100},{l:'雷达',v:100},{l:'震动',v:85},{l:'AI视觉',v:72}],
+  center:{v:'安全',l:'防护等级'},
+  footer:'5重传感器融合 · 误报率 <0.1%',footer2:'异常时3秒内告警',
+  ecoLabel:'入侵检测',ecoVal:'5重',ecoSub:'3秒告警'
+},'5种传感器数据融合判断入侵——单独一个传感器是不会误报的'));
+
+designs.push(d('门窗未关提醒：时间+位置',secCat,'gauge',{
+  header:'🚨 门窗未关',subhead:'302房 · 已开45min',
+  gauges:[{v:45,l:'开启时长',c:catColors.sec.accent,u:'min'},{v:3,l:'报警等级',c:'#f59e0b',u:''},{v:18,l:'其他门窗关',c:catColors.eco.accent,u:'间'}],
+  center:{v:'⏰',l:'提醒中'},
+  footer:'空间感知到门窗长时间未关',footer2:'客人可能忘了',
+  ecoLabel:'门窗提醒',ecoVal:'45min',ecoSub:'开启时长'
+},'空间感知到门窗异常长时间开启→提醒前台联系客人'));
+
+designs.push(d('安防告警历史：按严重程度',secCat,'feed',{
+  header:'🚨 安防告警历史',subhead:'今日',
+  feeds:[{icon:'🔴',txt:'310门未关 · 超30min',v:'紧急',c:catColors.sec.accent},{icon:'🟡',txt:'302雷达信号弱',v:'警告',c:'#f59e0b'},{icon:'🔵',txt:'301门磁自检通过',v:'信息',c:'#60a5fa'},{icon:'🟢',txt:'全楼层烟感检测',v:'正常',c:catColors.eco.accent},{icon:'🔵',txt:'308红外触发 · 已确认',v:'信息',c:'#60a5fa'}],
+  footer:'已处理 3件 · 处理中 1件',footer2:'紧急告警响应 2min',
+  ecoLabel:'告警历史',ecoVal:'5件',ecoSub:'今日告警'
+},'告警分三级：紧急(红)、警告(黄)、信息(蓝)——空间自动分级'));
+
+designs.push(d('在线设备地图：3F房间状态矩阵',secCat,'matrix',{
+  header:'🛡️ 3F安防状态',subhead:'25间房 · 实时',
+  cols:5,cells:[
+    {v:'301',s:'occ',l:''},{v:'302',s:'occ',l:''},{v:'303',s:'clean',l:''},{v:'304',s:'occ',l:''},{v:'305',s:'eco',l:''},
+    {v:'306',s:'eco',l:''},{v:'307',s:'alert',l:''},{v:'308',s:'occ',l:''},{v:'309',s:'occ',l:''},{v:'310',s:'eco',l:''},
+    {v:'311',s:'occ',l:''},{v:'312',s:'clean',l:''},{v:'313',s:'eco',l:''},{v:'314',s:'occ',l:''},{v:'315',s:'eco',l:''},
+    {v:'316',s:'eco',l:''},{v:'317',s:'occ',l:''},{v:'318',s:'eco',l:''},{v:'319',s:'occ',l:''},{v:'320',s:'occ',l:''},
+    {v:'321',s:'clean',l:''},{v:'322',s:'eco',l:''},{v:'323',s:'occ',l:''},{v:'324',s:'eco',l:''},{v:'325',s:'eco',l:''},
+  ],
+  footer:'🟥 告警 1间(307) · 🟩 节能中 9间 · 🟦 有人 10间',footer2:'清 3间 · 空 2间',
+  ecoLabel:'安防矩阵',ecoVal:'25间',ecoSub:'全楼层状态'
+},'整层楼的安防状态一眼看完——红色=告警，蓝色=有人，绿色=节能中'));
+
+designs.push(d('紧急按钮+烟感联动',secCat,'timeline',{
+  header:'🔥 紧急联动 · 事件时间线',subhead:'308房',
+  events:[{t:'14:22',txt:'🚨 烟感触发',v:'火警',c:catColors.sec.accent},{t:'14:22',txt:'📢 消防广播启动',c:catColors.sec.accent},{t:'14:23',txt:'🚪 门磁全部解锁',v:'逃生',c:'#f59e0b'},{t:'14:24',txt:'📱 通知前台+业主',v:'已发送',c:catColors.sec.accent},{t:'14:25',txt:'🚒 消防到场',c:catColors.eco.accent}],
+  footer:'自动联动：烟感+门磁+广播+通知 · <10秒',footer2:'空间知道你在哪 → 精准通知逃生路线',
+  ecoLabel:'联动响应',ecoVal:'<10秒',ecoSub:'烟感→全联动'
+},'烟感一响→空间自动开门磁→放广播→通知前台→通知住客，全自动'));
+
+designs.push(d('夜间安防模式：无人值守',secCat,'gauge',{
+  header:'🌙 夜间安防模式',subhead:'23:00-07:00',
+  gauges:[{v:100,l:'门磁在线',c:catColors.eco.accent,u:'%'},{v:100,l:'红外布防',c:catColors.sec.accent,u:'%'},{v:98,l:'雷达正常',c:'#60a5fa',u:'%'},{v:100,l:'烟感正常',c:catColors.eco.accent,u:'%'}],
+  center:{v:'🛡️',l:'全部正常'},
+  footer:'自动布防 · 无人值守 · 异常即时通知',footer2:'0异常 · 已守护 6h',
+  ecoLabel:'夜间安防',ecoVal:'全部正常',ecoSub:'0异常 · 6h'
+},'夜间自动进入安防模式——空间替你值夜班'));
+
+designs.push(d('进出统计：陌生人识别提示',secCat,'hero',{
+  hero:{v:'12次',l:'今日进出',sub:['客人本人 4次','工作人员 5次','未识别 3次⚠️']},
+  footer:'空间通过人员流动识别陌生人',footer2:'未识别人员需重点关注',
+  ecoLabel:'进出统计',ecoVal:'12次',ecoSub:'含3次未识别'
+},'空间不仅知道进出了几次，还知道是谁——陌生人标记'));
+
+designs.push(d('安防事件实时信息流',secCat,'feed',{
+  header:'📡 安防实时事件流',subhead:'3F',
+  feeds:[{icon:'🔒',txt:'302房门关闭',v:'正常',c:catColors.eco.accent},{icon:'🚶',txt:'308红外触发',v:'已确认',c:'#60a5fa'},{icon:'⚡',txt:'310门长时间未关',v:'45min',c:'#f59e0b'},{icon:'🔋',txt:'307门磁电池低',v:'18%',c:'#f59e0b'},{icon:'✅',txt:'全楼烟感自检通过',v:'正常',c:catColors.eco.accent}],
+  footer:'实时滚动 · 异常自动置顶',footer2:'0条未处理告警',
+  ecoLabel:'实时事件',ecoVal:'5条',ecoSub:'实时安防事件'
+},'实时滚动的安防信息流——异常自动置顶，一目了然'));
+
+designs.push(d('楼层轮廓：安防总览',secCat,'hero',{
+  hero:{v:'🛡️ 全楼安全',l:'3F · 25间 · 0异常',sub:['门磁 ✅ 全部在线','红外 ✅ 全部正常','雷达 ✅ 全部在线','烟感 ✅ 自检通过']},
+  footer:'最后扫描 2s前 · 守护时间 3d2h',footer2:'无异常 · 安心',
+  ecoLabel:'全楼安全',ecoVal:'全部正常',ecoSub:'0异常·3d2h'
+},'给老板看的全楼安防总览——一张屏知道整栋楼安不安全'));
+
+// ========== 空间感知 (45屏) ==========
+var spCat = CAT.SPACE;
+
+designs.push(d('人员检测：1人/2人/无人的空间响应',spCat,'gauge',{
+  header:'👤 人员检测 · 空间响应',subhead:'301房 · 实时',
+  gauges:[{v:1,l:'当前人数',c:'#8b5cf6',u:''},{v:22,l:'温度设定',c:'#60a5fa',u:'°C'},{v:68,l:'节能模式',c:catColors.eco.accent,u:'%'}],
+  center:{v:'有人',l:'空间响应：正常模式'},
+  footer:'空间根据人数切换策略：0人=节能 · 1人=正常 · 2人=舒适优先',footer2:'当前1人 → 正常模式',
+  ecoLabel:'人员检测',ecoVal:'1人',ecoSub:'正常模式'
+},'空间感知到几个人→自动切换模式。1人模式、2人模式、无人模式完全不同'));
+
+designs.push(d('分区感知：卧室/浴室/客厅',spCat,'split',{
+  left:{title:'🛏️ 卧室',big:'有人',items:[{l:'雷达',v:'检测到呼吸'},{l:'活动',v:'低 · 可能是浅睡'},{l:'温度',v:'22°C'}]},
+  right:{title:'🚿 浴室',big:'无人',items:[{l:'红外',v:'无触发'},{l:'湿度',v:'58%'},{l:'门磁',v:'关闭'}]},
+  footer:'空间知道你在卧室还是浴室——分区感知的精度',footer2:'浴室无人→可适当节能',
+  ecoLabel:'分区感知',ecoVal:'卧室有人',ecoSub:'浴室无人·节能中'
+},'空间精确到知道你在房间哪个区域——卧室有人，浴室无人'));
+
+designs.push(d('活动强度：休息/活动/剧烈',spCat,'gauge',{
+  header:'🏃 活动强度检测',subhead:'301房 · 实时',
+  gauges:[{v:32,l:'活动水平',c:'#8b5cf6',u:'%'},{v:42,l:'心率推测',c:'#60a5fa',u:'bpm'},{v:22,l:'体温推测',c:'#f59e0b',u:'°C'}],
+  center:{v:'🛋️',l:'休息中 · 低活动'},
+  footer:'空间通过雷达波动分析活动强度',footer2:'休息 → 节能空间 → 无干扰',
+  ecoLabel:'活动强度',ecoVal:'休息中',ecoSub:'低活动 · 节能空间'
+},'空间感知活动强度——坐着=休息，走动=正常，运动=需要降温'));
+
+designs.push(d('WiFi+蓝牙+雷达三重定位',spCat,'radar',{
+  header:'📡 三重定位精度',subhead:'301房',
+  dims:[{l:'WiFi',v:85},{l:'蓝牙',v:72},{l:'雷达',v:95},{l:'融合',v:96},{l:'覆盖',v:98}],
+  center:{v:'96%',l:'融合精度'},
+  footer:'单一定位都有死角，三重融合=全覆盖',footer2:'死角互补 · 精度96%',
+  ecoLabel:'三重定位',ecoVal:'96%',ecoSub:'WiFi+蓝牙+雷达'
+},'任何单一传感器都有盲区——三重融合才是空间感知的核心能力'));
+
+designs.push(d('空间到人距离：3D感知',spCat,'chart',{
+  header:'📏 空间→人 距离',subhead:'实时 · 301房',
+  bars:[{l:'雷达',v:3.2,c:'#8b5cf6'},{l:'WiFi',v:4.5,c:'#60a5fa'},{l:'蓝牙',v:2.8,c:catColors.eco.accent},{l:'融合',v:2.8,c:'#22c55e'}],
+  footer:'📡 融合精度 ±0.3m · 可定位到具体家具',footer2:'人在床附近',
+  ecoLabel:'3D定位',ecoVal:'±0.3m',ecoSub:'融合定位精度'
+},'空间精确到知道你在房间的哪个位置——不止在房间，而且在床边'));
+
+designs.push(d('客人活动时间线：全天轨迹',spCat,'timeline',{
+  header:'👣 今日活动轨迹',subhead:'301房',
+  events:[{t:'07:30',txt:'🛏️ 起床 · 卧室检测到活动',c:'#60a5fa'},{t:'07:35',txt:'🚶 进入浴室 · 红外触发',c:'#8b5cf6'},{t:'08:00',txt:'🍳 客厅活动',c:'#60a5fa'},{t:'08:15',txt:'🚪 离开房间',v:'WiFi断开',c:catColors.space.accent},{t:'11:05',txt:'🚪 回到房间',v:'WiFi重连',c:catColors.space.accent},{t:'11:10',txt:'🛋️ 休息',c:'#60a5fa'},{t:'21:00',txt:'🛏️ 上床准备睡',c:'#8b5cf6'},{t:'23:00',txt:'💤 进入深睡',v:'雷达低活动',c:catColors.eco.accent}],
+  footer:'空间完整记录你在哪个区域、做了什么',footer2:'精度 3min以内',
+  ecoLabel:'活动轨迹',ecoVal:'8个节点',ecoSub:'全天活动'
+},'空间把你的一天完整回溯——起床→洗澡→出门→回来→睡觉，全知道'));
+
+designs.push(d('单人vs双人活动差异',spCat,'split',{
+  left:{title:'👤 单人',big:'',items:[{l:'活动范围',v:'2个区域'},{l:'外出时长/天',v:'8h'},{l:'能耗/天',v:'3.2kWh'},{l:'节能贡献',v:'高'}]},
+  right:{title:'👥 双人',big:'',items:[{l:'活动范围',v:'3个区域'},{l:'外出时长/天',v:'4h'},{l:'能耗/天',v:'5.1kWh'},{l:'节能贡献',v:'中'}]},
+  footer:'空间自动识别单人/双人 → 策略自适应',footer2:'单人更节能，双人更舒适',
+  ecoLabel:'单人vs双人',ecoVal:'2种模式',ecoSub:'空间策略不同'
+},'空间知道是一个人还是两个人——单人房间就一个活动点，双人房间两个'));
+
+designs.push(d('异常活动检测：深夜活动告警',spCat,'feed',{
+  header:'🌙 深夜活动告警',subhead:'02:15 · 301房',
+  feeds:[{icon:'🚶',txt:'雷达检测到异常活动',v:'02:15',c:'#f59e0b'},{icon:'💡',txt:'灯光未开',v:'可能起夜',c:'#60a5fa'},{icon:'🚪',txt:'房门未开启',v:'不出门',c:catColors.eco.accent},{icon:'✅',txt:'5min后回到床上',v:'正常起夜',c:catColors.eco.accent}],
+  footer:'空间判断：正常起夜 · 无需干预',footer2:'如果超过15min会通知前台',
+  ecoLabel:'异常检测',ecoVal:'起夜',ecoSub:'深夜活动 · 正常'
+},'深夜检测到活动——空间判断是起夜上厕所还是异常行为'));
+
+designs.push(d('空间占用热图：24h分布',spCat,'matrix',{
+  header:'🗺️ 24h空间占用',subhead:'301房 · 各区域',
+  cols:6,cells:[
+    {v:'🔴',s:'occ',l:'床'},{v:'🔴',s:'occ',l:'床'},{v:'🟡',s:'alert',l:'浴室'},{v:'🟡',s:'alert',l:'浴室'},{v:'🟢',s:'eco',l:'客厅'},{v:'🟢',s:'eco',l:'客厅'},
+    {v:'🔴',s:'occ',l:'床'},{v:'🔴',s:'occ',l:'床'},{v:'',s:'empty',l:''},{v:'',s:'empty',l:''},{v:'🟢',s:'eco',l:'客厅'},{v:'🟢',s:'eco',l:'客厅'},
+    {v:'',s:'empty',l:''},{v:'',s:'empty',l:''},{v:'🟡',s:'alert',l:'浴室'},{v:'🟡',s:'alert',l:'浴室'},{v:'',s:'empty',l:''},{v:'',s:'empty',l:''},
+    {v:'🔴',s:'occ',l:'床'},{v:'🔴',s:'occ',l:'床'},{v:'',s:'empty',l:''},{v:'',s:'empty',l:''},{v:'',s:'empty',l:''},{v:'',s:'empty',l:''},
+  ],
+  footer:'🔴 卧室占用 60%  🟡 浴室占用 25%  🟢 客厅占用 15%',footer2:'最常活动区域：床',
+  ecoLabel:'空间热图',ecoVal:'60%-25%-15%',ecoSub:'床>浴室>客厅'
+},'24小时空间占用热图——卧室占60%时间，浴室25%，客厅15%'));
+
+designs.push(d('客人离开时长预测',spCat,'hero',{
+  hero:{v:'⏰ 短期外出',l:'预计 1-2h 回来',sub:['基于历史数据：工作日外出的平均时长','本周已出现 2次类似离开','WiFi已断开 · 门已关']},
+  footer:'空间通过学习客人习惯预测返回时间',footer2:'准确率 82%',
+  ecoLabel:'离开预测',ecoVal:'1-2h',ecoSub:'基于历史学习'
+},'空间知道你是去上班还是去取外卖——基于每次外出的时长学习'));
+
+designs.push(d('设备信号覆盖率：没有盲区',spCat,'radar',{
+  header:'📶 信号覆盖率',subhead:'301房',
+  dims:[{l:'WiFi',v:92},{l:'BLE',v:78},{l:'雷达',v:98},{l:'红外',v:65},{l:'门磁',v:100}],
+  center:{v:'全覆盖',l:'无盲区'},
+  footer:'空间每个位置都有至少3种传感器覆盖',footer2:'浴室信号稍弱 · 已补强',
+  ecoLabel:'信号覆盖',ecoVal:'全覆盖',ecoSub:'3种传感器/位置'
+},'空间里任何一个点都有至少3种感知手段覆盖——没有盲区'));
+
+designs.push(d('空间响应速度：感知→决策→执行',spCat,'feed',{
+  header:'⚡ 空间响应速度',subhead:'301房 · 实时',
+  feeds:[{icon:'📶',txt:'WiFi断开 → 判定离开',v:'0.5s',c:catColors.eco.accent},{icon:'🤖',txt:'执行节能决策',v:'1.2s',c:catColors.eco.accent},{icon:'🌡️',txt:'空调调温开始',v:'3.0s',c:'#60a5fa'},{icon:'🔒',txt:'门磁关闭记录',v:'即时',c:'#8b5cf6'},{icon:'📱',txt:'通知前台',v:'0.8s',c:'#f59e0b'}],
+  footer:'感知→决策→执行，平均 <5秒',footer2:'空间响应速度比人快100倍',
+  ecoLabel:'响应速度',ecoVal:'<5秒',ecoSub:'感知→决策→执行'
+},'从感知到决策到执行，平均不到5秒。空间比人快100倍'));
+
+designs.push(d('多人场景：区分不同人',spCat,'gauge',{
+  header:'👥 多人场景识别',subhead:'305房 · 双人入住',
+  gauges:[{v:2,l:'检测人数',c:'#8b5cf6',u:''},{v:1,l:'主客',c:'#60a5fa',u:''},{v:1,l:'同伴',c:'#f59e0b',u:''}],
+  center:{v:'双人模式',l:'舒适优先'},
+  footer:'空间通过不同信号区分不同人',footer2:'主客 vs 同伴 · 偏好不同',
+  ecoLabel:'多人识别',ecoVal:'2人',ecoSub:'双人·舒适优先'
+},'空间能区分两个人——主客和同伴，偏好甚至可以不同'));
+
+// ========== 前台运营 (30屏) ==========
+var frCat = CAT.FRONT;
+
+designs.push(d('入住/退房看板：实时房态',frCat,'matrix',{
+  header:'🏨 前台 · 房态看板',subhead:'3F · 25间',
+  cols:5,cells:[
+    {v:'301',s:'occ'},{v:'302',s:'occ'},{v:'303',s:'clean'},{v:'304',s:'occ'},{v:'305',s:'occ'},
+    {v:'306',s:'clean'},{v:'307',s:'alert'},{v:'308',s:'occ'},{v:'309',s:'occ'},{v:'310',s:'eco'},
+    {v:'311',s:'occ'},{v:'312',s:'clean'},{v:'313',s:'clean'},{v:'314',s:'occ'},{v:'315',s:'eco'},
+    {v:'316',s:'eco'},{v:'317',s:'occ'},{v:'318',s:'eco'},{v:'319',s:'occ'},{v:'320',s:'occ'},
+    {v:'321',s:'clean'},{v:'322',s:'eco'},{v:'323',s:'occ'},{v:'324',s:'occ'},{v:'325',s:'clean'},
+  ],
+  footer:'入住 14间 · 空房 3间 · 清洁 5间 · 维修 1间 · 告警 1间(307)',footer2:'预抵 8单 · 预离 5单 · VIP 4间',
+  ecoLabel:'房态看板',ecoVal:'14/25',ecoSub:'入住率 56%'
+},'前台一打开就看到整层楼的房间状态——彩色格子一目了然'));
+
+designs.push(d('VIP客人到店预警',frCat,'feed',{
+  header:'⭐ VIP到店预警',subhead:'今日 · 4位VIP',
+  feeds:[{icon:'👑',txt:'王先生 · 金卡 · 偏好20°C · 高隐私',v:'预计14:00',c:'#f59e0b'},{icon:'👑',txt:'李女士 · 钻石卡 · 偏好25°C · 欢迎水果',v:'已入住301',c:catColors.eco.accent},{icon:'👑',txt:'张总 · 黑卡 · 高层互访需陪同',v:'预计17:30',c:catColors.sec.accent},{icon:'👑',txt:'陈经理 · 银卡 · 团队客户',v:'预计19:00',c:'#60a5fa'}],
+  footer:'基于历史入住习惯提前1h预警',footer2:'空间已自动准备偏好温度',
+  ecoLabel:'VIP预警',ecoVal:'4位VIP',ecoSub:'提前准备偏好'
+},'VIP客人还没到，空间就已经准备好他/她偏好的温度和服务'));
+
+designs.push(d('清洁工单：空间确认已完成',frCat,'timeline',{
+  header:'🧹 清洁状态 · 空间确认',subhead:'3F',
+  events:[{t:'09:15',txt:'🧹 303分配清洁',v:'待执行',c:'#f59e0b'},{t:'09:30',txt:'🔍 空间检测到有人进入',v:'清洁工已到',c:'#60a5fa'},{t:'09:42',txt:'🔍 空间检测到吸尘器震动',v:'工作中',c:catColors.eco.accent},{t:'10:00',txt:'🔍 空间检测到人离开+无活动',v:'清洁完成 ✅',c:catColors.eco.accent}],
+  footer:'空间自动确认清洁完成——不需要人工扫码',footer2:'平均清洁时间 28min',
+  ecoLabel:'清洁确认',ecoVal:'空间确认',ecoSub:'不需要人工扫码'
+},'清洁工进出房间、工作痕迹——空间全知道。清洁做完了不需要扫码确认'));
+
+designs.push(d('前台一站式：客人信息速查',frCat,'hero',{
+  hero:{v:'301 · 陈先生',l:'入住第3天 · 商务出差',sub:['偏好温度 22°C · 节能贡献 A级','夜间需要安静 · 不打扰模式','已入住 8次 · 酒店常客']},
+  footer:'🛎️ 服务记录：打扫1次 · 矿泉水2瓶 · 无投诉',footer2:'空间推荐：客人今晚可能需要加床被子',
+  ecoLabel:'客人速查',ecoVal:'陈先生',ecoSub:'入住第3天'
+},'前台接待一键看到客人全部画像——空间知道的比客人自己还多'));
+
+// ========== 后台管理 (25屏) ==========
+var bkCat = CAT.BACK;
+
+designs.push(d('能耗总览看板：整栋楼',bkCat,'chart',{
+  header:'📊 整栋能耗总览',subhead:'3F · 今日',
+  bars:[{l:'1F',v:18,c:'#60a5fa'},{l:'2F',v:22,c:'#60a5fa'},{l:'3F',v:24,c:catColors.eco.accent},{l:'4F',v:16,c:catColors.eco.accent},{l:'5F',v:20,c:'#60a5fa'}],
+  footer:'总耗 100kWh · 省电 22kWh(22%)',footer2:'🏆 4F节能最佳 · 需要优化 2F',
+  ecoLabel:'能耗总览',ecoVal:'100kWh',ecoSub:'省电22%'
+},'后台看整栋楼的能耗——哪个楼层最节能、哪个需要优化，一目了然'));
+
+designs.push(d('设备管理：所有传感器在线状态',bkCat,'gauge',{
+  header:'⚙️ 设备管理',subhead:'全部设备',
+  gauges:[{v:96,l:'在线率',c:catColors.eco.accent,u:'%'},{v:125,l:'总设备',c:'#60a5fa',u:''},{v:5,l:'离线',c:catColors.sec.accent,u:''}],
+  center:{v:'125台',l:'已接入'},
+  footer:'固件版本 v0310A · 最后心跳 2s前',footer2:'5台离线设备需关注',
+  ecoLabel:'设备管理',ecoVal:'96%',ecoSub:'125台设备'
+},'后台看到所有感知设备的健康状态——空间离不开这些感知节点'));
+
+designs.push(d('节能ROI仪表盘：投入vs回报',bkCat,'hero',{
+  hero:{v:'¥7.6万/年',l:'50间房省电收益',sub:['硬件投入 ¥4,400 → 2个月回本','年化ROI 1,742%','设备寿命 5年 → 总省电 ¥38万']},
+  footer:'📈 投入产出比 1:17',footer2:'老板最想看到的数字',
+  ecoLabel:'ROI仪表盘',ecoVal:'¥7.6万',ecoSub:'年省电收益'
+},'给老板看的核心数字——投入4,400，年省7.6万，2个月回本'));
+
+// ========== 智能家居 (30屏) ==========
+var hmCat = CAT.HOME;
+
+designs.push(d('离家模式：一键全关闭',hmCat,'gauge',{
+  header:'🏠 离家模式',subhead:'已启动',
+  gauges:[{v:100,l:'空调关闭',c:'#f472b6',u:''},{v:100,l:'灯光关闭',c:'#f59e0b',u:''},{v:100,l:'安防布防',c:catColors.eco.accent,u:''},{v:0,l:'能耗',c:'#60a5fa',u:'%'}],
+  center:{v:'🏃',l:'一路平安'},
+  footer:'空间感知到出门 → 自动进入离家模式',footer2:'回家时自动恢复',
+  ecoLabel:'离家模式',ecoVal:'全部关闭',ecoSub:'一键省电+安防'
+},'出门动作→空间感知到→自动关空调关灯布安防'));
+
+designs.push(d('回家模式：空间唤醒',hmCat,'feed',{
+  header:'🏠 回家模式',subhead:'检测到靠近家',
+  feeds:[{icon:'📱',txt:'蓝牙检测：手机靠近',v:'50m',c:'#8b5cf6'},{icon:'📶',txt:'WiFi重连',v:'已连',c:'#60a5fa'},{icon:'🌡️',txt:'空调提前开启 → 预冷至25°C',v:'已启动',c:catColors.eco.accent},{icon:'💡',txt:'玄关灯亮',v:'迎宾',c:'#f59e0b'}],
+  footer:'空间提前5分钟感知到你要回来',footer2:'进门就是舒适温度',
+  ecoLabel:'回家模式',ecoVal:'已准备',ecoSub:'预冷+亮灯'
+},'蓝牙感知到你靠近→WiFi重连→提前开空调、亮玄关灯——回家就是最舒服的'));
+
+designs.push(d('睡眠模式：夜间空间守护',hmCat,'timeline',{
+  header:'🌙 睡眠模式',subhead:'今夜 · 守护中',
+  events:[{t:'21:00',txt:'🛏️ 上床 · 雷达检测到',c:'#8b5cf6'},{t:'21:05',txt:'💡 全屋关灯',c:catColors.eco.accent},{t:'21:30',txt:'🌡️ 进入睡眠温度 24°C',c:catColors.eco.accent},{t:'23:00',txt:'💤 深睡 · 温度+4°C',c:'#60a5fa'},{t:'02:15',txt:'🚶 检测到起夜 · 夜灯自动亮',c:'#f59e0b'},{t:'02:18',txt:'🛏️ 回到床上 · 夜灯关闭',c:catColors.eco.accent}],
+  footer:'🌙 空间整夜守护 —— 你睡你的，空间管一切',footer2:'起夜自动夜灯 · 深睡自动调温',
+  ecoLabel:'睡眠模式',ecoVal:'整夜守护',ecoSub:'深睡调温+夜灯'
+},'躺下→关灯→调温→深睡→起夜夜灯→回归→继续守护——空间一夜不睡'));
+
+designs.push(d('场景一键切换：家模式总控',hmCat,'hero',{
+  hero:{v:'🏠 一键场景',l:'离家 · 回家 · 睡眠 · 起床 · 影院',sub:['离家 → 所有关闭 + 安防布防','回家 → 空调+灯光 + 氛围','睡眠 → 关闭+调温+夜灯']},
+  footer:'空间感知到你的行为→自动切换场景',footer2:'不需要手动操作',
+  ecoLabel:'场景总控',ecoVal:'5种',ecoSub:'一键切换'
+},'五个人机交互场景——空间感知到你在做什么→自动切到最合适的模式'));
+
+// ========== 大规模生成 → 补齐200+设计 ==========
+(function fill() {
+  var layoutTypes = ['masonry','timeline','gauge','split','radar','feed','matrix','hud','chart','hero'];
+  var catList = ['eco','eco','eco','sec','sec','space','space','front','back','home'];
+
+  // 节能补充 (20屏)
+  var ecoMore = [
+    ['能耗仪表盘：完整概览','gauge','今日省电 2.4kWh / 节能时长 3h12m / 省电金额 ¥4.2','⚡ 本月累计 ¥86.4 · 节能率 23%','今天2.4度电=¥4.2=半杯咖啡，每天如此，一年就是¥1,512'],
+    ['节能效率：每平米省电量','split','0.08 kWh/m² vs 同层0.05，301是整层最节能的房间','🏆 节能效率高出60%','面积0.08度电/m²——空间感知让每平米都在省电'],
+    ['空调使用模式分析','chart','8时26°→10时26.5°→12时22°→14时27°→16时26.5°→18时22°','🟢 节能68%  🟦 有人32%','空间什么时候节能、什么时候有人——一目了然的温度曲线'],
+    ['节能周期：日/周/月/年','hero','¥4.2/天 → ¥29.4/周 → ¥126/月 → ¥1,512/年','📈 省电效果随时间累加','把一天放大到一年——2.4kWh/天 × 365 = 864kWh = ¥1,512'],
+    ['PMS对接：灵犀检测vs酒店登记','split','灵犀: 11:05到房 / 雷达+WiFi / 98%置信 | PMS: 14:00登记 / 前台录入','✅ 一致 时间差 2h55m','客人11:05就回房，系统立刻知道，PMS到14:00才登记——灵犀快3小时'],
+    ['空调预冷：提前15min降温','timeline','14:50 蓝牙检测靠近 / 14:55 预冷启动 / 15:05 客人进门已舒适','提前预冷 · 温差已缩小','空间提前感知到你要回来→提前把空调开好，进门就是舒适的'],
+    ['节能敏感度：静默模式开启','gauge','雷达检测有客人在 → 节能暂停 / 雷达无活动 → 节能恢复','客人静坐也不误判','空间知道你在安静地坐着，不会因为你不活动就误判为无人'],
+    ['照明节能：光感+人员双控','feed','光照充足 → 自动关灯 / 人员离开 → 关灯 / 有人+暗 → 开灯','照明能耗下降35%','空间感知到光+人→精准控制灯光，白天够亮就不开灯'],
+    ['窗帘节能：温度+日照联动','matrix','日照强烈时自动关窗帘 / 温度达标时开窗帘自然光','窗帘联动节能12%','空间感知到温度过高→关窗帘/温度合适→开窗帘用自然光'],
+    ['深夜节能后回温曲线','chart','04:00 26.5°(深睡) → 05:00 25° → 06:00 24° → 07:00 22°','🌅 起床前自动调回设定温度','空间在你醒之前1小时开始缓慢回温——你醒时刚好是22°C'],
+    ['冷热分区：床侧vs窗侧温控','split','床侧22°C(人附近) vs 窗侧26°C(无人区) 温差4°C','仅人所在区域精准控温','空间知道你在床上→只控床侧温度，窗侧不浪费空调'],
+    ['早出晚归型节能模式','hero','🕐 外出 8h → 节能 8h12m → 省电 2.8kWh','📊 典型上班族·节能效率最高','住客每天8点出门、20点回来——空间把所有白天空闲时间都用来节能'],
+    ['长住客vs短住客节能策略','split','长住客: 3天学习偏好 → 节能+23% / 短住客: 统一策略 → 节能+15%','空间越了解你，越节能','空间住得越久越节能——3天学习完偏好后省电效率提升'],
+    ['CO₂+人员联动新风控制','feed','CO₂>800ppm+有人 → 新风开 / CO₂<600ppm → 新风停','⚡ 新风节能40%','空间知道房间里有人+CO₂高了才开新风——不空转'],
+    ['次卧/客厅分时节能','timeline','08:00 主卧人出 → 客厅节能 / 21:00 进卧室 → 客厅节能更深入','客厅无人时全节能','2室1厅公寓——空间感知到你在哪个房间，另一个房间就节能'],
+    ['节能数据对比：有灵犀vs没有','chart','安装前日均4.2kWh / 安装后日均3.0kWh / 下降29%','📉 从4.2降到3.0，省了1.2kWh/天','装了灵犀后这间房每天少用1.2度电——一个月就是36度'],
+    ['OTA固件升级后节能提升','gauge','升级前: 节能时长45% / 升级后: 节能时长68%','版本 v0307B → v0310A +23%','每次OTA升级，节能效率都在提升——空间在持续变聪明'],
+    ['节能故障：门磁失效的代价','timeline','08:00 门磁失效 → 空间盲区 → 09:00 清洁进房 → 误判为客人','🔴 门磁失效期间节能暂停 45min','任何一个传感器失效都会影响空间决策——门磁坏了，节能就会出错'],
+    ['地暖节能：冬季空间感知','hero','❄️ 冬季模式 / 有人区域22°C / 无人区域18°C / 节能4°C','🔥 地暖能耗降低31%','冬天你知道的空间不止知道——有人区22°C，无人区18°C，差=省电'],
+    ['综合节能得分：每日评分','radar','省电95 / 舒适88 / 响应92 / 安静85 / 稳定90','今日综合评分 90分 · A级','今天空间给自己打了个分——省电95分、舒适88分，A级评价'],
+  ];
+  ecoMore.forEach(function(a,i){ var t=a[1],data={header:a[0],footer:a[3]||'',footer2:''}; if(t==='hero'){var hv=a[2].split('/')[0];data.hero={v:hv,l:a[0].split('：')[1]||'',sub:a[2].split('/').slice(1)};}else if(t==='split'){var sp=a[2].split('/');data.left={title:'左',big:sp[0]};data.right={title:'右',big:sp[1]};}else if(t==='chart'||t==='timeline'){data.bars=[{l:'1',v:50}];data.events=[{t:'00:00',txt:a[2].substring(0,30),c:catColors.eco.accent}];}else if(t==='gauge'){data.gauges=[{v:85,l:'节能效率',c:catColors.eco.accent,u:'%'}];data.center={v:a[2].split('/')[0],l:''};}else if(t==='radar'){data.dims=[{l:'省电',v:92},{l:'舒适',v:88},{l:'响应',v:92}];data.center={v:'90',l:'综合'};}else if(t==='feed'){data.feeds=[{icon:'⚡',txt:a[2].substring(0,30),c:catColors.eco.accent}];} data.ecoLabel=''+a[0],data.ecoVal='',data.ecoSub=''; designs.push(d(a[0],'eco',t,data,a[4]||'')); });
+
+  // 安防补充 (30屏)
+  for(var i=0;i<30;i++){
+    var secNames=['门磁自检报告','红外布防状态','雷达监控区域','烟感联动测试','紧急按钮检测','消防通道监控','电梯安防联动','停车场监控','周界告警提醒','移动侦测记录','智能门锁日志','访客记录分析','门禁开合统计','监控摄像头状态','智能猫眼记录','门窗传感器自检','漏水检测预警','燃气泄漏检测','震动传感器报告','报警器联动测试','安防日志审计','安保巡逻记录','异常登录检测','设备防拆告警','AI视觉分析告警','无感布防撤防','安防规则引擎','多传感器融合报警','安全等级评估','全楼安全巡检'],
+      secStories=['空间每24h自检一次所有门磁——哪个电池低了知道','红外探头覆盖每个房间——有人经过就知道','雷达扫描区域——角落也不放过','烟感和消防联动——空间会自己报警','每个房间的紧急按钮——按了就知道了','通道有东西阻挡→空间知道','电梯故障→空间联动救援','停车场夜间的每个动静','周界有人越过→空间看得到','移动的才是活的','门锁开关记录——谁进了哪间房','访客停留多长时间','今天几个门开了关了','摄像头都在正常看吗','门外谁来过','窗户关了没','漏水了空间第一个知道','燃气泄漏→关门+通风','墙上震动→空间感受到','所有报警器一键测试','安防日志——空间从来不删','保安巡逻到每个点了没','有人半夜登录后台','设备被拆了→空间知道','AI看监控——异常报警','人进来自动布防，人走自动撤防','规则引擎——空间按规则报警','3个传感器同时触发才报警','房间安全评分——满分多少','整栋楼安全巡检报告'],
+      secLayouts=['timeline','gauge','radar','feed','hero','matrix','masonry','chart','hud','split'];
+    var t=secLayouts[i%secLayouts.length], data={header:secNames[i],footer:'空间感知安全价值',footer2:''};
+    if(t==='hero'){data.hero={v:'🛡️',l:secNames[i],sub:[secStories[i]]};}
+    else if(t==='gauge'){data.gauges=[{v:100-i*2,l:secNames[i].substring(0,6),c:i<10?catColors.eco.accent:i<20?'#f59e0b':catColors.sec.accent,u:'%'}];data.center={v:i<10?'安全':i<20?'关注':'警告',l:''};}
+    else if(t==='split'){data.left={title:'今日',items:[{l:'正常',v:'24/7'}]};data.right={title:'异常',items:[{l:secNames[i],v:'0'}]};}
+    else if(t==='radar'){data.dims=[{l:'检测',v:98-i},{l:'响应',v:95-i},{l:'准确',v:99-i}];data.center={v:'安全',l:''};}
+    else if(t==='feed'){data.feeds=[{icon:'🛡️',txt:secNames[i],c:catColors.eco.accent},{icon:'✅',txt:'运行正常',c:catColors.eco.accent}];}
+    else if(t==='matrix'){data.cells=[{v:'✅',s:'occ'},{v:'✅',s:'eco'},{v:'✅',s:'eco'},{v:'⚠️',s:'alert'}];data.cols=4;}
+    else if(t==='timeline'){data.events=[{t:'00:00',txt:secNames[i],c:catColors.eco.accent},{t:'24:00',txt:'全部正常',c:catColors.eco.accent}];}
+    else if(t==='chart'){data.bars=[{l:secNames[i].substring(0,3),v:95-i,c:catColors.eco.accent},{l:'异常',v:5,c:catColors.sec.accent}];}
+    designs.push(d(secNames[i],'sec',t,data,secStories[i]));
+  }
+
+  // 空间感知补充 (40屏)
+  var spaceNames = ['雷达精度校准','WiFi定位测试','蓝牙三角定位','融合定位报告','区域识别精度','人员计数校准','活动强度分级','睡眠阶段分析','起夜检测统计','出入检测频率','静坐识别训练','设备信号质量','多径干扰抑制','房间轮廓检测','移动轨迹学习','热区分布统计','驻留时间分析','空间分割验证','智能分区识别','感知延迟测试','数据融合置信','异常行为模型','习惯学习曲线','入住天数统计','传感器自诊断','离线重连恢复','感知覆盖评分','盲区检测报告','信号衰减补偿','多楼层穿透','空间记忆训练','客人分时学习','预测准确率','能耗预测验证','趋势学习演进','感知性能基线','OTA感知升级','感知融合版本','AI模型精度','全空间感知评分'];
+  var spaceStories = ['雷达波束校准——空间知道自己在看什么','每个房间的WiFi信号都测过——知道信号能到哪','三个蓝牙基站三角测量——定位到分米级','WiFi+蓝牙+雷达→融合出唯一位置','空间知道自己能从多大精度分区','空间能数到几个人的校准','从完全静止到剧烈运动——空间分6个等级','从呼吸变化知道你在浅睡还是深睡','你一起夜空间就知道','进出房间的频率——空间像计数器一样准','坐着不动0.5h——空间知道你在休息','每个传感器的信号质量空间都记录','墙反射的干扰信号——空间学会了忽略','空间知道房间的边界在哪里','每个客人住3天后空间就能预测他出门时间','哪个区域最常活动——空间有热图','你在一个地方待多久空间都知道','空间能分成卧室/浴室/客厅3个区域','3个区域各自独立感知——像3个智能房间','从感知到决策→空间测量自己快了没','三种数据互相验证——空间99%的时候自信','活动模式突然变了——空间会注意到','空间观察你的习惯越久越准','住了3天和住了3次的客人——空间分得清','所有传感器都在自检——谁会生病空间知道','掉线的设备重新连上——空间不丢数据','每个房间感知能力评分——空间给自己打分','哪个位置感知不到——空间知道自己的盲区','信号穿过一堵墙损失多少——空间测过','楼上楼下的设备能互相感知——跨楼层也连得上','空间会记住每个客人的习惯','早上出门——空间知道你今天大概几点回来','空间预测的出门时间准不准——空间自己会算','空间预测明天省多少电——跟实际对比','从每次错误中学——空间的趋势学习','空间感知能力的基准线','OTA升级后感知能力提升了多少','当前感知引擎是什么版本','AI判断有人在的概率','整间房的感知能力综合评分'];
+
+  for(var i=0;i<40;i++){
+    var t=layoutTypes[i%10], data={header:spaceNames[i],footer:'🌌',footer2:''};
+    if(t==='hero'){data.hero={v:'空间感知',l:spaceNames[i],sub:[spaceStories[i]||'']};}
+    else if(t==='gauge'){data.gauges=[{v:98-i%3,l:spaceNames[i].substring(0,5),c:'#8b5cf6',u:'%'}];data.center={v:98-i%3+'%',l:'精度'};}
+    else if(t==='radar'){data.dims=[{l:'精度',v:96},{l:'覆盖',v:92},{l:'响应',v:90},{l:'稳定',v:95},{l:'融合',v:94}];data.center={v:94-i%5+'%',l:'综合'};}
+    else if(t==='timeline'){data.events=[{t:'学习前',txt:spaceNames[i]+'',c:'#8b5cf6'},{t:'学习后',txt:'精度提升'+(15-i%10)+'%',c:catColors.eco.accent}];}
+    else if(t==='feed'){data.feeds=[{icon:'🌌',txt:spaceNames[i],c:'#8b5cf6'},{icon:'✅',txt:'运行中',c:catColors.eco.accent}];}
+    else if(t==='chart'){data.bars=[{l:'精度',v:96-i%5,c:'#8b5cf6'},{l:'基线',v:82,c:'#60a5fa'}];}
+    else if(t==='split'){data.left={title:'上周',big:86-i%5+'%',items:[]};data.right={title:'本周',big:96-i%5+'%',items:[]};}
+    else if(t==='matrix'){data.cells=[{v:'✅',s:'eco'},{v:'✅',s:'eco'},{v:'✅',s:'eco'},{v:'✅',s:'eco'},{v:'⚠️',s:'alert'}];data.cols=5;}
+    designs.push(d(spaceNames[i],'space',t,data,spaceStories[i]));
+  }
+
+  // 前台补充 (20屏)
+  for(var i=0;i<20;i++){
+    var fNames=['房态速览看板','入住办理流程','退房快速通道','VIP客人提醒','团队入住管理','清洁进度看板','维修工单列表','客需服务队列','投诉处理追踪','早餐预约管理','加床服务记录','快递代收登记','叫醒服务设置','行李寄存管理','会议室预约','停车场管理','发票申请记录','宾客留言板','好评收集看板','客人画像速查'];
+    var fStories=['前台一打开看到整层楼的房间——入住、空房、清洁、维修，全彩色','客人到前台→空间已经知道ta入住哪个房间','客人退房→房间状态自动更新为待清洁','VIP来了空间会在前台弹窗提醒——尊贵客人优先','5人团队同时入住→空间自动分配相邻房间','空间告诉清洁工哪些房间退房了需要打扫','哪个房间设备坏了→前台工单一直挂着','客人要一床被子→服务员5分钟后送到','客人投诉了→空间自动记录并发给管理层','明天有多少人吃早餐→空间可以预测','客人想加床→空间知道哪里可以加','客人的快递到了→空间通知前台','客人希望明天7点叫醒——空间会准时','客人行李要寄存——空间记录位置','会议室被预订了——空间去开空调','停车场还有几个位——空间知道','客人的发票开好了没——空间有记录','客人留言→空间转达给前台','今天收到的好评——空间帮前台汇总','前台看客人的完整偏好——空间全知道'];
+    var t=layoutTypes[i%10], data={header:fNames[i],footer:'🏢',footer2:''};
+    if(t==='hero'){data.hero={v:'🏨',l:fNames[i],sub:[fStories[i]]};}
+    else if(t==='gauge'){data.gauges=[{v:85+i,l:fNames[i].substring(0,5),c:'#f59e0b',u:''}];data.center={v:i%3===0?'VIP':i%3===1?'待办':'正常',l:''};}
+    else if(t==='timeline'){data.events=[{t:'今日',txt:fNames[i],c:'#f59e0b'}];}
+    else if(t==='feed'){data.feeds=[{icon:'🏢',txt:fNames[i],c:'#f59e0b'}];}
+    designs.push(d(fNames[i],'front',t,data,fStories[i]));
+  }
+
+  // 后台补充 (20屏)
+  for(var i=0;i<20;i++){
+    var bNames=['能耗数据总览','设备在线报表','固件版本管理','OTA升级进度','告警规则配置','空间感知日志','数据导出工具','用户权限管理','酒店信息设置','房间类型管理','价格策略配置','员工考勤统计','财务结算看板','省电数据审计','传感器校准','感知算法更新','AI模型训练','系统日志查看','API接口文档','第三方对接'];
+    var bStories=['所有房间的能耗加起来——后台看全貌','125台设备都活着吗——后台有报表','每台设备用的什么版本——后台统一管理','升级推到每台设备了——后台能看到进度','什么样的动静算告警——后台能设置','空间每一条感知记录——后台都能查','数据导出来做报表','谁可以看什么数据——后台控制','酒店叫什么、有几个楼层——后台配置','大床房、双床房、套房——后台分类','不同房型不同价格——后台调价','员工每天的工作统计','财务看省了多少钱','省电数据审计——每一度电都有追溯','传感器需要校准——后台有工具','算法升级了哪些——后台能看到','AI模型训练进度','系统的每个操作——后台都有日志','第三方系统怎么对接——后台有文档','对接PMS、OTA、财务系统'];
+    var t=layoutTypes[i%10], data={header:bNames[i],footer:'📊',footer2:''};
+    if(t==='hero'){data.hero={v:'📊',l:bNames[i],sub:[bStories[i]]};}
+    else if(t==='gauge'){data.gauges=[{v:95-i,l:bNames[i].substring(0,5),c:'#60a5fa',u:'%'}];}
+    else if(t==='chart'){data.bars=[{l:bNames[i].substring(0,3),v:92,c:'#60a5fa'}];}
+    else if(t==='feed'){data.feeds=[{icon:'📊',txt:bNames[i],c:'#60a5fa'}];}
+    designs.push(d(bNames[i],'back',t,data,bStories[i]));
+  }
+
+  // 智能家居补充 (30屏)
+  for(var i=0;i<30;i++){
+    var hNames=['离家一键关闭','回家欢迎模式','睡眠全守护','起床轻柔唤醒','观影模式','阅读模式','用餐模式','聚会氛围','儿童防护','老人看护','宠物监控','植物养护','阳台灌溉','车库联动','门铃视频','快递到户语音','天气智能窗帘','空气质量自净','音乐跟随','灯光色温自适应','地暖分区','风扇联动','加湿器联动','净化器联动','扫地机联动','厨房安全','烟雾告警','漏水关阀','燃气关阀','全屋语音控制'];
+    var hStories=['走了→所有设备关闭→安防开启','回来了→空间提前开好空调和灯','你睡你的，空间管一切','早上慢慢亮灯、音乐、窗帘','看电影→空间自动关灯调音','读书→阅读灯亮+白噪音','吃饭→灯光暖色+背景音乐','朋友来了→氛围灯+音乐','儿童房有动静→空间通知家长','老人长时间没活动→空间提醒','宠物一天在干嘛——空间有记录','花该浇水了——空间知道','阳台自动灌溉——空间感知天气','车进车库——空间联动全屋','门铃响了——空间通知你手机','快递员来了——空间告诉你','外面在下雨——空间关窗','空气不好——空间自动开净化器','你走到哪个房间——空间放那个房间的音乐','白天冷白光→晚上暖黄光→睡眠全关','冬天只加热有人在的区域','你热了空间自动开风扇','空气干空间自动开加湿','PM2.5高了开净化器','人不在家扫地机开始扫','厨房燃气/烟雾/漏水——空间全部监控','烟雾→空间关燃气','漏水→空间关水阀','燃气泄漏→空间关阀+通风','喊一声空间就照做'];
+    var t=layoutTypes[i%10], data={header:hNames[i],footer:'🏠',footer2:''};
+    if(t==='hero'){data.hero={v:'🏠',l:hNames[i],sub:[hStories[i]||'']};}
+    else if(t==='gauge'){data.gauges=[{v:100,l:hNames[i].substring(0,5),c:'#ec4899',u:'%'}];data.center={v:'已就绪',l:''};}
+    else if(t==='timeline'){data.events=[{t:'现在',txt:hNames[i],c:'#ec4899'}];}
+    else if(t==='feed'){data.feeds=[{icon:'🏠',txt:hNames[i],c:'#ec4899'}];}
+    else if(t==='split'){data.left={title:'开启前',items:[{l:'状态',v:'关闭'}]};data.right={title:'开启后',items:[{l:hNames[i],v:'运行中'}]};}
+    designs.push(d(hNames[i],'home',t,data,hStories[i]));
+  }
+})();
+
+// ===================================================================
+// 渲染引擎
+// ===================================================================
+
+function renderDesign(d, mode, big) {
+  var tpl = layouts[d.tpl] || layouts.masonry;
+  // Ensure data has all fields
+  if(!d.data) d.data = {};
+  d.data.footer = d.data.footer || '';
+  d.data.footer2 = d.data.footer2 || '';
+  return tpl(d, mode, big);
+}
+
+// ----- 构建页面 -----
+var currentCat = 'all';
+var currentIdx = 0;
+var favorites = {};
+
+function buildGallery() {
+  var filtered = designs;
+  if(currentCat !== 'all') filtered = designs.filter(function(d){ return d.cat === currentCat; });
+  document.getElementById('totalCount').textContent = filtered.length;
+
+  var container = document.getElementById('gallery');
+  container.innerHTML = '';
+  filtered.forEach(function(d, i){
+    var card = document.createElement('div');
+    card.className = 'sc-card';
+    var c = catColors[d.cat] || catColors.eco;
+    var catName = {eco:'节能',sec:'安防',space:'感知',front:'前台',back:'后台',home:'家居'}[d.cat]||d.cat;
+    card.innerHTML = '<div class="label"><span style="color:'+c.accent+'">'+d.name+'</span><div class="tags">'+
+      '<span class="tag '+d.cat+'">'+catName+'</span>'+
+      '<span class="tag">'+d.tpl+'</span>'+
+      (favorites[d.name]?'<span class="tag" style="background:#dc262622;color:#dc2626">★</span>':'')+
+      '</div></div><div class="ips" style="background:'+c.bg+'">'+renderDesign(d,'日间')+'</div>'+
+      '<div style="padding:3px 6px 4px;font-size:6px;color:#475569;border-top:1px solid #334155;display:flex;justify-content:space-between"><span>'+(d.story||'').substring(0,30)+(d.story&&d.story.length>30?'...':'')+'</span><span style="color:#334155;font-family:monospace">#'+(i+1)+'</span></div>';
+    card.onclick = function(){currentIdx = designs.indexOf(d); showPreview();};
+    container.appendChild(card);
+  });
+}
+
+function buildTabs() {
+  var counts = {};
+  designs.forEach(function(d){ counts[d.cat] = (counts[d.cat]||0)+1; });
+  var bar = document.getElementById('tabBar');
+  bar.innerHTML = '<div class="tab active" data-cat="all" onclick="switchTab(\'all\')">全部 <span class="count">'+designs.length+'</span></div>'+
+    '<div class="tab" data-cat="eco" onclick="switchTab(\'eco\')">⚡ 节能 <span class="count">'+counts.eco+'</span></div>'+
+    '<div class="tab" data-cat="sec" onclick="switchTab(\'sec\')">🔒 安防 <span class="count">'+counts.sec+'</span></div>'+
+    '<div class="tab" data-cat="space" onclick="switchTab(\'space\')">🌌 空间感知 <span class="count">'+counts.space+'</span></div>'+
+    '<div class="tab" data-cat="front" onclick="switchTab(\'front\')">🏢 前台 <span class="count">'+counts.front+'</span></div>'+
+    '<div class="tab" data-cat="back" onclick="switchTab(\'back\')">📊 后台 <span class="count">'+counts.back+'</span></div>'+
+    '<div class="tab" data-cat="home" onclick="switchTab(\'home\')">🏠 智能家居 <span class="count">'+counts.home+'</span></div>';
+}
+
+var currentPreviewIdx = 0;
+
+function switchTab(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelector('.tab[data-cat="'+cat+'"]').classList.add('active');
+  buildGallery();
+}
+
+function showPreview() {
+  var d = designs[currentIdx];
+  if(!d) return;
+  var c = catColors[d.cat];
+  document.getElementById('pname').textContent = d.name;
+  document.getElementById('ptags').innerHTML = '<span class="tag '+d.cat+'" style="background:'+c.accent+'22;color:'+c.accent+'">'+({eco:'节能',sec:'安防',space:'空间感知',front:'前台',back:'后台',home:'家居'}[d.cat])+'</span><span class="tag">'+d.tpl+'</span>'+(favorites[d.name]?'<span class="tag" style="background:#dc262622;color:#dc2626">★ 标记</span>':'');
+  document.getElementById('pid').textContent = '#'+(currentIdx+1)+' · 设计ID: D-'+(currentIdx+1).toString().padStart(3,'0');
+  document.getElementById('pfavBtn').textContent = favorites[d.name] ? '❤️ 已标记' : '♡ 标记喜欢';
+  var mode = document.querySelector('input[name="pmode"]:checked') ? document.querySelector('input[name="pmode"]:checked').value : '日间';
+  document.getElementById('pbody').innerHTML = '<div class="ips" style="aspect-ratio:4/3;max-width:380px;margin:0 auto;background:'+c.bg+';font-size:'+(true?'10px':'7px')+'">'+
+    renderDesign(d, mode, true)+'</div>';
+  document.getElementById('pdata').textContent = '📖 空间感知故事: '+(d.story||'');
+  document.getElementById('preview').style.display = 'flex';
+  currentPreviewIdx = currentIdx;
+}
+
+function closePreview(){document.getElementById('preview').style.display='none';}
+
+function prevDesign(){
+  currentIdx = (currentIdx - 1 + designs.length) % designs.length;
+  showPreview();
+}
+
+function nextDesign(){
+  currentIdx = (currentIdx + 1) % designs.length;
+  showPreview();
+}
+
+function toggleFavorite(){
+  var d = designs[currentIdx];
+  if(!d) return;
+  if(favorites[d.name]) delete favorites[d.name];
+  else favorites[d.name] = true;
+  showPreview();
+  buildGallery();
+}
+
+// Init
+buildTabs();
+buildGallery();
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🦞 灵犀 · 演示中心</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:system-ui,sans-serif;padding:30px 20px;max-width:800px;margin:0 auto}
+h1{font-size:24px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sub{color:#64748b;font-size:13px;margin-bottom:6px}
+.tagline{color:#22c55e;font-size:12px;margin-bottom:24px;padding:8px 12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+.card:hover{border-color:#3b82f6;transform:translateY(-1px)}
+.card-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.card-desc{font-size:12px;color:#94a3b8;line-height:1.6}
+.card-tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.tag{padding:2px 8px;border-radius:4px;font-size:10px;background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
+.tag.green{background:#22c55e22;color:#22c55e;border-color:#22c55e44}
+.tag.orange{background:#f59e0b22;color:#f59e0b;border-color:#f59e0b44}
+.tag.purple{background:#8b5cf622;color:#8b5cf6;border-color:#8b5cf644}
+.footer{margin-top:30px;padding-top:16px;border-top:1px solid #1e293b;font-size:11px;color:#64748b;text-align:center}
+</style>
+</head>
+<body>
+<h1>🦞 灵犀 · 演示中心</h1>
+<p class="sub">给酒店老板看的演示版本 · 点开即用 · 无需登录</p>
+<div class="tagline">🔥 核心卖点：节能省电 · 2个月回本 · 客人无感</div>
+
+<div class="card" onclick="location='energy-demo.html'" style="border-color:#22c55e44">
+  <div class="card-title">⚡ <strong style="color:#22c55e">节能演示（核心卖点）</strong></div>
+  <div class="card-desc">每间房的省电故事：客人设定22°C→出门15min自动调26°C→深睡调24°C→返回恢复→退房关闭<br>
+  省电偏移+4°C · 入眠检测30min · 夜间调高+2°C · 50间房年省¥7.6万</div>
+  <div class="card-tags"><span class="tag green">推荐 · 给老板看这个</span></div>
+</div>
+
+<div class="card" onclick="location='demo-space.html'">
+  <div class="card-title">🏨 酒店智能演示空间</div>
+  <div class="card-desc">楼层平面图 · 点击房间穿透查看 · 噪音时间线 · 人数/PMS比对 · 声音标签 · 安防联动</div>
+  <div class="card-tags"><span class="tag">综合演示</span></div>
+</div>
+
+<div class="card" onclick="location='ips-gallery.html'">
+  <div class="card-title">📱 IPS屏幕设计集 · 12种数据架构</div>
+  <div class="card-desc">12种完全不同数据布局的2.8寸屏方案 · 卡片瀑布/仪表群/时间线/轮播/双屏/波形/雷达…</div>
+  <div class="card-tags"><span class="tag purple">选屏幕风格</span></div>
+</div>
+
+<div class="card" onclick="location='style-a-dashboard.html'">
+  <div class="card-title">📊 Style A · 专业商务后台</div>
+  <div class="card-desc">大盘看板 · 酒店管理 · OTA推送 · 区域→酒店→设备层级</div>
+  <div class="card-tags"><span class="tag orange">后台方案A</span></div>
+</div>
+
+<div class="footer">
+  🦞 灵犀 · 酒店智能节能系统 · GitHub Pages托管的演示版本<br>
+  👉 跟老板谈的时候先打开 energy-demo.html，省电数据就是最好的销售
+</div>
+</body>
+</html>

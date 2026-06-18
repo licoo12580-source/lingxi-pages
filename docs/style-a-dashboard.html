@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🦞 灵犀 · 专业版 智能酒店节能平台</title>
+<style>
+:root {
+  --bg:#0b1120; --card:#1e293b; --card2:#1a2332;
+  --border:#334155; --fg:#e2e8f0; --fg2:#94a3b8; --fg3:#64748b;
+  --accent:#3b82f6; --accent2:#2563eb; --accent-l:#60a5fa;
+  --green:#22c55e; --orange:#f59e0b; --red:#ef4444; --purple:#8b5cf6;
+  --radius:12px; --radius-sm:8px; --pad:16px; --gap:12px;
+  --font:system-ui,-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:13px;line-height:1.5;min-height:100vh}
+.nav{background:#0f172a;border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;height:48px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--accent-l);display:flex;align-items:center;gap:8px;margin-right:32px}
+.nav-items{display:flex;gap:4px;flex:1}
+.nav-item{padding:6px 14px;border-radius:6px;font-size:12px;color:var(--fg2);cursor:pointer;transition:all .15s;border:none;background:transparent}
+.nav-item:hover{color:var(--fg);background:var(--card)}
+.nav-item.active{color:var(--accent-l);background:#3b82f622;font-weight:500}
+.nav-right{font-size:11px;color:var(--fg3)}
+.container{max-width:1200px;margin:0 auto;padding:16px 20px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap);margin-bottom:var(--gap)}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--pad);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.type-total::before{background:var(--accent)}
+.stat-card.type-online::before{background:var(--green)}
+.stat-card.type-hotel::before{background:var(--purple)}
+.stat-card.type-kwh::before{background:var(--orange)}
+.stat-card.type-total-kwh::before{background:var(--accent-l)}
+.stat-label{font-size:10px;color:var(--fg3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.stat-value{font-size:28px;font-weight:700;line-height:1.2}
+.stat-value.green{color:var(--green)}
+.stat-value.orange{color:var(--orange)}
+.stat-value.blue{color:var(--accent-l)}
+.stat-value.purple{color:var(--purple)}
+.stat-sub{font-size:11px;color:var(--fg3);margin-top:2px}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
+.row-3{display:grid;grid-template-columns:2fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
+@media(max-width:900px){.row-2,.row-3{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--pad)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:600;color:var(--fg2);display:flex;align-items:center;gap:6px}
+.card-title .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.region-list{display:flex;flex-direction:column;gap:8px}
+.region-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg);border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;border:1px solid transparent}
+.region-item:hover{background:var(--card2);border-color:var(--border)}
+.region-name{font-size:13px;font-weight:500;min-width:48px}
+.region-bar{flex:1;height:22px;background:#0f172a;border-radius:4px;overflow:hidden;position:relative}
+.region-bar-fill{height:100%;border-radius:4px;transition:width .5s;display:flex;align-items:center;padding-left:8px;font-size:10px;color:#fff;font-weight:500}
+.region-bar-fill.gz{background:linear-gradient(90deg,#3b82f6,#60a5fa);width:100%}
+.region-bar-fill.sz{background:linear-gradient(90deg,#8b5cf6,#a78bfa);width:80%}
+.region-bar-fill.dg{background:linear-gradient(90deg,#22c55e,#4ade80);width:56%}
+.region-bar-fill.fs{background:linear-gradient(90deg,#f59e0b,#fbbf24);width:28%}
+.region-detail{font-size:11px;color:var(--fg3);min-width:100px;text-align:right}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th{text-align:left;padding:8px 6px;color:var(--fg3);border-bottom:1px solid var(--border);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+.table td{padding:7px 6px;border-bottom:1px solid #1e293b}
+.table tr:hover td{background:#0f172a44}
+.table tr:last-child td{border:none}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500}
+.tag-success{background:#22c55e22;color:var(--green);border:1px solid #22c55e44}
+.tag-progress{background:#3b82f622;color:var(--accent-l);border:1px solid #3b82f644}
+.tag-warn{background:#f59e0b22;color:var(--orange);border:1px solid #f59e0b44}
+.progress{height:4px;background:#0f172a;border-radius:2px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:2px;transition:width .5s}
+.version-chart{display:flex;flex-direction:column;gap:6px}
+.version-row{display:flex;align-items:center;gap:8px}
+.version-label{font-size:11px;min-width:70px;color:var(--fg2);font-family:monospace}
+.version-bar{flex:1;height:20px;background:#0f172a;border-radius:4px;overflow:hidden}
+.version-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;font-size:10px;color:#fff}
+.version-fill.v1{background:linear-gradient(90deg,#3b82f6,#60a5fa);width:82%}
+.version-fill.v2{background:linear-gradient(90deg,#6366f1,#818cf8);width:18%}
+.version-count{font-size:11px;color:var(--fg3);min-width:60px;text-align:right;font-family:monospace}
+.task-list{display:flex;flex-direction:column;gap:8px}
+.task-item{padding:10px 12px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid transparent}
+.task-item:hover{border-color:var(--border)}
+.task-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.task-version{font-weight:600;color:var(--accent-l);font-family:monospace;font-size:12px}
+.task-hotel{font-size:12px;color:var(--fg)}
+.task-batch{font-size:10px;color:var(--fg3);background:var(--card);padding:1px 6px;border-radius:3px}
+.task-meta{display:flex;align-items:center;gap:12px;font-size:10px;color:var(--fg3)}
+.filter-bar{display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.filter-bar input{background:#0f172a;border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--fg);font-size:12px;outline:none;min-width:160px}
+.filter-bar input:focus{border-color:var(--accent)}
+.filter-bar select{background:#0f172a;border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--fg);font-size:12px;outline:none}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:6px;font-size:11px;border:none;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-sm{padding:4px 10px;font-size:10px}
+.empty{text-align:center;padding:20px;color:var(--fg3);font-size:12px}
+@media(max-width:600px){.container{padding:10px 12px}.stats{grid-template-columns:repeat(2,1fr)}.stat-value{font-size:22px}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-brand">🦞 灵犀</div>
+  <div class="nav-items">
+    <button class="nav-item active">大盘</button>
+    <button class="nav-item" onclick="switchPage('hotels')">酒店管理</button>
+    <button class="nav-item" onclick="switchPage('ota')">OTA管理</button>
+  </div>
+  <div class="nav-right">广东 · 23家酒店 · 1,247台设备</div>
+</nav>
+<div class="container">
+
+<div id="page-dashboard">
+  <div class="stats" id="statsRow">
+    <div class="stat-card type-total"><div class="stat-label">总设备</div><div class="stat-value blue">-</div></div>
+    <div class="stat-card type-online"><div class="stat-label">在线</div><div class="stat-value green">-</div><div class="stat-sub">离线 - 台</div></div>
+    <div class="stat-card type-hotel"><div class="stat-label">酒店数</div><div class="stat-value purple">-</div><div class="stat-sub">4 个区域</div></div>
+    <div class="stat-card type-kwh"><div class="stat-label">今日省电</div><div class="stat-value orange">- kWh</div></div>
+    <div class="stat-card type-total-kwh"><div class="stat-label">累计省电</div><div class="stat-value blue">- kWh</div></div>
+  </div>
+  <div class="row-3">
+    <div class="card"><div class="card-header"><span class="card-title"><span class="dot" style="background:var(--accent)"></span>区域分布</span></div><div class="region-list" id="regionList"></div></div>
+    <div class="card"><div class="card-header"><span class="card-title"><span class="dot" style="background:var(--purple)"></span>固件版本</span></div><div class="version-chart" id="versionChart"></div></div>
+  </div>
+  <div class="row-2">
+    <div class="card"><div class="card-header"><span class="card-title"><span class="dot" style="background:var(--orange)"></span>OTA进行中</span></div><div class="task-list" id="taskList"></div></div>
+    <div class="card"><div class="card-header"><span class="card-title"><span class="dot" style="background:var(--green)"></span>今日省电 Top 3</span></div><div class="task-list" id="topHotels"></div></div>
+  </div>
+</div>
+
+<div id="page-hotels" style="display:none">
+  <div class="card">
+    <div class="card-header"><span class="card-title">🏨 酒店管理</span></div>
+    <div class="filter-bar">
+      <input id="hotelSearch" placeholder="搜索酒店名称..." oninput="filterHotels()">
+      <select id="regionFilter" onchange="filterHotels()"><option value="">全部区域</option><option value="广州">广州</option><option value="深圳">深圳</option><option value="东莞">东莞</option><option value="佛山">佛山</option></select>
+      <select id="versionFilter" onchange="filterHotels()"><option value="">全部版本</option><option value="v0307E">v0307E</option><option value="v0307D">v0307D</option></select>
+    </div>
+    <table class="table"><thead><tr><th>酒店</th><th>区域</th><th>房间数</th><th>在线率</th><th>版本</th><th>今日省电</th></tr></thead><tbody id="hotelTableBody"></tbody></table>
+  </div>
+</div>
+
+<div id="page-ota" style="display:none">
+  <div class="card">
+    <div class="card-header"><span class="card-title">🚀 OTA推送</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div><label style="font-size:10px;color:var(--fg3);display:block;margin-bottom:4px">选择酒店</label><select id="otaHotel" style="width:100%;background:#0f172a;border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--fg);font-size:12px;outline:none"></select></div>
+      <div><label style="font-size:10px;color:var(--fg3);display:block;margin-bottom:4px">选择版本</label><select id="otaVersion" style="width:100%;background:#0f172a;border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--fg);font-size:12px;outline:none"><option value="v0310A">v0310A（最新）</option><option value="v0307E">v0307E</option></select></div>
+      <div><label style="font-size:10px;color:var(--fg3);display:block;margin-bottom:4px">策略</label><select id="otaStrategy" style="width:100%;background:#0f172a;border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--fg);font-size:12px;outline:none"><option value="全量">全量推送</option><option value="灰度10%">灰度 10%</option><option value="灰度5台">灰度 5台测试</option></select></div>
+    </div>
+    <div style="margin-top:10px"><button class="btn btn-primary" onclick="alert('OTA已加入队列')">🚀 开始推送</button></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📋 OTA任务记录</span></div>
+    <table class="table"><thead><tr><th>任务ID</th><th>版本</th><th>酒店</th><th>批次</th><th>进度</th><th>状态</th></tr></thead><tbody id="otaTaskBody"></tbody></table>
+  </div>
+</div>
+
+</div>
+<script>
+var DATA = {"hotels":[{"id":"lanwei","name":"兰威酒店","region":"广州","rooms":91,"online":89,"offline":2,"version":"v0307E","saved_today_kwh":68,"saved_month_kwh":1872,"install_date":"2026-06-01","status":"active","ota_history":[{"date":"06-16","version":"v0307E","result":"success","count":91},{"date":"06-10","version":"v0307D","result":"rollback","reason":"假目标bug"}]},{"id":"rujia-gz","name":"如家广州火车站店","region":"广州","rooms":60,"online":55,"offline":5,"version":"v0307D","saved_today_kwh":42,"saved_month_kwh":1080,"install_date":"2026-05-20","status":"active","ota_history":[{"date":"05-25","version":"v0307D","result":"success","count":60}]},{"id":"qitian-sz","name":"7天深圳华强北店","region":"深圳","rooms":45,"online":42,"offline":3,"version":"v0307E","saved_today_kwh":31,"saved_month_kwh":720,"install_date":"2026-06-05","status":"active","ota_history":[{"date":"06-17","version":"v0307E","result":"success","count":45}]},{"id":"hanting-gz","name":"汉庭广州体育中心店","region":"广州","rooms":80,"online":78,"offline":2,"version":"v0307E","saved_today_kwh":56,"saved_month_kwh":1440,"install_date":"2026-05-15","status":"active","ota_history":[{"date":"06-18","version":"v0307E","result":"success","count":80}]},{"id":"jinjiang-sz","name":"锦江之星深圳南山店","region":"深圳","rooms":55,"online":50,"offline":5,"version":"v0307D","saved_today_kwh":38,"saved_month_kwh":960,"install_date":"2026-05-28","status":"active","ota_history":[{"date":"06-02","version":"v0307D","result":"success","count":55}]},{"id":"vienna-dg","name":"维也纳东莞厚街店","region":"东莞","rooms":70,"online":65,"offline":5,"version":"v0307E","saved_today_kwh":48,"saved_month_kwh":1152,"install_date":"2026-06-10","status":"active","ota_history":[{"date":"06-15","version":"v0307E","result":"success","count":70}]},{"id":"lavande-fs","name":"丽枫佛山祖庙店","region":"佛山","rooms":35,"online":33,"offline":2,"version":"v0307D","saved_today_kwh":24,"saved_month_kwh":540,"install_date":"2026-06-12","status":"active","ota_history":[]}],"regions":[{"name":"广州","count":3,"rooms":231,"online":222},{"name":"深圳","count":2,"rooms":100,"online":92},{"name":"东莞","count":1,"rooms":70,"online":65},{"name":"佛山","count":1,"rooms":35,"online":33}],"ota_tasks":[{"task_id":"ota_20260618_001","version":"v0310A","hotel":"兰威酒店","batch":1,"batch_total":3,"progress":80,"status":"in_progress","started":"10:30","devices_ok":73,"devices_total":91},{"task_id":"ota_20260617_001","version":"v0307E","hotel":"7天深圳华强北店","batch":"全量","progress":100,"status":"completed","started":"14:00","devices_ok":45,"devices_total":45}],"stats":{"total_devices":1247,"online_devices":1183,"hotel_count":23,"saved_today_kwh":2184,"saved_month_kwh":58392,"versions":{"v0307E":1023,"v0307D":224}}};
+
+function init() {
+  var s = DATA.stats;
+  document.querySelector('#statsRow .stat-card:nth-child(1) .stat-value').textContent = s.total_devices.toLocaleString();
+  document.querySelector('#statsRow .stat-card:nth-child(2) .stat-value').textContent = s.online_devices.toLocaleString();
+  document.querySelector('#statsRow .stat-card:nth-child(2) .stat-sub').textContent = '离线 '+(s.total_devices-s.online_devices)+' 台';
+  document.querySelector('#statsRow .stat-card:nth-child(3) .stat-value').textContent = s.hotel_count;
+  document.querySelector('#statsRow .stat-card:nth-child(4) .stat-value').textContent = s.saved_today_kwh.toLocaleString()+' kWh';
+  document.querySelector('#statsRow .stat-card:nth-child(5) .stat-value').textContent = s.saved_month_kwh.toLocaleString()+' kWh';
+
+  var rl = '', colors = {广州:'gz',深圳:'sz',东莞:'dg',佛山:'fs'};
+  DATA.regions.forEach(function(r){
+    var pct = Math.round(r.online/r.rooms*100);
+    rl += '<div class="region-item"><div class="region-name">'+r.name+'</div><div class="region-bar"><div class="region-bar-fill '+(colors[r.name]||'gz')+'" style="width:'+(r.rooms/231*100)+'%">'+r.rooms+'间</div></div><div class="region-detail">'+r.count+'家 · '+r.online+'/'+r.rooms+'在线 · '+pct+'%</div></div>';
+  });
+  document.getElementById('regionList').innerHTML = rl;
+
+  var vc = '', total = s.total_devices, i = 0;
+  Object.keys(s.versions).forEach(function(v){
+    var cnt = s.versions[v], pct = Math.round(cnt/total*100);
+    vc += '<div class="version-row"><div class="version-label">'+v+'</div><div class="version-bar"><div class="version-fill v'+(++i)+'" style="width:'+pct+'%"></div></div><div class="version-count">'+cnt+'台 · '+pct+'%</div></div>';
+  });
+  document.getElementById('versionChart').innerHTML = vc;
+
+  var tl = '';
+  DATA.ota_tasks.forEach(function(t){
+    tl += '<div class="task-item"><div class="task-top"><span class="task-version">'+t.version+'</span><span class="task-hotel">'+t.hotel+'</span><span class="task-batch">第'+(t.batch||'?')+'/'+(t.batch_total||'?')+'批</span></div><div class="task-meta"><span>'+(t.status==='completed'?'✅ 已完成':'⏳ 进行中')+'</span><span>'+t.devices_ok+'/'+t.devices_total+'台</span><span>'+t.started+'</span></div>'+(t.status!=='completed'?'<div class="progress"><div class="progress-fill" style="width:'+t.progress+'%;background:var(--accent)"></div></div>':'')+'</div>';
+  });
+  document.getElementById('taskList').innerHTML = tl || '<div class="empty">暂无OTA任务</div>';
+
+  var sorted = DATA.hotels.slice().sort(function(a,b){return b.saved_today_kwh-a.saved_today_kwh}).slice(0,3);
+  var th = '';
+  sorted.forEach(function(h,i){th += '<div class="task-item"><div class="task-top"><span>'+['🥇','🥈','🥉'][i]+' <strong>'+h.name+'</strong></span><span class="task-version" style="color:var(--green)">+'+h.saved_today_kwh+' kWh</span></div><div class="task-meta"><span>'+h.region+'</span><span>'+h.online+'/'+h.rooms+'在线</span><span>'+h.version+'</span></div></div>';});
+  document.getElementById('topHotels').innerHTML = th;
+
+  var h = '';
+  DATA.hotels.forEach(function(hotel){
+    var rate = Math.round(hotel.online/hotel.rooms*100);
+    h += '<tr><td><strong>'+hotel.name+'</strong></td><td>'+hotel.region+'</td><td>'+hotel.rooms+'</td><td><span style="color:'+(rate>95?'var(--green)':rate>80?'var(--orange)':'var(--red)')+'">'+rate+'%</span> ('+hotel.online+'/'+hotel.rooms+')</td><td><span class="tag tag-success">'+hotel.version+'</span></td><td style="color:var(--green);font-weight:500">+'+hotel.saved_today_kwh+' kWh</td></tr>';
+  });
+  document.getElementById('hotelTableBody').innerHTML = h;
+
+  var sel = document.getElementById('otaHotel');
+  DATA.hotels.forEach(function(h){sel.innerHTML += '<option value="'+h.id+'">'+h.name+' ('+h.region+' · '+h.rooms+'间)</option>';});
+
+  var ot = '';
+  DATA.ota_tasks.forEach(function(t){
+    var pct = t.status==='completed'?100:t.progress;
+    ot += '<tr><td style="font-family:mono;font-size:10px;color:var(--fg3)">'+t.task_id.slice(-16)+'</td><td><span class="tag '+(t.status==='completed'?'tag-success':'tag-progress')+'">'+t.version+'</span></td><td>'+t.hotel+'</td><td>'+t.batch+'/'+t.batch_total+'</td><td><div style="display:flex;align-items:center;gap:6px"><div class="progress" style="flex:1;min-width:60px"><div class="progress-fill" style="width:'+pct+'%;background:'+(t.status==='completed'?'var(--green)':'var(--accent)')+'"></div></div><span style="font-size:10px;color:var(--fg3)">'+pct+'%</span></div></td><td><span class="tag '+(t.status==='completed'?'tag-success':'tag-progress')+'">'+(t.status==='completed'?'✅ 完成':'⏳ 进行中')+'</span></td></tr>';
+  });
+  document.getElementById('otaTaskBody').innerHTML = ot;
+}
+function filterHotels() {
+  var q = document.getElementById('hotelSearch').value.toLowerCase();
+  var r = document.getElementById('regionFilter').value;
+  var v = document.getElementById('versionFilter').value;
+  document.querySelectorAll('#hotelTableBody tr').forEach(function(tr){
+    var txt = tr.textContent.toLowerCase();
+    tr.style.display = (!q || txt.includes(q)) && (!r || txt.includes(r)) && (!v || txt.includes(v)) ? '' : 'none';
+  });
+}
+function switchPage(page) {
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  document.querySelectorAll('[id^="page-"]').forEach(function(p){p.style.display='none'});
+  document.getElementById('page-'+page).style.display='block';
+  document.querySelectorAll('.nav-item')[page==='dashboard'?0:page==='hotels'?1:2].classList.add('active');
+}
+init();
+</script>
+</body>
+</html>

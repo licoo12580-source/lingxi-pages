@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🦞 灵犀 · 酒店智能演示空间</title>
+<style>
+:root {
+  --bg:#0b1120; --card:#1e293b; --border:#334155; --card2:#1a2332;
+  --fg:#e2e8f0; --fg2:#94a3b8; --fg3:#64748b;
+  --accent:#3b82f6; --green:#22c55e; --orange:#f59e0b; --red:#ef4444; --purple:#8b5cf6;
+  --font:system-ui,-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:13px;min-height:100vh}
+
+/* 顶栏 */
+.demo-top{background:linear-gradient(135deg,#0f172a,#1e293b);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.demo-top h1{font-size:16px;color:var(--accent-l);display:flex;align-items:center;gap:6px}
+.demo-top .tag{background:var(--accent);color:#fff;font-size:9px;padding:2px 8px;border-radius:4px}
+.demo-top .sub{color:var(--fg3);font-size:11px;flex:1;text-align:right}
+.demo-top .nav-btn{background:transparent;border:1px solid var(--border);color:var(--fg2);padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .15s}
+.demo-top .nav-btn:hover{background:var(--card);color:var(--fg)}
+
+.container{max-width:1200px;margin:0 auto;padding:16px 20px}
+
+/* 房间网格 - 类似酒店楼层平面图 */
+.floor-plan{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.room-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.room-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px #3b82f622}
+.room-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.room-card.status-ok::before{background:var(--green)}
+.room-card.status-warn::before{background:var(--orange)}
+.room-card.status-alert::before{background:var(--red)}
+.room-card.status-empty::before{background:var(--fg3)}
+
+.room-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.room-no{font-size:14px;font-weight:600}
+.room-status{font-size:9px;padding:2px 8px;border-radius:4px}
+.room-status.ok{background:#22c55e22;color:var(--green);border:1px solid #22c55e44}
+.room-status.warn{background:#f59e0b22;color:var(--orange);border:1px solid #f59e0b44}
+.room-status.alert{background:#ef444422;color:var(--red);border:1px solid #ef444444}
+.room-status.empty{background:#64748b22;color:var(--fg3);border:1px solid #64748b44}
+
+.room-people{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.room-people .num{font-size:22px;font-weight:600}
+.room-people .num.g{color:var(--green)}
+.room-people .num.w{color:var(--orange)}
+.room-people .num.r{color:var(--red)}
+.room-people .pms{font-size:10px;color:var(--fg3);padding:2px 6px;background:var(--bg);border-radius:4px}
+
+.room-sensors{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:6px;font-size:10px}
+.room-sensors .s{text-align:center;padding:3px;background:var(--bg);border-radius:4px}
+.room-sensors .s .v{font-size:11px;font-weight:500}
+.room-sensors .s .l{font-size:8px;color:var(--fg3)}
+
+.room-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
+.room-tags .t{padding:2px 6px;border-radius:3px;font-size:8px}
+.room-tags .t.voice{background:#8b5cf622;color:var(--purple);border:1px solid #8b5cf644}
+.room-tags .t.noise{background:#f59e0b22;color:var(--orange);border:1px solid #f59e0b44}
+.room-tags .t.security{background:#ef444422;color:var(--red);border:1px solid #ef444444}
+.room-tags .t.eco{background:#22c55e22;color:var(--green);border:1px solid #22c55e44}
+
+.room-sigs{display:flex;gap:8px;font-size:7px;color:var(--fg3);margin-top:4px}
+
+/* 底部统计条 */
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:12px 0}
+.stat-item{text-align:center;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.stat-item .v{font-size:18px;font-weight:600}
+.stat-item .l{font-size:9px;color:var(--fg3);margin-top:2px}
+
+/* ===== 详情面板（覆盖/弹窗） ===== */
+.detail-panel{position:fixed;inset:0;background:#00000088;display:none;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(4px)}
+.detail-panel.show{display:flex}
+.detail-inner{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:680px;width:92%;max-height:85vh;overflow-y:auto;padding:20px}
+.detail-close{float:right;background:transparent;border:none;color:var(--fg3);font-size:20px;cursor:pointer;padding:4px}
+.detail-close:hover{color:var(--fg)}
+.detail-title{font-size:16px;display:flex;align-items:center;gap:8px;margin-bottom:16px}
+
+/* 详情标签页 */
+.detail-tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.detail-tab{padding:6px 14px;border-radius:6px;font-size:11px;cursor:pointer;background:transparent;color:var(--fg3);border:none;transition:all .15s}
+.detail-tab:hover{color:var(--fg);background:var(--bg)}
+.detail-tab.active{background:var(--accent);color:#fff}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* 噪音时间线 */
+.noise-timeline{display:flex;flex-direction:column;gap:6px}
+.noise-event{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:8px;transition:all .15s;cursor:pointer}
+.noise-event:hover{background:var(--card2)}
+.noise-event .time{font-size:10px;color:var(--fg3);min-width:45px;font-family:monospace}
+.noise-event .bar{height:6px;border-radius:3px;min-width:30px;flex:1}
+.noise-event .bar.loud{background:var(--red);width:70%}
+.noise-event .bar.med{background:var(--orange);width:50%}
+.noise-event .bar.soft{background:var(--accent);width:30%}
+.noise-event .label{font-size:11px;color:var(--fg2);min-width:80px}
+.noise-event .db{font-size:10px;color:var(--fg3);font-family:monospace;min-width:35px}
+.noise-event .tag-label{font-size:8px;padding:2px 6px;border-radius:3px}
+.noise-event .tag-label.female{background:#8b5cf622;color:var(--purple);border:1px solid #8b5cf644}
+.noise-event .tag-label.male{background:#3b82f622;color:var(--accent);border:1px solid #3b82f644}
+.noise-event .tag-label.child{background:#22c55e22;color:var(--green);border:1px solid #22c55e44}
+.noise-event .tag-label.tv{background:#64748b22;color:var(--fg2);border:1px solid #64748b44}
+.noise-event .tag-label.slam{background:#ef444422;color:var(--red);border:1px solid #ef444444}
+
+/* 入住时间线 */
+.checkin-timeline{position:relative;padding-left:20px}
+.checkin-timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border)}
+.checkin-event{position:relative;padding:8px 10px;margin-bottom:8px;background:var(--bg);border-radius:8px}
+.checkin-event::before{content:'';position:absolute;left:-16px;top:12px;width:10px;height:10px;border-radius:50%}
+.checkin-event.in::before{background:var(--green);box-shadow:0 0 8px #22c55e44}
+.checkin-event.out::before{background:var(--orange);box-shadow:0 0 8px #f59e0b44}
+.checkin-event.alert::before{background:var(--red);box-shadow:0 0 8px #ef444444}
+.checkin-event .ce-time{font-size:10px;color:var(--fg3);font-family:monospace}
+.checkin-event .ce-label{font-size:12px;margin-top:2px}
+.checkin-event .ce-detail{font-size:10px;color:var(--fg3);margin-top:1px}
+
+/* 声音频谱 */
+.spectrum{display:flex;align-items:flex-end;gap:2px;height:60px;margin:10px 0}
+.spectrum .sp-bar{width:8px;border-radius:2px 2px 0 0;transition:height .3s}
+.spectrum .sp-bar.bass{background:var(--accent)}
+.spectrum .sp-bar.mid{background:var(--green)}
+.spectrum .sp-bar.high{background:var(--orange)}
+.spectrum .sp-bar.ultra{background:var(--red)}
+
+/* 网格统计 */
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.info-card{padding:10px;background:var(--bg);border-radius:8px;text-align:center}
+.info-card .iv{font-size:16px;font-weight:600}
+.info-card .il{font-size:9px;color:var(--fg3);margin-top:2px}
+
+/* 动画 */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+
+@media(max-width:600px){
+  .floor-plan{grid-template-columns:1fr 1fr}
+  .stats-bar{grid-template-columns:repeat(3,1fr)}
+  .container{padding:10px 12px}
+}
+</style>
+</head>
+<body>
+
+<div class="demo-top">
+  <h1>🦞 灵犀 · 酒店智能演示空间 <span class="tag">DEMO</span></h1>
+  <button class="nav-btn" onclick="resetDemo()">⟳ 重置演示</button>
+  <span class="sub">广州·兰威酒店 ｜ 实时模拟 · 可点击穿透查看详情</span>
+</div>
+
+<div class="container">
+
+<!-- 统计 -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="v" style="color:var(--accent-l)">12</div><div class="l">在住房</div></div>
+  <div class="stat-item"><div class="v" style="color:var(--green)">8</div><div class="l">空房节能</div></div>
+  <div class="stat-item"><div class="v" style="color:var(--orange)">3</div><div class="l">噪音告警</div></div>
+  <div class="stat-item"><div class="v" style="color:var(--purple)">1</div><div class="l">人数异常</div></div>
+  <div class="stat-item"><div class="v" style="color:var(--green)">38.6</div><div class="l">今日省电/kWh</div></div>
+</div>
+
+<!-- 楼层平面 -->
+<h3 style="font-size:12px;color:var(--fg3);margin-bottom:10px;display:flex;align-items:center;gap:6px">📋 楼层状态 · 3F 点击任意房间查看详情</h3>
+<div class="floor-plan" id="floorPlan"></div>
+
+</div>
+
+<!-- 详情面板 -->
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-inner">
+    <button class="detail-close" onclick="closeDetail()">✕</button>
+    <div class="detail-title" id="detailTitle">🏨 301 房</div>
+    
+    <div class="detail-tabs" id="detailTabs">
+      <button class="detail-tab active" data-tab="overview" onclick="switchDetailTab('overview')">📊 总览</button>
+      <button class="detail-tab" data-tab="noise" onclick="switchDetailTab('noise')">🔊 噪音</button>
+      <button class="detail-tab" data-tab="people" onclick="switchDetailTab('people')">👤 入住</button>
+      <button class="detail-tab" data-tab="security" onclick="switchDetailTab('security')">🛡️ 安防</button>
+      <button class="detail-tab" data-tab="energy" onclick="switchDetailTab('energy')">⚡ 节能</button>
+    </div>
+
+    <!-- 总览 -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="grid-3">
+        <div class="info-card"><div class="iv" style="color:var(--green)" id="ovPeople">2</div><div class="il">入住人数</div></div>
+        <div class="info-card"><div class="iv" id="ovTemp">26°C</div><div class="il">室温</div></div>
+        <div class="info-card"><div class="iv" id="ovNoise">62dB</div><div class="il">当前噪音</div></div>
+      </div>
+      <div class="grid-3">
+        <div class="info-card"><div class="iv" id="ovHumi">58%</div><div class="il">湿度</div></div>
+        <div class="info-card"><div class="iv" style="color:var(--green)" id="ovEco">2.4kWh</div><div class="il">今日省电</div></div>
+        <div class="info-card"><div class="iv" id="ovDur">3h12m</div><div class="il">已入住</div></div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--fg2);margin-bottom:6px">🔖 声音标签</div>
+        <div class="room-tags" id="ovTags">
+          <span class="t voice">女性谈话 ✓</span>
+          <span class="t voice">男性说话 ✓</span>
+          <span class="t voice">电视声 ✓</span>
+          <span class="t eco">空调运作 ✓</span>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--fg3);display:flex;gap:12px;flex-wrap:wrap">
+        <span>4G ████ 强</span>
+        <span>WiFi ███░ 中</span>
+        <span>BLE ██░░ 弱</span>
+        <span>PMS联动 ✅</span>
+      </div>
+    </div>
+
+    <!-- 噪音 -->
+    <div class="tab-content" id="tab-noise">
+      <div class="noise-timeline" id="noiseTimeline"></div>
+      <div style="margin-top:12px;font-size:10px;color:var(--fg3)">
+        <p>💡 灵犀通过MEMS麦克风实时采集声音，云端AI识别声纹特征：</p>
+        <p style="margin-top:4px">• 识别性别/年龄段 · 区分谈话/电视/关门声 · 异常分贝自动告警</p>
+      </div>
+    </div>
+
+    <!-- 入住 -->
+    <div class="tab-content" id="tab-people">
+      <div class="grid-3" style="margin-bottom:10px">
+        <div class="info-card"><div class="iv" style="color:var(--green)">2人</div><div class="il">灵犀检测</div></div>
+        <div class="info-card"><div class="iv" style="color:var(--green)">2人</div><div class="il">PMS登记</div></div>
+        <div class="info-card"><div class="iv" style="color:var(--green)">✅ 一致</div><div class="il">比对结果</div></div>
+      </div>
+      <div class="checkin-timeline" id="checkinTimeline"></div>
+    </div>
+
+    <!-- 安防 -->
+    <div class="tab-content" id="tab-security">
+      <div class="grid-3">
+        <div class="info-card"><div class="iv" style="color:var(--green)">🟢 正常</div><div class="il">门磁状态</div></div>
+        <div class="info-card"><div class="iv" style="color:var(--green)">🟢 正常</div><div class="il">人数比对</div></div>
+        <div class="info-card"><div class="iv" style="color:var(--green)">🟢 正常</div><div class="il">异常告警</div></div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--fg2)">
+        <p>✅ 本房间无安防异常</p>
+        <p style="margin-top:4px;font-size:10px;color:var(--fg3)">💡 当检测人数与PMS登记不符时，系统自动标记异常并推送告警</p>
+      </div>
+    </div>
+
+    <!-- 节能 -->
+    <div class="tab-content" id="tab-energy">
+      <div class="grid-3">
+        <div class="info-card"><div class="iv" style="color:var(--green)">2.4kWh</div><div class="il">今日省电</div></div>
+        <div class="info-card"><div class="iv" style="color:var(--green)">38.6kWh</div><div class="il">本月省电</div></div>
+        <div class="info-card"><div class="iv" style="color:var(--green)">¥42.5</div><div class="il">省电金额</div></div>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--fg3)">
+        <p>节能策略生效中：</p>
+        <p>• ✅ 无人超15分钟 → 空调调至26°C节能模式</p>
+        <p>• ✅ 无人超30分钟 → 关闭空调，保持通风</p>
+        <p>• ✅ 客人返回 → 红外+雷达双重确认后恢复空调</p>
+        <p>• ✅ 退房检测 → 保洁打扫完毕后自动切换节能模式</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 模拟房间数据
+var rooms = [
+  {no:'301', status:'ok', people:2, pms:2, temp:26, humi:58, noise:62, eco:'2.4', dur:'3h12m', sig:{'4G':85,'WiFi':60,'BLE':35}, tags:['女性谈话','男性说话','电视声'], gender:'mixed', checkin:[
+    {time:'07:15',type:'in',label:'2人办理入住',detail:'PMS登记一致'},
+    {time:'08:30',type:'out',label:'2人外出',detail:'预计11:00返回'},
+    {time:'11:05',type:'in',label:'2人返回',detail:'携带外卖'},
+  ], noise:[
+    {time:'10:23',type:'female',label:'女性谈话',db:62,bar:'med'},
+    {time:'10:15',type:'male',label:'男性说话',db:58,bar:'med'},
+    {time:'10:02',type:'slam',label:'关门声',db:72,bar:'loud'},
+    {time:'09:45',type:'tv',label:'电视声',db:55,bar:'soft'},
+    {time:'09:30',type:'female',label:'女性说话',db:52,bar:'soft'},
+    {time:'07:20',type:'male',label:'搬运行李',db:48,bar:'soft'},
+  ]},
+  {no:'302', status:'ok', people:1, pms:1, temp:25, humi:55, noise:38, eco:'3.8', dur:'5h20m', sig:{'4G':90,'WiFi':75,'BLE':50}, tags:['单人·办公','键盘声'], gender:'male', checkin:[
+    {time:'06:00',type:'in',label:'1人办理入住',detail:'商务旅客'},
+    {time:'08:45',type:'out',label:'1人外出',detail:'可能是开会'},
+  ], noise:[
+    {time:'08:30',type:'male',label:'电话通话',db:55,bar:'med'},
+    {time:'07:50',type:'male',label:'键盘打字',db:42,bar:'soft'},
+    {time:'07:00',type:'male',label:'洗漱声',db:48,bar:'soft'},
+  ]},
+  {no:'303', status:'alert', people:3, pms:2, temp:27, humi:62, noise:68, eco:'1.2', dur:'1h45m', sig:{'4G':80,'WiFi':55,'BLE':30}, tags:['女性谈话','小孩尖叫声','电视声','男性说话'], gender:'family', checkin:[
+    {time:'09:30',type:'in',label:'PMS登记2人',detail:'⚠️ 检测到3人'},
+    {time:'09:35',type:'alert',label:'⚠️ 人数异常告警',detail:'检测3人 vs PMS登记2人'},
+  ], noise:[
+    {time:'10:30',type:'child',label:'小孩尖叫声',db:78,bar:'loud'},
+    {time:'10:20',type:'female',label:'女性说话',db:65,bar:'med'},
+    {time:'10:10',type:'child',label:'小孩跑步声',db:60,bar:'med'},
+    {time:'09:50',type:'tv',label:'电视·动画片',db:58,bar:'med'},
+    {time:'09:35',type:'male',label:'男性说话',db:52,bar:'soft'},
+  ]},
+  {no:'304', status:'warn', people:0, pms:1, temp:28, humi:60, noise:72, eco:'0', dur:'已退房', sig:{'4G':75,'WiFi':50,'BLE':25}, tags:['噪音异常','退房后有人声'], gender:'none', checkin:[
+    {time:'08:00',type:'out',label:'退房',detail:'PMS标记已退房'},
+    {time:'09:15',type:'alert',label:'⚠️ 退房后检测到声音',detail:'持续15分钟，可能是保洁'},
+  ], noise:[
+    {time:'09:15',type:'female',label:'保洁打扫·吸尘器',db:72,bar:'loud'},
+    {time:'09:00',type:'male',label:'水电维修',db:65,bar:'med'},
+  ]},
+  {no:'305', status:'empty', people:0, pms:0, temp:30, humi:50, noise:0, eco:'6.8', dur:'空房', sig:{'4G':70,'WiFi':45,'BLE':20}, tags:['节能中','已空8h'], gender:'none', checkin:[
+    {time:'昨日22:00',type:'out',label:'最后客人退房',detail:''},
+  ], noise:[]},
+  {no:'306', status:'ok', people:2, pms:2, temp:24, humi:52, noise:45, eco:'3.2', dur:'6h30m', sig:{'4G':88,'WiFi':65,'BLE':40}, tags:['安静','空调运作'], gender:'quiet', checkin:[
+    {time:'04:30',type:'in',label:'2人办理入住（凌晨）',detail:'红眼航班'},
+  ], noise:[
+    {time:'06:00',type:'female',label:'轻声交谈',db:45,bar:'soft'},
+  ]},
+  {no:'307', status:'empty', people:0, pms:0, temp:29, humi:48, noise:0, eco:'5.2', dur:'空房', sig:{'4G':65,'WiFi':40,'BLE':15}, tags:['节能中','已空2天'], gender:'none', checkin:[], noise:[]},
+  {no:'308', status:'warn', people:1, pms:1, temp:26, humi:56, noise:55, eco:'1.8', dur:'2h00m', sig:{'4G':82,'WiFi':58,'BLE':32}, tags:['女性独居','音乐声'], gender:'female', checkin:[
+    {time:'08:00',type:'in',label:'1人办理入住',detail:'女性独行旅客'},
+  ], noise:[
+    {time:'09:30',type:'female',label:'播放音乐',db:55,bar:'med'},
+    {time:'09:00',type:'female',label:'打电话',db:50,bar:'soft'},
+  ]},
+];
+
+// 详细房间数据映射
+var roomDetail = {};
+rooms.forEach(function(r){roomDetail[r.no]=r});
+
+function renderFloor() {
+  var fp = document.getElementById('floorPlan');
+  fp.innerHTML = '';
+  rooms.forEach(function(r) {
+    var cls = 'room-card status-'+r.status;
+    var stText = {ok:'🟢 正常',warn:'🟡 关注',alert:'🔴 异常',empty:'⚫ 空房'};
+    var stCls = {ok:'ok',warn:'warn',alert:'alert',empty:'empty'};
+    var numColor = {ok:'g',warn:'w',alert:'r',empty:''};
+    
+    var html = '<div class="'+cls+'" onclick="openDetail(\''+r.no+'\')">';
+    html += '<div class="room-header"><span class="room-no">'+r.no+'</span><span class="room-status '+stCls[r.status]+'">'+stText[r.status]+'</span></div>';
+    
+    if (r.status !== 'empty') {
+      html += '<div class="room-people"><span class="num '+numColor[r.status]+'">'+r.people+'</span><span style="font-size:11px;color:var(--fg2)">人</span>';
+      html += '<span class="pms">PMS: '+r.pms+'人 '+(r.people===r.pms?'✅':'⚠️')+'</span></div>';
+    } else {
+      html += '<div class="room-people"><span style="font-size:11px;color:var(--fg3)">无人 · 节能中</span></div>';
+    }
+    
+    html += '<div class="room-sensors">';
+    html += '<div class="s"><div class="v">'+r.temp+'°</div><div class="l">室温</div></div>';
+    html += '<div class="s"><div class="v">'+(r.status!=='empty'?r.noise+'dB':'—')+'</div><div class="l">噪音</div></div>';
+    html += '<div class="s"><div class="v">'+r.humi+'%</div><div class="l">湿度</div></div>';
+    html += '</div>';
+    
+    html += '<div class="room-tags">';
+    r.tags.forEach(function(t){html += '<span class="t voice">#'+t+'</span>'});
+    if (r.eco > 0) html += '<span class="t eco">⚡ +'+r.eco+'kWh</span>';
+    html += '</div>';
+    
+    html += '<div class="room-sigs">';
+    html += '<span>4G '+(r.sig['4G']>80?'████':r.sig['4G']>60?'███░':r.sig['4G']>40?'██░░':'█░░░')+'</span>';
+    html += '<span>WiFi '+(r.sig['WiFi']>60?'███░':r.sig['WiFi']>40?'██░░':'█░░░')+'</span>';
+    html += '<span>BLE '+(r.sig['BLE']>30?'██░░':'█░░░')+'</span>';
+    html += '<span style="flex:1;text-align:right;color:var(--fg3)">'+r.dur+'</span>';
+    html += '</div></div>';
+    
+    fp.innerHTML += html;
+  });
+}
+
+function openDetail(no) {
+  var r = roomDetail[no];
+  if (!r) return;
+  document.getElementById('detailTitle').innerHTML = '🏨 '+r.no+' 房  <span style="font-size:12px;color:var(--fg3);font-weight:400">点击标签页查看详情</span>';
+  
+  // 总览数据
+  document.getElementById('ovPeople').textContent = r.people+'人';
+  document.getElementById('ovPeople').style.color = r.people===r.pms ? 'var(--green)' : 'var(--red)';
+  document.getElementById('ovTemp').textContent = r.temp+'°C';
+  document.getElementById('ovNoise').textContent = r.noise+'dB';
+  document.getElementById('ovHumi').textContent = r.humi+'%';
+  document.getElementById('ovEco').textContent = r.eco+'kWh';
+  document.getElementById('ovDur').textContent = r.dur;
+  
+  // 标签
+  var tags = '';
+  r.tags.forEach(function(t){tags += '<span class="t voice">'+t+'</span>'});
+  if (r.gender === 'male') tags += '<span class="t voice">男性 ✓</span>';
+  else if (r.gender === 'female') tags += '<span class="t voice">女性 ✓</span>';
+  else if (r.gender === 'family') tags += '<span class="t voice">家庭入住 👨‍👩‍👧</span>';
+  else if (r.gender === 'mixed') tags += '<span class="t voice">男女混合 ✓</span>';
+  else if (r.gender === 'quiet') tags += '<span class="t voice">安静 ✓</span>';
+  if (r.status === 'empty') tags += '<span class="t eco">节能中 ✓</span>';
+  if (r.status === 'alert') tags += '<span class="t security">⚠️ 异常告警</span>';
+  tags += '<span class="t eco">⚡ 省电 '+r.eco+'kWh</span>';
+  document.getElementById('ovTags').innerHTML = tags;
+  
+  // 噪音时间线
+  var nt = '';
+  r.noise.forEach(function(n) {
+    var tcls = {female:'female',male:'male',child:'child',tv:'tv',slam:'slam'}[n.type]||'female';
+    var icons = {female:'👩',male:'👨',child:'👶',tv:'📺',slam:'🚪'};
+    nt += '<div class="noise-event">';
+    nt += '<span class="time">'+n.time+'</span>';
+    nt += '<div class="bar '+n.bar+'"></div>';
+    nt += '<span class="tag-label '+tcls+'">'+(icons[n.type]||'')+' '+n.label+'</span>';
+    nt += '<span class="db">'+n.db+'dB</span>';
+    nt += '</div>';
+  });
+  if (!nt) nt = '<div style="padding:12px;text-align:center;color:var(--fg3);font-size:11px">暂无噪音记录</div>';
+  document.getElementById('noiseTimeline').innerHTML = nt;
+  
+  // 入住时间线
+  var ct = '';
+  r.checkin.forEach(function(e) {
+    var ic = {in:'✅',out:'🚶',alert:'⚠️'}[e.type]||'•';
+    ct += '<div class="checkin-event '+e.type+'">';
+    ct += '<div class="ce-time">'+e.time+' '+ic+'</div>';
+    ct += '<div class="ce-label">'+e.label+'</div>';
+    if (e.detail) ct += '<div class="ce-detail">'+e.detail+'</div>';
+    ct += '</div>';
+  });
+  if (!ct) ct = '<div style="padding:12px;text-align:center;color:var(--fg3);font-size:11px">暂无入住记录</div>';
+  document.getElementById('checkinTimeline').innerHTML = ct;
+  
+  // 安防tab更新
+  var secTabs = document.querySelectorAll('#tab-security .grid-3 .info-card .iv');
+  if (r.status === 'alert') {
+    secTabs[0].textContent = '🟢 正常';
+    secTabs[0].style.color = 'var(--green)';
+    secTabs[1].textContent = '🔴 异常';
+    secTabs[1].style.color = 'var(--red)';
+    secTabs[2].textContent = '⚠️ 人数不符';
+    secTabs[2].style.color = 'var(--red)';
+  } else if (r.status === 'warn') {
+    secTabs[0].textContent = '🟢 正常';
+    secTabs[0].style.color = 'var(--green)';
+    secTabs[1].textContent = '🟢 正常';
+    secTabs[1].style.color = 'var(--green)';
+    secTabs[2].textContent = '⚠️ 噪音异常';
+    secTabs[2].style.color = 'var(--orange)';
+  } else {
+    secTabs[0].textContent = '🟢 正常';
+    secTabs[0].style.color = 'var(--green)';
+    secTabs[1].textContent = '🟢 正常';
+    secTabs[1].style.color = 'var(--green)';
+    secTabs[2].textContent = '🟢 无异常';
+    secTabs[2].style.color = 'var(--green)';
+  }
+  
+  document.getElementById('detailPanel').classList.add('show');
+  switchDetailTab('overview');
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('show');
+}
+
+function switchDetailTab(tab) {
+  document.querySelectorAll('.detail-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active')});
+  document.querySelector('.detail-tab[data-tab="'+tab+'"]').classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+function resetDemo() {
+  closeDetail();
+}
+
+// click outside to close
+document.getElementById('detailPanel').addEventListener('click', function(e) {
+  if (e.target === this) closeDetail();
+});
+
+renderFloor();
+</script>
+</body>
+</html>

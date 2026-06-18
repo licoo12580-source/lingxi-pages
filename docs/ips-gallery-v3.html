@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🦞 IPS屏幕设计集 v3 · 12种数据模型</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:system-ui,sans-serif;padding:16px}
+h1{font-size:18px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sub{color:#64748b;font-size:11px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.sc-card{background:#1e293b;border:1px solid #334155;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s}
+.sc-card:hover{transform:translateY(-2px);border-color:#3b82f6;box-shadow:0 4px 20px #3b82f622}
+.sc-card .label{padding:7px 12px;font-size:10px;color:#94a3b8;border-bottom:1px solid #334155;display:flex;justify-content:space-between}
+.sc-card .label .tag{padding:1px 6px;border-radius:3px;font-size:8px}
+.ips{width:100%;aspect-ratio:4/3;padding:8px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+/* ===== 1: 能耗概况（省电核心） ===== */
+.s1{background:linear-gradient(135deg,#0f172a,#064e3b)}.s1 .eco-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex:1}.s1 .eco-card{background:#00000044;border-radius:6px;padding:6px;display:flex;flex-direction:column;justify-content:center}.s1 .eco-card .ev{font-size:18px;font-weight:700}.s1 .eco-card .ev.g{color:#22c55e}.s1 .eco-card .ev.b{color:#60a5fa}.s1 .eco-card .el{font-size:7px;color:#94a3b8;margin-top:1px}.s1 .eco-card .esub{font-size:9px;color:#64748b;display:flex;justify-content:space-between}.s1 .eco-main{grid-column:1/-1;background:#22c55e11;border:1px solid #22c55e33;padding:8px}.s1 .eco-main .ebig{font-size:28px;font-weight:700;color:#22c55e}.s1 .eco-main .eunit{font-size:10px;color:#64748b;margin-left:4px}.s1 .eco-main .erow{display:flex;gap:10px;margin-top:4px;font-size:7px;color:#94a3b8}.s1 .eco-footer{font-size:6px;color:#64748b;display:flex;justify-content:space-between;margin-top:2px}
+/* ===== 2: 酒店运营 ===== */
+.s2{background:#0f172a}.s2 .ops-top{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:4px}.s2 .ops-occ{background:#3b82f611;border:1px solid #3b82f633;border-radius:6px;padding:6px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.s2 .ops-occ .op{font-size:24px;font-weight:700;color:#60a5fa}.s2 .ops-occ .ol{font-size:7px;color:#94a3b8}.s2 .ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;flex:1}.s2 .ops-item{background:#1e293b;border-radius:4px;padding:4px;display:flex;justify-content:space-between;align-items:center;font-size:8px}.s2 .ops-item .ov{font-weight:600}.s2 .ops-item .ov.red{color:#ef4444}.s2 .ops-item .ov.green{color:#22c55e}.s2 .ops-item .ov.yellow{color:#f59e0b}.s2 .ops-item .ol2{color:#64748b;font-size:7px}.s2 .ops-bot{font-size:6px;color:#64748b;display:flex;justify-content:space-between;margin-top:2px}
+/* ===== 3: 安防监控 ===== */
+.s3{background:#0a0a0a}.s3 .sec-header{display:flex;justify-content:space-between;font-size:7px;color:#ef4444;margin-bottom:4px}.s3 .sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;flex:1}.s3 .sec-door{grid-column:1/-1;background:#1e293b;border-radius:6px;padding:6px;display:flex;justify-content:space-between;align-items:center}.s3 .sec-door .dstat{display:flex;align-items:center;gap:6px}.s3 .sec-door .dicon{font-size:16px}.s3 .sec-door .dtext{font-size:8px}.s3 .sec-door .dtext.closed{color:#22c55e}.s3 .sec-door .dtext.open{color:#ef4444;animation:pulse 1.5s infinite}.s3 .sec-door .dcount{font-size:10px;color:#64748b}.s3 .sec-item{background:#1e293b;border-radius:4px;padding:4px;font-size:7px;display:flex;justify-content:space-between}.s3 .sec-item .sv{font-weight:600}.s3 .sec-item .sv.green{color:#22c55e}.s3 .sec-item .sv.red{color:#ef4444}.s3 .sec-alert{background:#ef444422;border:1px solid #ef444455;border-radius:4px;padding:4px;font-size:7px;display:flex;justify-content:space-between;color:#ef4444;animation:pulse 2s infinite}.s3 .sec-bot{font-size:6px;color:#64748b;display:flex;justify-content:space-between;margin-top:2px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+/* ===== 4: 能耗对比 ===== */
+.s4{background:#0f172a}.s4 .cmp-header{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:4px}.s4 .cmp-main{display:flex;gap:6px;flex:1}.s4 .cmp-bar{flex:1;display:flex;flex-direction:column;align-items:center}.s4 .cmp-bar .bh{font-size:7px;color:#94a3b8;margin-bottom:2px}.s4 .cmp-bar .bvis{flex:1;display:flex;flex-direction:column;justify-content:flex-end;width:100%;align-items:center}.s4 .cmp-bar .bar{width:32px;border-radius:4px 4px 0 0;transition:height .5s}.s4 .cmp-bar .bar.today{background:#22c55e}.s4 .cmp-bar .bar.yest{background:#60a5fa}.s4 .cmp-bar .bar.avg{background:#f59e0b}.s4 .cmp-bar .bv{font-size:16px;font-weight:700;margin-top:4px}.s4 .cmp-bar .bv.g{color:#22c55e}.s4 .cmp-bar .bv.b{color:#60a5fa}.s4 .cmp-bar .bv.o{color:#f59e0b}.s4 .cmp-bar .bl{font-size:6px;color:#64748b;margin-top:2px}.s4 .cmp-table{width:100%;margin-top:4px}.s4 .cmp-table .cr{display:flex;justify-content:space-between;font-size:7px;padding:2px 4px}.s4 .cmp-table .cr:nth-child(odd){background:#1e293b;border-radius:3px}.s4 .cmp-table .cr .cv.g{color:#22c55e}.s4 .cmp-table .cr .cv.r{color:#ef4444}
+/* ===== 5: 客需服务 ===== */
+.s5{background:#111827}.s5 .svc-header{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:4px}.s5 .svc-queue{flex:1;display:flex;flex-direction:column;gap:3px}.s5 .svc-item{display:flex;align-items:center;gap:4px;padding:4px 6px;background:#1e293b;border-radius:5px;font-size:8px;border-left:3px solid}.s5 .svc-item.p0{border-color:#ef4444}.s5 .svc-item.p1{border-color:#f59e0b}.s5 .svc-item.p2{border-color:#3b82f6}.s5 .svc-item.p3{border-color:#64748b}.s5 .svc-item .sroom{color:#60a5fa;font-size:7px;min-width:30px}.s5 .svc-item .stype{flex:1;color:#e2e8f0}.s5 .svc-item .selapsed{color:#64748b;font-size:6px;min-width:24px;text-align:right}.s5 .svc-stats{display:flex;justify-content:space-between;font-size:6px;color:#64748b;margin-top:3px}.s5 .svc-stats .ss{color:#e2e8f0}.s5 .svc-avgresp{text-align:center;font-size:6px;color:#64748b;margin-top:2px}.s5 .svc-avgresp .svc-num{color:#22c55e;font-weight:600}
+/* ===== 6: 设备健康 ===== */
+.s6{background:#0a0e1a}.s6 .dev-header{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:4px}.s6 .dev-ok{background:#22c55e11;border:1px solid #22c55e33;border-radius:6px;padding:4px 8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.s6 .dev-ok .dop{font-size:22px;font-weight:700;color:#22c55e}.s6 .dev-ok .dol{font-size:7px;color:#94a3b8}.s6 .dev-table{flex:1;display:flex;flex-direction:column;gap:2px}.s6 .dev-row{display:flex;align-items:center;gap:4px;padding:3px 4px;background:#1e293b;border-radius:3px;font-size:7px}.s6 .dev-row .dname{min-width:36px;color:#94a3b8}.s6 .dev-row .dbar{flex:1;height:4px;background:#334155;border-radius:2px;overflow:hidden}.s6 .dev-row .dbar .dfill{height:100%;border-radius:2px;transition:width .5s}.s6 .dev-row .dbar .dfill.g{background:#22c55e}.s6 .dev-row .dbar .dfill.y{background:#f59e0b}.s6 .dev-row .dbar .dfill.r{background:#ef4444}.s6 .dev-row .dpct{color:#64748b;min-width:22px;text-align:right}.s6 .dev-row .dstat{width:6px;height:6px;border-radius:50%}.s6 .dev-row .dstat.online{background:#22c55e}.s6 .dev-row .dstat.offline{background:#ef4444}.s6 .dev-footer{font-size:6px;color:#64748b;display:flex;justify-content:space-between;margin-top:2px}
+/* ===== 7: 环境感知 ===== */
+.s7{background:#0f172a}.s7 .env-header{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:3px}.s7 .env-mat{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,1fr);gap:2px;flex:1}.s7 .env-cell{background:#1e293b;border-radius:3px;padding:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:6px}.s7 .env-cell .ev2{font-size:9px;font-weight:600}.s7 .env-cell .ev2.cool{color:#60a5fa}.s7 .env-cell .ev2.warm{color:#f59e0b}.s7 .env-cell .ev2.hot{color:#ef4444}.s7 .env-cell .ev2.good{color:#22c55e}.s7 .env-cell .el2{color:#64748b;font-size:5px}.s7 .env-cell.sensor{background:#3b82f611;border:1px solid #3b82f633}.s7 .env-legend{display:flex;gap:6px;font-size:5px;color:#64748b;margin-top:2px}.s7 .env-legend span{display:flex;align-items:center;gap:2px}.s7 .env-legend .dot{width:5px;height:5px;border-radius:50%}
+/* ===== 8: 时间回溯 ===== */
+.s8{background:#111827}.s8 .ts-header{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:4px}.s8 .ts-timeline{flex:1;display:flex;flex-direction:column;gap:2px;overflow:hidden}.s8 .ts-event{display:flex;align-items:center;gap:4px;padding:3px 5px;background:#1e293b;border-radius:4px;font-size:7px;border-left:2px solid}.s8 .ts-event.te-eco{border-color:#22c55e}.s8 .ts-event.te-in{border-color:#60a5fa}.s8 .ts-event.te-out{border-color:#f59e0b}.s8 .ts-event.te-noise{border-color:#ef4444}.s8 .ts-event .ttime{color:#94a3b8;font-family:monospace;min-width:28px}.s8 .ts-event .ttext{flex:1;color:#e2e8f0}.s8 .ts-event .tval{color:#64748b;font-size:6px}.s8 .ts-summary{display:flex;justify-content:space-between;font-size:6px;color:#64748b;margin-top:2px;padding:3px 4px;background:#1e293b;border-radius:3px}
+/* ===== 9: 房态总览 ===== */
+.s9{background:#0f172a}.s9 .rm-header{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:4px}.s9 .rm-legend{display:flex;gap:6px;font-size:6px;margin-bottom:4px}.s9 .rm-legend span{display:flex;align-items:center;gap:2px}.s9 .rm-legend .rdot{width:6px;height:6px;border-radius:2px}.s9 .rm-legend .rdot.occ{background:#3b82f6}.s9 .rm-legend .rdot.empty{background:#334155}.s9 .rm-legend .rdot.clean{background:#22c55e}.s9 .rm-legend .rdot.maint{background:#f59e0b}.s9 .rm-legend .rdot.alert{background:#ef4444}.s9 .rm-grid{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:3px;align-content:start}.s9 .rm-cell{aspect-ratio:1.2;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;font-weight:600;position:relative}.s9 .rm-cell.occ{background:#3b82f622;border:1px solid #3b82f644;color:#60a5fa}.s9 .rm-cell.empty{background:#1e293b;border:1px solid #334155;color:#475569}.s9 .rm-cell.clean{background:#22c55e22;border:1px solid #22c55e44;color:#22c55e}.s9 .rm-cell.maint{background:#f59e0b22;border:1px solid #f59e0b44;color:#f59e0b}.s9 .rm-cell.alert{background:#ef444422;border:1px solid #ef444444;color:#ef4444;animation:pulse 2s infinite}.s9 .rm-cell .rmnum{font-size:9px}.s9 .rm-cell .rmicon{font-size:7px;margin-top:1px}.s9 .rm-footer{font-size:6px;color:#64748b;display:flex;justify-content:space-between;margin-top:2px}
+/* ===== 10: 收益分析 ===== */
+.s10{background:linear-gradient(135deg,#0f172a,#1a1a2e)}.s10 .rev-header{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:3px}.s10 .rev-main{display:flex;gap:4px;flex:1}.s10 .rev-left{flex:1;display:flex;flex-direction:column}.s10 .rev-left .rbig{font-size:24px;font-weight:700;color:#22c55e}.s10 .rev-left .runit{font-size:8px;color:#64748b}.s10 .rev-left .rsub{font-size:7px;color:#94a3b8;margin-top:2px;display:flex;gap:8px}.s10 .rev-left .rsub span{display:flex;align-items:center;gap:2px}.s10 .rev-right{width:40%;display:grid;grid-template-columns:1fr 1fr;gap:2px}.s10 .rev-right .rcell{background:#00000033;border-radius:4px;padding:3px;display:flex;flex-direction:column;align-items:center;justify-content:center}.s10 .rev-right .rcell .rv2{font-size:8px;font-weight:600}.s10 .rev-right .rcell .rv2.g{color:#22c55e}.s10 .rev-right .rcell .rv2.r{color:#ef4444}.s10 .rev-right .rcell .rv2.b{color:#60a5fa}.s10 .rev-right .rcell .rl2{font-size:5px;color:#64748b}.s10 .rev-pie{position:absolute;bottom:4px;left:6px;right:6px;display:flex;gap:4px;font-size:5px;color:#64748b;justify-content:space-between}
+/* ===== 11: 客人画像 ===== */
+.s11{background:#0f172a}.s11 .prof-header{display:flex;justify-content:space-between;font-size:7px;color:#64748b;margin-bottom:4px}.s11 .prof-avatar{display:flex;align-items:center;gap:6px;margin-bottom:4px}.s11 .prof-avatar .pa{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:700}.s11 .prof-avatar .pname{font-size:10px;font-weight:600}.s11 .prof-avatar .ptag{font-size:6px;color:#64748b;background:#1e293b;padding:1px 5px;border-radius:3px}.s11 .prof-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;flex:1}.s11 .prof-item{background:#1e293b;border-radius:4px;padding:4px;display:flex;flex-direction:column;align-items:center;text-align:center}.s11 .prof-item .pv{font-size:14px;font-weight:700}.s11 .prof-item .pv.g{color:#22c55e}.s11 .prof-item .pv.b{color:#60a5fa}.s11 .prof-item .pv.o{color:#f59e0b}.s11 .prof-item .pv.r{color:#ef4444}.s11 .prof-item .pl{font-size:6px;color:#64748b;margin-top:1px}.s11 .prof-foot{font-size:6px;color:#64748b;display:flex;justify-content:space-between;margin-top:2px}
+/* ===== 12: 告警中心 ===== */
+.s12{background:#0a0a0a}.s12 .alert-header{display:flex;justify-content:space-between;font-size:7px;color:#ef4444;margin-bottom:4px}.s12 .alert-badge{background:#ef4444;color:#fff;font-size:8px;padding:1px 6px;border-radius:8px;font-weight:700}.s12 .alert-list{flex:1;display:flex;flex-direction:column;gap:3px;overflow:hidden}.s12 .alert-item{display:flex;align-items:center;gap:4px;padding:4px 5px;background:#1e293b;border-radius:4px;font-size:7px;border-left:3px solid}.s12 .alert-item.critical{border-color:#ef4444;background:#ef44440a}.s12 .alert-item.warning{border-color:#f59e0b;background:#f59e0b0a}.s12 .alert-item.info{border-color:#3b82f6;background:#3b82f60a}.s12 .alert-item .aicon{font-size:10px}.s12 .alert-item .atext{flex:1;color:#e2e8f0}.s12 .alert-item .atime{color:#64748b;font-size:6px;min-width:28px;text-align:right;font-family:monospace}.s12 .alert-foot{display:flex;justify-content:space-between;font-size:6px;color:#64748b;margin-top:2px;padding:2px 4px;background:#1e293b;border-radius:3px}
+</style>
+</head>
+<body>
+<h1>🦞 IPS屏幕设计集 v3 · 12种数据模型</h1>
+<p class="sub">每种屏幕的数据来源、数据层次、数据用途完全不同 · 不只是布局换皮</p>
+<div class="grid" id="gallery"></div>
+<script>
+var styles = [
+  {id:'s1',name:'⚡ 能耗概况',tag:'ECO',data:'今日省电、偏移量、外出节能、深睡调温 — 核心省电数据模型'},
+  {id:'s2',name:'🏢 酒店运营',tag:'OPS',data:'入住率、退房/清洁、维修工单、VIP — 运营管理数据模型'},
+  {id:'s3',name:'🔒 安防监控',tag:'SEC',data:'门磁状态、开合次数、异常告警、紧急按钮 — 安防数据模型'},
+  {id:'s4',name:'📊 能耗对比',tag:'CMP',data:'今日vs昨日vs同类型、每房排行 — 对比分析数据模型'},
+  {id:'s5',name:'🛎️ 客需服务',tag:'SVC',data:'服务队列、响应时长、满意度 — 服务管理数据模型'},
+  {id:'s6',name:'⚙️ 设备健康',tag:'DEV',data:'在线率、信号强度、电量、固件 — 设备运维数据模型'},
+  {id:'s7',name:'🌿 环境感知',tag:'ENV',data:'温度矩阵、CO₂、PM2.5、TVOC — 环境传感数据模型'},
+  {id:'s8',name:'🕐 时间回溯',tag:'TS',data:'全天活动轨迹、节能事件、进出记录 — 时序数据模型'},
+  {id:'s9',name:'🏨 房态总览',tag:'RM',data:'整层房间状态矩阵 — 空间分布数据模型'},
+  {id:'s10',name:'💰 收益分析',tag:'REV',data:'RevPAR、能耗成本、利润占比、佣金 — 财务数据模型'},
+  {id:'s11',name:'👤 客人画像',tag:'PROF',data:'温度偏好、节能贡献分、入住习惯 — 用户画像数据模型'},
+  {id:'s12',name:'🚨 告警中心',tag:'ALERT',data:'实时告警、异常事件、处理状态 — 事件告警数据模型'},
+];
+var modes = ['日间','夜间','高峰','维护','屏保'];
+
+function renderStyle(s, mode, preview) {
+  var sz = preview ? '28px' : '18px';
+  switch(s.id) {
+    case 's1': return s1html(mode); case 's2': return s2html(mode);
+    case 's3': return s3html(mode); case 's4': return s4html(mode);
+    case 's5': return s5html(mode); case 's6': return s6html(mode);
+    case 's7': return s7html(mode); case 's8': return s8html(mode);
+    case 's9': return s9html(mode); case 's10': return s10html(mode);
+    case 's11': return s11html(mode); case 's12': return s12html(mode);
+  }
+}
+
+// S1: 能耗概况 — 省电核心
+function s1html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">⚡ 今日省电</div><div style="font-size:28px;font-weight:700;color:#22c55e">2.4 kWh</div><div style="font-size:7px;color:#64748b">省电金额 ¥4.2 · 无人 3h12m</div></div>';
+  return '<div class="eco-grid"><div class="eco-card eco-main"><div class="ebig">2.4 <span class="eunit">kWh</span></div><div class="erow"><span>省电金额 ¥4.2</span><span>节能率 23%</span><span>CO₂减排 1.8kg</span></div></div><div class="eco-card"><div class="ev g">+4°C</div><div class="el">省电偏移</div><div class="esub"><span>设定22°→26°</span></div></div><div class="eco-card"><div class="ev b">3次</div><div class="el">外出节能</div><div class="esub"><span>共5h12m</span></div></div><div class="eco-card"><div class="ev g">24°C</div><div class="el">深睡调温</div><div class="esub"><span>21:30→23:00触发</span></div></div><div class="eco-card"><div class="ev b">6h</div><div class="el">深睡时长</div><div class="esub"><span>占夜间 75%</span></div></div></div><div class="eco-footer"><span>301房 · 陈先生</span><span>设定22°C</span><span>4G ████</span></div>';
+}
+
+// S2: 酒店运营
+function s2html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">🏢 运营概览</div><div style="font-size:24px;font-weight:700;color:#60a5fa">68%</div><div style="font-size:7px;color:#64748b">入住率 · 17/25间</div></div>';
+  var occs = {日间:'68%',夜间:'72%',高峰:'94%',维护:'15%'};
+  var occ = occs[mode]||'68%';
+  var busy = mode==='高峰'?'24':'12';
+  return '<div class="ops-top"><span>🏢 楼层运营</span><span>'+mode+'</span><span>更新 刚刚</span></div><div class="ops-occ"><div class="op">'+occ+'</div><div><div class="ol">入住率</div><div class="ol" style="color:#94a3b8">17/25间已订</div></div></div><div class="ops-grid"><div class="ops-item"><span class="ol2">退房待清</span><span class="ov yellow">3间</span></div><div class="ops-item"><span class="ol2">清洁中</span><span class="ov green">2间</span></div><div class="ops-item"><span class="ol2">维修中</span><span class="ov red">1间</span></div><div class="ops-item"><span class="ol2">VIP在住</span><span class="ov yellow">'+busy+'间</span></div><div class="ops-item"><span class="ol2">预抵今日</span><span class="ov green">8单</span></div><div class="ops-item"><span class="ol2">预离今日</span><span class="ov">5单</span></div></div><div class="ops-bot"><span>⏱ 平均清洁 28min</span><span>团队入住 2批</span></div>';
+}
+
+// S3: 安防监控
+function s3html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">🔒 安防状态</div><div style="font-size:18px;font-weight:700;color:#22c55e">全部正常</div><div style="font-size:7px;color:#64748b">0异常 · 已守护 3d2h</div></div>';
+  var alerts = {日間:0,夜間:0,高峰:3,維護:1,屏保:0};
+  var na = alerts[mode]||0;
+  return '<div class="sec-header"><span>🔒 安防监控</span><span>'+mode+'</span><span>异常 '+(na>0?'<span style="color:#ef4444">'+na+'件</span>':'0件')+'</span></div><div class="sec-grid"><div class="sec-door"><div class="dstat"><span class="dicon">🚪</span><span class="dtext '+(mode==='高峰'?'open':'closed')+'">'+(mode==='高峰'?'门窗开启':'门窗关闭')+'</span></div><span class="dcount">今日开合 12次</span></div><div class="sec-item"><span>门磁电池</span><span class="sv green">98%</span></div><div class="sec-item"><span>红外探头</span><span class="sv green">在线</span></div><div class="sec-item"><span>紧急按钮</span><span class="sv green">正常</span></div><div class="sec-item"><span>烟感</span><span class="sv green">正常</span></div>'+(na>0?'<div class="sec-alert" style="grid-column:1/-1">🚨 异常告警 '+na+'件 · 302门未关 · 308烟感自检</div>':'<div class="sec-item" style="grid-column:1/-1"><span>消防联动</span><span class="sv green">正常</span></div>')+'</div><div class="sec-bot"><span>📷 抓拍 0异常</span><span>离线设备 0</span></div>';
+}
+
+// S4: 能耗对比
+function s4html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">📊 能耗对比</div><div style="font-size:22px;font-weight:300;color:#22c55e">-23%</div><div style="font-size:7px;color:#64748b">比昨日省 0.6kWh</div></div>';
+  var pcts = {日間:'100%',夜間:'100%',高峰:'120%',維護:'40%'};
+  var hp = pcts[mode]||'100%';
+  return '<div class="cmp-header"><span>📊 能耗对比</span><span>301房</span><span>'+mode+'</span></div><div class="cmp-main"><div class="cmp-bar"><div class="bh">今日</div><div class="bvis"><div class="bar today" style="height:'+hp+'"></div></div><div class="bv g">2.4</div><div class="bl">kWh</div></div><div class="cmp-bar"><div class="bh">昨日</div><div class="bvis"><div class="bar yest" style="height:130%"></div></div><div class="bv b">3.0</div><div class="bl">kWh</div></div><div class="cmp-bar"><div class="bh">同类均值</div><div class="bvis"><div class="bar avg" style="height:110%"></div></div><div class="bv o">2.8</div><div class="bl">kWh</div></div></div><div class="cmp-table"><div class="cr"><span>同类最低</span><span class="cv g">1.8 kWh · 205房</span></div><div class="cr"><span>同类最高</span><span class="cv r">4.2 kWh · 310房</span></div><div class="cr"><span>本月累计</span><span class="cv g">省电 47 kWh · ¥82.3</span></div></div>';
+}
+
+// S5: 客需服务
+function s5html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">🛎️ 客需服务</div><div style="font-size:16px;font-weight:700;color:#22c55e">待处理 2</div><div style="font-size:7px;color:#64748b">平均响应 4min</div></div>';
+  var items = {日間:[{room:'302',type:'🧹 需要打扫',prio:'p1',time:'3min'},{room:'305',type:'🛏️ 加一床被子',prio:'p2',time:'8min'},{room:'310',type:'🔧 电视遥控',prio:'p2',time:'12min'}],夜間:[{room:'301',type:'🌙 夜床服务',prio:'p2',time:'2min'},{room:'307',type:'🚰 需要矿泉水',prio:'p3',time:'6min'}],高峰:[{room:'308',type:'🚨 马桶堵塞',prio:'p0',time:'15min'},{room:'302',type:'🧹 打扫',prio:'p1',time:'5min'},{room:'305',type:'🛏️ 加床',prio:'p2',time:'7min'},{room:'311',type:'🔑 门卡失效',prio:'p0',time:'20min'}],維護:[{room:'201',type:'🔧 空调检修',prio:'p1',time:'30min'},{room:'203',type:'💡 灯泡更换',prio:'p3',time:'5min'}]};
+  var list = items[mode]||items['日間'];
+  return '<div class="svc-header"><span>🛎️ 客需服务</span><span>'+mode+'</span><span>待处理 '+list.length+'</span></div><div class="svc-queue">'+list.map(function(i){return '<div class="svc-item '+i.prio+'"><span class="sroom">'+i.room+'</span><span class="stype">'+i.type+'</span><span class="selapsed">'+i.time+'</span></div>';}).join('')+'</div><div class="svc-stats"><span>已处理 今日 <span class="ss">24单</span></span><span>满意度 <span class="ss">4.8★</span></span></div><div class="svc-avgresp">平均响应 <span class="svc-num">4.2min</span> · 超时 2单</div>';
+}
+
+// S6: 设备健康
+function s6html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">⚙️ 设备健康</div><div style="font-size:22px;font-weight:700;color:#22c55e">96%</div><div style="font-size:7px;color:#64748b">在线率 · 23/24台在线</div></div>';
+  var devices = {日間:[{n:'灵犀主板',p:98,s:'g'},{n:'门磁',p:92,s:'g'},{n:'红外雷达',p:76,s:'y'},{n:'温湿度',p:88,s:'g'}],夜間:[{n:'灵犀主板',p:97,s:'g'},{n:'门磁',p:94,s:'g'},{n:'红外雷达',p:80,s:'y'},{n:'光感',p:65,s:'y'}],高峰:[{n:'灵犀主板',p:99,s:'g'},{n:'门磁',p:88,s:'g'},{n:'红外雷达',p:72,s:'y'},{n:'烟感',p:45,s:'r'},{n:'紧急按钮',p:90,s:'g'}],維護:[{n:'灵犀主板',p:82,s:'y'},{n:'门磁',p:60,s:'y'},{n:'红外雷达',p:30,s:'r'}]};
+  var devs = devices[mode]||devices['日間'];
+  return '<div class="dev-header"><span>⚙️ 设备健康</span><span>'+mode+'</span><span>'+devs.length+'台设备</span></div><div class="dev-ok"><div class="dop">'+Math.round(devs.filter(function(d){return d.s==='g';}).length/devs.length*100)+'%</div><div><div class="dol">健康在线</div><div class="dol" style="color:#94a3b8">离线 0 · 告警 1</div></div></div><div class="dev-table">'+devs.map(function(d){return '<div class="dev-row"><span class="dstat '+(d.p>70?'online':'offline')+'"></span><span class="dname">'+d.n+'</span><div class="dbar"><div class="dfill '+(d.p>80?'g':d.p>50?'y':'r')+'" style="width:'+d.p+'%"></div></div><span class="dpct">'+d.p+'%</span></div>';}).join('')+'</div><div class="dev-footer"><span>固件 v0310A</span><span>最后心跳 2s前</span><span>WiFi -58dBm</span></div>';
+}
+
+// S7: 环境感知
+function s7html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">🌿 环境健康</div><div style="font-size:16px;font-weight:700;color:#22c55e">优质</div><div style="font-size:6px;color:#64748b">AQI 28 · 温湿度适宜</div></div>';
+  var temps = {日間:['26°','24°','25°','27°','23°'],夜間:['22°','21°','23°','24°','20°'],高峰:['28°','27°','29°','26°','30°'],維護:['25°','24°','24°','26°','25°']};
+  var t = temps[mode]||temps['日間'];
+  return '<div class="env-header"><span>🌿 环境感知</span><span>'+mode+'</span><span>舒适指数 88%</span></div><div class="env-mat"><div class="env-cell sensor"><div class="ev2 cool">'+t[0]+'</div><div class="el2">温度</div></div><div class="env-cell"><div class="ev2 good">412</div><div class="el2">CO₂ ppm</div></div><div class="env-cell"><div class="ev2 good">18</div><div class="el2">PM2.5</div></div><div class="env-cell"><div class="ev2 good">0.08</div><div class="el2">TVOC</div></div><div class="env-cell"><div class="ev2 good">58%</div><div class="el2">湿度</div></div><div class="env-cell sensor"><div class="ev2 cool">'+t[1]+'</div><div class="el2">温度</div></div><div class="env-cell"><div class="ev2 good">35</div><div class="el2">dB噪音</div></div><div class="env-cell"><div class="ev2 good">320</div><div class="el2">lux</div></div><div class="env-cell"><div class="ev2 warm">0.3</div><div class="el2">甲醛</div></div><div class="env-cell"><div class="ev2">1F</div><div class="el2">楼层</div></div><div class="env-cell sensor"><div class="ev2 warm">'+t[2]+'</div><div class="el2">温度</div></div><div class="env-cell"><div class="ev2 good">450</div><div class="el2">CO₂</div></div><div class="env-cell"><div class="ev2 good">22</div><div class="el2">PM2.5</div></div><div class="env-cell"><div class="ev2">301</div><div class="el2">房间</div></div><div class="env-cell"><div class="ev2 cool">'+t[3]+'</div><div class="el2">温度</div></div></div><div class="env-legend"><span><div class="dot" style="background:#60a5fa"></div>舒适</span><span><div class="dot" style="background:#f59e0b"></div>偏高</span><span><div class="dot" style="background:#ef4444"></div>超标</span><span>风向 东北 · 2级</span></div>';
+}
+
+// S8: 时间回溯
+function s8html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">🕐 今日回溯</div><div style="font-size:18px;font-weight:300;color:#22c55e">节能事件 4次</div><div style="font-size:7px;color:#64748b">省电 2.4kWh · 外出 3h</div></div>';
+  var events = {日間:[{t:'07:30',txt:'客人起床',v:'','c':'te-in'},{t:'08:15',txt:'客人出门',v:'','c':'te-out'},{t:'08:30',txt:'⛰ 节能启动 · 空调调至26°C',v:'+4°C','c':'te-eco'},{t:'11:05',txt:'客人回来 · 恢复22°C',v:'','c':'te-in'},{t:'12:30',txt:'维修敲门',v:'42dB','c':'te-noise'}],夜間:[{t:'18:20',txt:'客人回房',v:'','c':'te-in'},{t:'21:00',txt:'设置睡眠模式',v:'24°C','c':'te-eco'},{t:'23:00',txt:'⛰ 深睡节能 · 无活动检测',v:'调高2°C','c':'te-eco'}],高峰:[{t:'09:00',txt:'清洁进入',v:'','c':'te-in'},{t:'09:15',txt:'清洁离开',v:'','c':'te-out'},{t:'09:30',txt:'⛰ 节能启动',v:'+4°C','c':'te-eco'},{t:'10:00',txt:'客人回房',v:'','c':'te-in'},{t:'10:05',txt:'⛰ 退出节能',v:'恢复','c':'te-eco'}],維護:[{t:'06:00',txt:'检修进入',v:'','c':'te-in'},{t:'06:45',txt:'检修离开',v:'','c':'te-out'},{t:'07:00',txt:'⛰ 节能启动',v:'+4°C','c':'te-eco'}]};
+  var evs = events[mode]||events['日間'];
+  return '<div class="ts-header"><span>🕐 时间回溯</span><span>301房 · '+mode+'</span><span>'+evs.length+'事件</span></div><div class="ts-timeline">'+evs.map(function(e){return '<div class="ts-event '+e.c+'"><span class="ttime">'+e.t+'</span><span class="ttext">'+e.txt+'</span>'+(e.v?'<span class="tval">'+e.v+'</span>':'')+'</div>';}).join('')+'</div><div class="ts-summary"><span>⛰ 节能 '+(mode==='屏保'?'0':evs.filter(function(e){return e.c==='te-eco';}).length)+'次</span><span>累计节能 '+(mode==='夜間'?'1.1':'2.4')+' kWh</span><span>无人总时长 '+(mode==='夜間'?'0m':'3h12m')+'</span></div>';
+}
+
+// S9: 房态总览
+function s9html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">🏨 房态总览</div><div style="font-size:18px;font-weight:700;color:#60a5fa">25</div><div style="font-size:7px;color:#64748b">间房 · 3/5层有房</div></div>';
+  var statusMap = {日間:['occ','occ','occ','empty','occ','occ','occ','clean','occ','occ','empty','empty','occ','occ','occ','maint','occ','occ','occ','clean','empty','occ','occ','occ','occ'],夜間:['occ','occ','occ','occ','occ','occ','occ','occ','empty','occ','occ','empty','occ','occ','occ','occ','occ','occ','occ','occ','empty','occ','occ','occ','occ'],高峰:['occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ','occ'],維護:['empty','empty','empty','empty','empty','maint','maint','empty','empty','empty','empty','empty','empty','maint','empty','empty','empty','empty','empty','empty','empty','empty','empty','empty','empty']};
+  var stats = statusMap[mode]||statusMap['日間'];
+  return '<div class="rm-header"><span>🏨 房态总览</span><span>'+mode+'</span><span>3F · 25间</span></div><div class="rm-legend"><span><div class="rdot occ"></div>入住</span><span><div class="rdot clean"></div>清洁</span><span><div class="rdot maint"></div>维修</span><span><div class="rdot alert"></div>告警</span><span><div class="rdot empty"></div>空房</span></div><div class="rm-grid">'+stats.map(function(s,i){var n = 301+i; var icon = s==='occ'?'👤':s==='clean'?'🧹':s==='maint'?'🔧':s==='alert'?'⚠️':'🛏️'; return '<div class="rm-cell '+s+'"><div class="rmnum">'+n+'</div><div class="rmicon">'+icon+'</div></div>';}).join('')+'</div><div class="rm-footer"><span>入住 '+stats.filter(function(s){return s==='occ';}).length+'间</span><span>空房 '+stats.filter(function(s){return s==='empty';}).length+'间</span><span>清洁 '+stats.filter(function(s){return s==='clean';}).length+'间</span><span>维修 '+stats.filter(function(s){return s==='maint';}).length+'间</span></div>';
+}
+
+// S10: 收益分析
+function s10html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">💰 收益分析</div><div style="font-size:20px;font-weight:300;color:#22c55e">¥328.4</div><div style="font-size:7px;color:#64748b">今日收入 · 能耗占比 6.2%</div></div>';
+  var revs = {日間:'328.4',夜間:'0',高峰:'892.6',維護:'45.0'};
+  var rev = revs[mode]||'328.4';
+  return '<div class="rev-header"><span>💰 收益分析</span><span>'+mode+'</span><span>3F · 25间</span></div><div class="rev-main"><div class="rev-left"><div class="rbig">¥'+rev+'</div><div class="runit">今日收入</div><div class="rsub"><span>RevPAR <b>¥218.9</b></span><span>ADR <b>¥352</b></span></div><div class="rsub"><span>能耗成本 <b>¥20.3 (6.2%)</b></span><span style="color:#22c55e">省电 ¥4.2</span></div></div><div class="rev-right"><div class="rcell"><div class="rv2 g">+15%</div><div class="rl2">同比</div></div><div class="rcell"><div class="rv2 b">82%</div><div class="rl2">入住率</div></div><div class="rcell"><div class="rv2 r">¥28.5</div><div class="rl2">OTA佣金</div></div><div class="rcell"><div class="rv2 g">¥1.8k</div><div class="rl2">月利润</div></div></div></div><div class="rev-pie"><span>🧾 本月累计 ¥9,240</span><span>📉 能耗占比 6.2%</span><span>📈 同比提升 23%</span></div>';
+}
+
+// S11: 客人画像
+function s11html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">👤 客人画像</div><div style="font-size:18px;font-weight:700;color:#60a5fa">陈先生</div><div style="font-size:7px;color:#64748b">节能贡献 A级 · 入住第3天</div></div>';
+  var profiles = {日間:{name:'陈先生',tag:'商务出差',pref:'22°C',score:'92',badge:'节能先锋',stays:'8次',rating:'4.9★'},夜間:{name:'李女士',tag:'家庭出游',pref:'25°C',score:'78',badge:'温和节能',stays:'3次',rating:'4.5★'},高峰:{name:'王先生',tag:'旅行团',pref:'20°C',score:'95',badge:'节能冠军',stays:'12次',rating:'5.0★'},維護:{name:'检修',tag:'工作人员',pref:'24°C',score:'60',badge:'',stays:'-',rating:'-'}};
+  var p = profiles[mode]||profiles['日間'];
+  return '<div class="prof-header"><span>👤 客人画像</span><span>301房</span><span>入住第3天</span></div><div class="prof-avatar"><div class="pa">'+(p.name[0]||'?')+'</div><div><div class="pname">'+p.name+'</div><div class="ptag">'+p.tag+' · '+p.badge+'</div></div></div><div class="prof-grid"><div class="prof-item"><div class="pv b">'+p.pref+'</div><div class="pl">偏好温度</div></div><div class="prof-item"><div class="pv g">'+p.score+'</div><div class="pl">节能贡献分</div></div><div class="prof-item"><div class="pv b">'+p.stays+'</div><div class="pl">累计入住</div></div><div class="prof-item"><div class="pv g">'+p.rating+'</div><div class="pl">历史评分</div></div><div class="prof-item"><div class="pv b">19:30</div><div class="pl">平均回房</div></div><div class="prof-item"><div class="pv o">07:45</div><div class="pl">平均离房</div></div></div><div class="prof-foot"><span>📊 同类偏好 22°C 占42%</span><span>🤝 复住率 68%</span></div>';
+}
+
+// S12: 告警中心
+function s12html(mode) {
+  if(mode==='屏保') return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center"><div style="font-size:8px;color:#64748b">🚨 告警中心</div><div style="font-size:22px;font-weight:700;color:#22c55e">0 未读</div><div style="font-size:7px;color:#64748b">全部已处理 · 今日告警 3件</div></div>';
+  var alerts = {日間:[{l:'info',icon:'ℹ️',txt:'302门磁自检通过',t:'09:32'},{l:'warning',icon:'⚠️',txt:'305雷达信号弱 · 建议重启',t:'10:15'},{l:'info',icon:'ℹ️',txt:'301固件更新成功',t:'11:00'}],夜間:[{l:'info',icon:'ℹ️',txt:'308红外触发 · 已标记',t:'22:10'},{l:'warning',icon:'⚠️',txt:'307门磁电池 <20%',t:'23:45'}],高峰:[{l:'critical',icon:'🚨',txt:'310门未关 · 超过30min',t:'14:22'},{l:'warning',icon:'⚠️',txt:'302雷达无响应 · 离线上报',t:'14:35'},{l:'info',icon:'ℹ️',txt:'305加床请求已处理',t:'14:50'},{l:'warning',icon:'⚠️',txt:'308噪音持续超标 52dB',t:'15:10'}],維護:[{l:'critical',icon:'🚨',txt:'201空调通信中断',t:'07:10'},{l:'info',icon:'ℹ️',txt:'203灯泡已更换',t:'07:45'}]};
+  var al = alerts[mode]||alerts['日間'];
+  var cr = al.filter(function(a){return a.l==='critical';}).length;
+  return '<div class="alert-header"><span>🚨 告警中心</span><span>'+mode+'</span><span>'+(cr>0?'<span class="alert-badge">'+cr+'紧急</span>':'<span style="color:#22c55e">全部正常</span>')+'</span></div><div class="alert-list">'+al.map(function(a){return '<div class="alert-item '+a.l+'"><span class="aicon">'+a.icon+'</span><span class="atext">'+a.txt+'</span><span class="atime">'+a.t+'</span></div>';}).join('')+'</div><div class="alert-foot"><span>今日告警 '+al.length+'件</span><span>已处理 '+al.filter(function(a){return a.l!=='critical';}).length+'件</span><span>未处理 '+cr+'件</span></div>';
+}
+
+// Build gallery
+var container = document.getElementById('gallery');
+styles.forEach(function(s) {
+  var card = document.createElement('div');
+  card.className = 'sc-card';
+  card.innerHTML = '<div class="label"><span>'+s.name+'</span><span class="tag" style="background:#334155">'+s.tag+'</span></div><div class="ips '+s.id+'">'+renderStyle(s,'日间',true)+'</div><div style="padding:4px 8px 5px;font-size:6px;color:#475569;border-top:1px solid #334155">'+s.data+'</div>';
+  card.onclick = function(){openPreview(s.id);};
+  container.appendChild(card);
+});
+
+// Preview overlay
+var current = 0;
+function openPreview(id) {
+  var idx = styles.findIndex(function(s){return s.id===id;});
+  if(idx<0) return;
+  current = idx;
+  showPreview();
+}
+function showPreview() {
+  var s = styles[current];
+  var modeSel = document.querySelector('input[name="pmode"]:checked');
+  var mode = modeSel ? modeSel.value : '日间';
+  var overlay = document.getElementById('preview');
+  var body = document.getElementById('pbody');
+  body.innerHTML = '<div class="ips '+s.id+'" style="aspect-ratio:4/3;max-width:380px;margin:0 auto;font-size:16px">'+renderStyle(s,mode,false)+'</div>';
+  document.getElementById('pname').textContent = s.name;
+  document.getElementById('pdesc').textContent = s.data;
+  overlay.style.display = 'flex';
+}
+function closePreview(){document.getElementById('preview').style.display='none';}
+</script>
+
+<!-- Preview overlay -->
+<div id="preview" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#000000dd;z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+<div style="background:#0b1120;border:1px solid #334155;border-radius:12px;padding:16px;max-width:420px;width:100%">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<div><div id="pname" style="font-size:14px;font-weight:600"></div><div id="pdesc" style="font-size:8px;color:#64748b;margin-top:2px"></div></div>
+<button onclick="closePreview()" style="background:transparent;border:none;color:#64748b;font-size:18px;cursor:pointer">✕</button>
+</div>
+<div id="pbody" style="margin-bottom:8px"></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="日间" checked onchange="showPreview()"> ☀️ 日间</label>
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="夜间" onchange="showPreview()"> 🌙 夜间</label>
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="高峰" onchange="showPreview()"> 🔥 高峰</label>
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="维护" onchange="showPreview()"> 🔧 维护</label>
+<label style="font-size:8px;color:#94a3b8;cursor:pointer;background:#1e293b;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:3px"><input type="radio" name="pmode" value="屏保" onchange="showPreview()"> 💤 屏保</label>
+</div>
+<div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+<button onclick="prevStyle()" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:10px">◀ 上一个</button>
+<button onclick="nextStyle()" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:10px">下一个 ▶</button>
+</div>
+</div>
+</div>
+<script>
+function prevStyle(){current=(current-1+styles.length)%styles.length;showPreview();}
+function nextStyle(){current=(current+1)%styles.length;showPreview();}
+</script>
+</body>
+</html>

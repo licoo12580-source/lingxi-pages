@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灵犀 · 样板机装配指南</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080d1a;color:#e2e8f0;font-family:system-ui,sans-serif;padding:0}
+.header{background:linear-gradient(135deg,#0f172a,#064e3b);padding:20px 24px;border-bottom:1px solid #1e293b}
+.header h1{font-size:20px;font-weight:600;display:flex;align-items:center;gap:8px}
+.header h1 span{color:#22c55e}
+.header .sub{font-size:11px;color:#64748b;margin-top:4px}
+.nav{position:sticky;top:0;z-index:10;display:flex;gap:0;background:#0f172a;border-bottom:1px solid #1e293b;overflow-x:auto;padding:0 16px}
+.nav a{padding:10px 14px;font-size:10px;color:#64748b;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all .15s}
+.nav a:hover{color:#e2e8f0}
+.nav a.active{color:#22c55e;border-bottom-color:#22c55e}
+.content{max-width:800px;margin:0 auto;padding:24px}
+.step{display:none}
+.step.active{display:block}
+.step h2{font-size:16px;font-weight:600;color:#e2e8f0;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.step h2 .step-num{background:#22c55e;color:#000;padding:1px 8px;border-radius:4px;font-size:11px;margin-right:4px}
+.step .desc{font-size:11px;color:#64748b;line-height:1.6;margin-bottom:12px}
+/* 物料清单 */
+.bom-table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:12px}
+.bom-table th{background:#1e293b;color:#94a3b8;padding:6px 8px;text-align:left;font-weight:500;border-bottom:1px solid #334155}
+.bom-table td{padding:5px 8px;border-bottom:1px solid #0f172a;color:#e2e8f0}
+.bom-table tr.need td{background:#22c55e08}
+.bom-table tr.have td{background:#60a5fa08}
+.bom-table .tag{font-size:7px;padding:1px 4px;border-radius:3px}
+.bom-table .tag.buy{background:#22c55e22;color:#22c55e}
+.bom-table .tag.have{background:#60a5fa22;color:#60a5fa}
+.bom-table .tag.opt{background:#f59e0b22;color:#f59e0b}
+/* 线序图 */
+.wiring{background:#0a0e1a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:12px;font-size:10px}
+.wiring .wtitle{font-size:11px;font-weight:600;color:#e2e8f0;margin-bottom:8px}
+.wiring table{width:100%;border-collapse:collapse;font-size:9px}
+.wiring table th{background:#1e293b;color:#94a3b8;padding:4px 6px;text-align:left;font-weight:500}
+.wiring table td{padding:3px 6px;border-bottom:1px solid #1e293b;color:#e2e8f0;font-family:monospace}
+.wiring table td.g{color:#22c55e}
+.wiring table td.b{color:#60a5fa}
+.wiring table td.p{color:#8b5cf6}
+.wiring table td.y{color:#f59e0b}
+.wiring table td.r{color:#ef4444}
+/* 示意图 */
+.diagram{background:#0a0e1a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:12px;text-align:center;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.diagram svg{max-width:100%;height:auto}
+.diagram .dlabel{font-size:8px;color:#64748b;margin-top:6px}
+/* 操作步骤 */
+.action-list{counter-reset:act;margin-bottom:12px}
+.action-item{background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:10px 12px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start}
+.action-item .anum{background:#1e293b;color:#22c55e;font-size:11px;font-weight:600;padding:2px 8px;border-radius:3px;flex-shrink:0;counter-increment:act}
+.action-item .atext{flex:1}
+.action-item .atext .atitle{font-size:11px;font-weight:600;color:#e2e8f0}
+.action-item .atext .anote{font-size:9px;color:#64748b;margin-top:2px;line-height:1.4}
+.action-item .aimg{width:80px;height:60px;background:#1e293b;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+/* 提示框 */
+.tip{background:#22c55e08;border:1px solid #22c55e22;border-radius:6px;padding:8px 10px;font-size:10px;color:#bbf7d0;margin-bottom:8px;display:flex;gap:6px;align-items:flex-start}
+.tip.warn{background:#f59e0b08;border-color:#f59e0b22;color:#fde68a}
+.tip.danger{background:#ef444408;border-color:#ef444422;color:#fca5a5}
+.tip .ticon{font-size:14px;flex-shrink:0}
+/* 购买列表 */
+.buy-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.buy-item{background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:8px;font-size:9px}
+.buy-item .bname{font-weight:600;color:#e2e8f0;font-size:10px}
+.buy-item .bprice{color:#22c55e}
+.buy-item .bshop{color:#64748b;font-size:8px}
+/* 配置折叠 */
+.config{background:#0f172a;border:1px solid #1e293b;border-radius:8px;margin-bottom:10px;overflow:hidden}
+.config .ch{background:#1e293b;padding:8px 10px;font-size:10px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.config .ch:hover{background:#33415522}
+.config .cb{padding:10px;display:block}
+/* 针脚图 */
+.pin-map{background:#0a0e1a;border:1px solid #1e293b;border-radius:8px;padding:12px;margin-bottom:12px;overflow-x:auto}
+.pin-map pre{font-size:8px;color:#64748b;line-height:1.4}
+/* 按钮 */
+.btn{display:inline-block;background:#22c55e;color:#000;border:none;padding:6px 14px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;text-decoration:none;margin-top:4px}
+.btn:hover{background:#4ade80}
+/* 图片占位 */
+.placeholder{background:#0a0e1a;border:1px dashed #1e293b;border-radius:6px;padding:20px;text-align:center;color:#475569;font-size:9px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🦞 <span>灵犀 · 样板机装配指南</span></h1>
+  <div class="sub">从零到手搓第一台可工作的样板机 · 外行也能照着做</div>
+</div>
+
+<div class="nav" id="stepNav">
+  <a class="active" onclick="goStep(0,this)">① 买什么</a>
+  <a onclick="goStep(1,this)">② 接线图</a>
+  <a onclick="goStep(2,this)">③ 装配步骤</a>
+  <a onclick="goStep(3,this)">④ 上电测试</a>
+  <a onclick="goStep(4,this)">⑤ 烧录固件</a>
+  <a onclick="goStep(5,this)">⑥ 校准雷达</a>
+</div>
+
+<div class="content">
+
+<!-- 第1步：买什么 -->
+<div class="step active" id="step0">
+  <h2><span class="step-num">1</span>先买这些</h2>
+  <div class="desc">全部淘宝/立创商城能买到。先买必须的，选配的看需求。</div>
+
+  <div class="config">
+    <div class="ch">📋 方案A：纯节能（¥69成本）<span style="color:#22c55e">¥128售价</span></div>
+    <div class="cb">
+      <table class="bom-table">
+        <tr><th>物料</th><th>数量</th><th>单价</th><th>买什么型号</th><th></th></tr>
+        <tr class="need"><td>ESP32-C3 开发板</td><td>1</td><td>¥15</td><td>合宙ESP32C3-DevKit</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="need"><td>RD2450 雷达模块</td><td>1</td><td>¥18</td><td>LD2450/RD2450雷达模块</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="have"><td>Air780E 4G模块</td><td>1</td><td>¥20</td><td>合宙Air780E核心板</td><td><span class="tag have">已有</span></td></tr>
+        <tr class="need"><td>红外收发模块</td><td>1</td><td>¥3</td><td>红外发射+接收一体模块</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="need"><td>继电器模块</td><td>1</td><td>¥3</td><td>1路5V继电器模块(低电平触发)</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="need"><td>面包板+杜邦线</td><td>1套</td><td>¥10</td><td>830孔面包板 + 公对母/母对母杜邦线</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="need"><td>电源模块</td><td>1</td><td>¥8</td><td>HLK-PM01 220V→5V</td><td><span class="tag buy">买</span></td></tr>
+        <tr><td colspan="4" style="text-align:right;font-weight:600;color:#22c55e">总计：约 ¥77</td><td></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="config">
+    <div class="ch">📋 方案B：标准版（节能+语音，主力）<span style="color:#22c55e">¥198售价</span></div>
+    <div class="cb">
+      <table class="bom-table">
+        <tr><th>物料</th><th>数量</th><th>单价</th><th>买什么型号</th><th></th></tr>
+        <tr class="need"><td>ESP32-S3 开发板</td><td>1</td><td>¥35</td><td>合宙ESP32S3-DevKit 或 乐鑫官方</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="have"><td>RD2450 雷达</td><td>1</td><td>¥18</td><td>已到货</td><td><span class="tag have">已有</span></td></tr>
+        <tr class="have"><td>AR780 雷达</td><td>1</td><td>¥22</td><td>已到货</td><td><span class="tag have">已有</span></td></tr>
+        <tr class="need"><td>ES7210 音频模块</td><td>1</td><td>¥8</td><td>ES7210麦克风阵列模块（淘宝搜）</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="need"><td>INMP441 麦克风</td><td>3</td><td>¥8</td><td>INMP441 MEMS麦克风模块×3</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="have"><td>4G模块</td><td>1</td><td>¥20</td><td>Air780E</td><td><span class="tag have">已有</span></td></tr>
+        <tr class="need"><td>2.8" IPS屏</td><td>1</td><td>¥15</td><td>2.8寸ST7789 SPI屏（已到货）</td><td><span class="tag have">已有</span></td></tr>
+        <tr class="need"><td>SHT30 温湿度</td><td>1</td><td>¥5</td><td>SHT30模块 I2C接口</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="need"><td>面包板+杜邦线</td><td>1套</td><td>¥10</td><td>大号面包板+杜邦线</td><td><span class="tag buy">买</span></td></tr>
+        <tr class="need"><td>电源</td><td>1</td><td>¥8</td><td>HLK-PM01</td><td><span class="tag buy">买</span></td></tr>
+        <tr><td colspan="4" style="text-align:right;font-weight:600;color:#22c55e">总计：约 ¥145</td><td></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="tip warn">
+    <span class="ticon">⚠️</span>
+    <div><b>不要先买PCB打样！</b>先用开发板+面包板搭验证，验证通了再画PCB。你现在在验证阶段，面包板最快。</div>
+  </div>
+
+  <div class="tip">
+    <span class="ticon">💡</span>
+    <div><b>淘宝搜索关键词：</b>"ESP32-S3 开发板"、"LD2450 雷达模块"、"ES7210 模块"、"面包板 830孔"、"杜邦线 公对母"</div>
+  </div>
+</div>
+
+<!-- 第2步：接线图 -->
+<div class="step" id="step1">
+  <h2><span class="step-num">2</span>接线图（照着接就行）</h2>
+  <div class="desc">这是方案B（主力版）的完整接线。用杜邦线一头插开发板，一头插模块，面包板做中转。</div>
+
+  <div class="wiring">
+    <div class="wtitle">📌 ESP32-S3 针脚分配总表</div>
+    <table>
+      <tr><th>功能</th><th>S3针脚</th><th>接</th><th>对方模块</th><th>线色建议</th></tr>
+      <tr><td>🔴 电源</td><td class="r">5V</td><td>→</td><td>HLK-PM01 5V输出</td><td class="r">红色</td></tr>
+      <tr><td>⚫ 地</td><td class="y">GND</td><td>→</td><td>所有模块GND（共用）</td><td>黑色</td></tr>
+      <tr><td>📡 RD2450 雷达</td><td class="b">GPIO17 (TX)</td><td>→ RX</td><td>RD2450 雷达</td><td>蓝色</td></tr>
+      <tr><td>📡 RD2450 雷达</td><td class="b">GPIO18 (RX)</td><td>← TX</td><td>RD2450 雷达</td><td>蓝色</td></tr>
+      <tr><td>📡 AR780 雷达</td><td class="b">GPIO19 (TX)</td><td>→ RX</td><td>AR780 雷达</td><td>绿色</td></tr>
+      <tr><td>📡 AR780 雷达</td><td class="b">GPIO20 (RX)</td><td>← TX</td><td>AR780 雷达</td><td>绿色</td></tr>
+      <tr><td>🎤 ES7210 BCLK</td><td class="p">GPIO6</td><td>→</td><td>ES7210 模块</td><td>紫色</td></tr>
+      <tr><td>🎤 ES7210 LRCLK</td><td class="p">GPIO7</td><td>→</td><td>ES7210 模块</td><td>紫色</td></tr>
+      <tr><td>🎤 ES7210 DOUT</td><td class="p">GPIO8</td><td>←</td><td>ES7210 模块（数据入）</td><td>紫色</td></tr>
+      <tr><td>🎤 ES7210 MCLK</td><td class="p">GPIO10</td><td>→</td><td>ES7210 模块</td><td>紫色</td></tr>
+      <tr><td>🎤 ES7210 I2C SCL</td><td class="p">GPIO11</td><td>↔</td><td>ES7210 SCL</td><td>紫色</td></tr>
+      <tr><td>🎤 ES7210 I2C SDA</td><td class="p">GPIO12</td><td>↔</td><td>ES7210 SDA</td><td>紫色</td></tr>
+      <tr><td>🖥 IPS屏 CS</td><td class="g">GPIO2</td><td>→</td><td>IPS屏 CS</td><td>橙色</td></tr>
+      <tr><td>🖥 IPS屏 DC</td><td class="g">GPIO3</td><td>→</td><td>IPS屏 DC</td><td>橙色</td></tr>
+      <tr><td>🖥 IPS屏 MOSI</td><td class="g">GPIO11</td><td>→</td><td>IPS屏 MOSI</td><td>橙色</td></tr>
+      <tr><td>🖥 IPS屏 SCK</td><td class="g">GPIO12</td><td>→</td><td>IPS屏 SCK</td><td>橙色</td></tr>
+      <tr><td>🖥 IPS屏 RST</td><td class="g">GPIO1</td><td>→</td><td>IPS屏 RST</td><td>橙色</td></tr>
+      <tr><td>🌡️ SHT30 SCL</td><td>GPIO9</td><td>↔</td><td>SHT30 SCL</td><td>白色</td></tr>
+      <tr><td>🌡️ SHT30 SDA</td><td>GPIO10</td><td>↔</td><td>SHT30 SDA</td><td>白色</td></tr>
+      <tr><td>📶 Air780E 4G</td><td>GPIO43(TX)/44(RX)</td><td>↔</td><td>4G模块 UART</td><td>灰色</td></tr>
+      <tr><td>🔥 继电器</td><td>GPIO14</td><td>→</td><td>继电器 IN</td><td class="r">红色</td></tr>
+      <tr><td>🔦 红外发射</td><td>GPIO15</td><td>→</td><td>红外发射管</td><td>灰色</td></tr>
+    </table>
+  </div>
+
+  <div class="tip danger">
+    <span class="ticon">⚡</span>
+    <div><b>第一次上电前必看：</b>先只接开发板USB供电，不接HLK-PM01的220V。确认开发板亮灯、能连电脑，再接其他模块。最后才接220V。</div>
+  </div>
+
+  <div class="diagram">
+    <svg viewBox="0 0 600 420" style="max-width:600px">
+      <rect x="0" y="0" width="600" height="420" fill="#0a0e1a" rx="8"/>
+      <!-- ESP32-S3 主控 -->
+      <rect x="220" y="30" width="160" height="80" rx="8" fill="#1e293b" stroke="#22c55e" stroke-width="1.5"/>
+      <text x="300" y="58" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="600">ESP32-S3 开发板</text>
+      <text x="300" y="72" text-anchor="middle" fill="#64748b" font-size="7">合宙/乐鑫 DevKit</text>
+      <text x="300" y="86" text-anchor="middle" fill="#475569" font-size="6">USB供电+烧录</text>
+
+      <!-- 面包板 -->
+      <rect x="60" y="140" width="480" height="60" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1" stroke-dasharray="4,2"/>
+      <text x="300" y="167" text-anchor="middle" fill="#475569" font-size="7">🔌 面包板 · 所有GND先连在一起</text>
+      <text x="300" y="182" text-anchor="middle" fill="#475569" font-size="7">面包板两侧长条=电源（红色+/蓝色-）</text>
+
+      <!-- 两个雷达 -->
+      <rect x="50" y="230" width="100" height="50" rx="6" fill="#064e3b" stroke="#22c55e" stroke-width="1"/>
+      <text x="100" y="253" text-anchor="middle" fill="#22c55e" font-size="8" font-weight="600">RD2450 雷达 #1</text>
+      <text x="100" y="267" text-anchor="middle" fill="#64748b" font-size="6">UART1: GPIO17/18</text>
+
+      <rect x="190" y="230" width="100" height="50" rx="6" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+      <text x="240" y="253" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="600">AR780 雷达 #2</text>
+      <text x="240" y="267" text-anchor="middle" fill="#64748b" font-size="6">UART2: GPIO19/20</text>
+
+      <!-- ES7210 -->
+      <rect x="330" y="230" width="130" height="50" rx="6" fill="#2a0a2a" stroke="#ec4899" stroke-width="1"/>
+      <text x="395" y="253" text-anchor="middle" fill="#ec4899" font-size="8" font-weight="600">ES7210 音频Codec</text>
+      <text x="395" y="267" text-anchor="middle" fill="#64748b" font-size="6">I2S: GPIO6/7/8/10</text>
+
+      <!-- 4G模块 -->
+      <rect x="500" y="230" width="90" height="50" rx="6" fill="#0f172a" stroke="#60a5fa" stroke-width="1"/>
+      <text x="545" y="253" text-anchor="middle" fill="#60a5fa" font-size="8" font-weight="600">Air780E</text>
+      <text x="545" y="267" text-anchor="middle" fill="#64748b" font-size="6">UART0</text>
+
+      <!-- IPS屏 -->
+      <rect x="50" y="310" width="120" height="50" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="1"/>
+      <text x="110" y="333" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600">2.8" IPS屏</text>
+      <text x="110" y="347" text-anchor="middle" fill="#64748b" font-size="6">SPI: GPIO2/3/11/12</text>
+
+      <!-- 继电器+红外 -->
+      <rect x="210" y="310" width="100" height="50" rx="6" fill="#1a0a0a" stroke="#ef4444" stroke-width="1"/>
+      <text x="260" y="333" text-anchor="middle" fill="#ef4444" font-size="8" font-weight="600">继电器+红外</text>
+      <text x="260" y="347" text-anchor="middle" fill="#64748b" font-size="6">GPIO14/15</text>
+
+      <!-- SHT30 -->
+      <rect x="350" y="310" width="100" height="50" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="1"/>
+      <text x="400" y="333" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600">SHT30 温湿度</text>
+      <text x="400" y="347" text-anchor="middle" fill="#64748b" font-size="6">I2C: GPIO9/10</text>
+
+      <!-- 3个麦克风 -->
+      <rect x="490" y="310" width="100" height="50" rx="6" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+      <text x="540" y="330" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="600">3×INMP441</text>
+      <text x="540" y="344" text-anchor="middle" fill="#64748b" font-size="6">麦克风阵列</text>
+      <text x="540" y="356" text-anchor="middle" fill="#64748b" font-size="6">→ ES7210</text>
+
+      <!-- 连线标注 -->
+      <line x1="300" y1="110" x2="300" y2="140" stroke="#22c55e44" stroke-width="1"/>
+      <line x1="100" y1="200" x2="100" y2="230" stroke="#22c55e44" stroke-width="1"/>
+      <line x1="240" y1="200" x2="240" y2="230" stroke="#8b5cf644" stroke-width="1"/>
+      <line x1="395" y1="200" x2="395" y2="230" stroke="#ec489944" stroke-width="1"/>
+      <line x1="300" y1="200" x2="300" y2="230" stroke="#64748b44" stroke-width="1"/>
+    </svg>
+    <div class="dlabel">装配框图 —— 所有模块通过面包板连接</div>
+  </div>
+</div>
+
+<!-- 第3步：装配步骤 -->
+<div class="step" id="step2">
+  <h2><span class="step-num">3</span>手把手装配</h2>
+  <div class="desc">按顺序做，别跳步。每一步做完再下一步。</div>
+
+  <div class="action-list">
+    <div class="action-item">
+      <div class="anum">1</div>
+      <div class="atext">
+        <div class="atitle">把开发板插到面包板上</div>
+        <div class="anote">ESP32-S3 开发板插在面包板中间凹槽处，针脚跨在凹槽两侧。先不上电。</div>
+      </div>
+      <div class="aimg">🔌</div>
+    </div>
+
+    <div class="action-item">
+      <div class="anum">2</div>
+      <div class="atext">
+        <div class="atitle">接电源线（红黑线）</div>
+        <div class="anote">开发板5V → 面包板红色电源轨。开发板GND → 面包板蓝色地轨。注意：先只接开发板USB，不接220V电源模块。</div>
+      </div>
+      <div class="aimg">🔴⚫</div>
+    </div>
+
+    <div class="action-item">
+      <div class="anum">3</div>
+      <div class="atext">
+        <div class="atitle">接RD2450雷达 #1</div>
+        <div class="anote">雷达模块VCC→面包板5V，GND→GND。模块TX→GPIO18（S3的RX），模块RX→GPIO17（S3的TX）。用蓝色杜邦线。</div>
+      </div>
+      <div class="aimg">📡</div>
+    </div>
+
+    <div class="action-item">
+      <div class="anum">4</div>
+      <div class="atext">
+        <div class="atitle">接AR780雷达 #2</div>
+        <div class="anote">同样接法：VCC→5V，GND→GND。TX→GPIO20（S3的RX2），RX→GPIO19（S3的TX2）。用绿色杜邦线。</div>
+      </div>
+      <div class="aimg">📡</div>
+    </div>
+
+    <div class="action-item">
+      <div class="anum">5</div>
+      <div class="atext">
+        <div class="atitle">接ES7210音频模块</div>
+        <div class="anote">ES7210模块VCC→3.3V，GND→GND。BCLK→GPIO6，LRCLK→GPIO7，DOUT→GPIO8，MCLK→GPIO10。I2C: SCL→GPIO11，SDA→GPIO12。用紫色线。</div>
+      </div>
+      <div class="aimg">🎤</div>
+    </div>
+
+    <div class="action-item">
+      <div class="anum">6</div>
+      <div class="atext">
+        <div class="atitle">接3个麦克风到ES7210</div>
+        <div class="anote">每个INMP441：VCC→3.3V，GND→GND，OUT→接到ES7210的模拟输入通道（模块上有标MIC1/MIC2/MIC3/MIC4）。三个麦克风间距6cm左右。</div>
+      </div>
+      <div class="aimg">🎙️</div>
+    </div>
+
+    <div class="action-item">
+      <div class="anum">7</div>
+      <div class="atext">
+        <div class="atitle">接IPS屏</div>
+        <div class="anote">VCC→3.3V或5V（看屏的要求），GND→GND。CS→GPIO2，DC→GPIO3，MOSI→GPIO11，SCK→GPIO12，RST→GPIO1。</div>
+      </div>
+      <div class="aimg">🖥️</div>
+    </div>
+
+    <div class="action-item">
+      <div class="anum">8</div>
+      <div class="atext">
+        <div class="atitle">接4G模块、继电器、红外、温湿度</div>
+        <div class="anote">4G模块接UART0(GPIO43/44)；继电器IN→GPIO14；红外→GPIO15；SHT30的SCL→GPIO9/SDA→GPIO10。都接好GND。</div>
+      </div>
+      <div class="aimg">🔌</div>
+    </div>
+
+    <div class="action-item">
+      <div class="anum">9</div>
+      <div class="atext">
+        <div class="atitle">检查所有接线</div>
+        <div class="anote">① 所有GND连到一起了吗？② 所有VCC电压对了吗（3.3V vs 5V）？③ 有没有任何线接反了？④ 杜邦线插紧了吗？</div>
+      </div>
+      <div class="aimg">✅</div>
+    </div>
+  </div>
+
+  <div class="tip danger">
+    <span class="ticon">🔥</span>
+    <div><b>接线最大的坑：</b>杜邦线没插紧 = 接触不良 = 设备抽风。每一根都按到底听到"咔"一声。</div>
+  </div>
+</div>
+
+<!-- 第4步：上电测试 -->
+<div class="step" id="step3">
+  <h2><span class="step-num">4</span>上电测试</h2>
+  <div class="desc">先不接220V，只用USB供电。确认每个模块都活了再走下一步。</div>
+
+  <div class="action-list">
+    <div class="action-item">
+      <div class="anum">1</div>
+      <div class="atext">
+        <div class="atitle">USB上电</div>
+        <div class="anote">用USB线连接ESP32-S3开发板到电脑。开发板上的电源灯应该亮。电脑上出现新的COM端口。</div>
+      </div>
+      <div class="aimg">💡</div>
+    </div>
+    <div class="action-item">
+      <div class="anum">2</div>
+      <div class="atext">
+        <div class="atitle">确认每个模块供电</div>
+        <div class="anote">① 雷达模块上的LED闪了吗？② IPS屏亮了吗？③ 4G模块的NET灯在闪吗？④ ES7210模块有温度吗？</div>
+      </div>
+      <div class="aimg">👁️</div>
+    </div>
+    <div class="action-item">
+      <div class="anum">3</div>
+      <div class="atext">
+        <div class="atitle">用串口工具看数据</div>
+        <div class="anote">电脑打开串口工具（Arduino IDE 串口监视器 / Putty）。波特率115200。看到设备打印信息 = 硬件OK。</div>
+      </div>
+      <div class="aimg">🖥️</div>
+    </div>
+  </div>
+
+  <div class="tip warn">
+    <span class="ticon">⚠️</span>
+    <div><b>上电后雷达没反应？</b>先检查雷达VCC电压，RD2450需要5V。你的面包板电源轨可能没接好。</div>
+  </div>
+</div>
+
+<!-- 第5步：烧录固件 -->
+<div class="step" id="step4">
+  <h2><span class="step-num">5</span>烧录固件</h2>
+  <div class="desc">固件让虾条跟你对齐。以下是他需要知道的技术规格。</div>
+
+  <div class="wiring">
+    <div class="wtitle">📋 给虾条的固件需求</div>
+    <table>
+      <tr><th>功能</th><th>技术规格</th><th>优先级</th></tr>
+      <tr><td>RD2450 雷达驱动</td><td>UART1 (GPIO17/18) 9600bps，读取人员存在+坐标</td><td class="g">P0</td></tr>
+      <tr><td>AR780 雷达驱动</td><td>UART2 (GPIO19/20) 115200bps，读取检测数据</td><td class="g">P0</td></tr>
+      <tr><td>双雷达数据上报</td><td>JSON格式 MQTT上报到EMQX，含设备ID+时间戳</td><td class="g">P0</td></tr>
+      <tr><td>ES7210 音频</td><td>I2S TDM 4通道采集，ESP-SR MultiNet关键词识别</td><td class="b">P1</td></tr>
+      <tr><td>IPS屏显示</td><td>SPI ST7789驱动，显示房间状态</td><td class="b">P1</td></tr>
+      <tr><td>继电器控制</td><td>GPIO14 高低电平控制空调</td><td class="g">P0</td></tr>
+    </table>
+  </div>
+
+  <div class="tip">
+    <span class="ticon">💡</span>
+    <div><b>你先烧一个简单的测试固件：</b>只读雷达数据+通过串口打印。确认雷达能读到人，再让虾条做完整固件。</div>
+  </div>
+</div>
+
+<!-- 第6步：校准 -->
+<div class="step" id="step5">
+  <h2><span class="step-num">6</span>雷达校准</h2>
+  <div class="desc">详细校准流程在 <a href="radar-calibration.md" style="color:#22c55e">radar-calibration.md</a>，这里只给快速步骤。</div>
+
+  <div class="action-list">
+    <div class="action-item">
+      <div class="anum">1</div>
+      <div class="atext">
+        <div class="atitle">空场基线（5分钟）</div>
+        <div class="anote">雷达前方不要有人，记录无人时的底噪读数。</div>
+      </div>
+      <div class="aimg">📡</div>
+    </div>
+    <div class="action-item">
+      <div class="anum">2</div>
+      <div class="atext">
+        <div class="atitle">静态测试（10分钟）</div>
+        <div class="anote">人在1m/2m/3m处站着不动，每个位置记下雷达读到的坐标。</div>
+      </div>
+      <div class="aimg">🧍</div>
+    </div>
+    <div class="action-item">
+      <div class="anum">3</div>
+      <div class="atext">
+        <div class="atitle">打开调试台看数据</div>
+        <div class="anote">http://43.155.153.59/docs/radar-debug.html —— 实时看雷达检测点。</div>
+      </div>
+      <div class="aimg">🌐</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function goStep(n, el){
+  document.querySelectorAll('.step').forEach(function(s,i){s.classList.toggle('active',i===n);});
+  document.querySelectorAll('.nav a').forEach(function(a,i){a.classList.toggle('active',i===n);});
+}
+</script>
+</body>
+</html>

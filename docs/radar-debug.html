@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>雷达感知调试台 · Radar Debug Console</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080d1a;color:#e2e8f0;font-family:system-ui,sans-serif;padding:0;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+/* 顶栏 */
+.topbar{background:#0f172a;border-bottom:1px solid #1e293b;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar .logo{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.topbar .logo span{color:#22c55e}
+.topbar .nav{display:flex;gap:8px;align-items:center}
+.topbar .nav .btn{padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;border:1px solid #334155;background:transparent;color:#94a3b8;transition:all .15s}
+.topbar .nav .btn:hover{border-color:#22c55e44;color:#22c55e}
+.topbar .nav .btn.active{background:#22c55e11;border-color:#22c55e44;color:#22c55e}
+.topbar .nav .btn.danger{color:#ef4444}
+.topbar .nav .btn.danger:hover{border-color:#ef444444}
+.topbar .status{display:flex;gap:12px;font-size:9px;color:#64748b}
+.topbar .status .dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px}
+.topbar .status .dot.on{background:#22c55e}
+.topbar .status .dot.off{background:#ef4444}
+/* 主体布局 */
+.main{flex:1;display:flex;overflow:hidden}
+/* 雷达地图区 */
+.map-area{flex:1;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden}
+.map-area .map-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.map-area .map-header .title{font-size:11px;font-weight:600;color:#e2e8f0}
+.map-area .map-header .controls{display:flex;gap:4px;font-size:9px}
+.map-area .map-header .controls select{background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:2px 6px;border-radius:3px;font-size:9px}
+.map-area .map-header .controls select option{background:#1e293b}
+.map-canvas-wrap{flex:1;background:#0a0e1a;border:1px solid #1e293b;border-radius:8px;position:relative;overflow:hidden}
+.map-canvas-wrap canvas{width:100%;height:100%}
+.map-legends{display:flex;gap:10px;font-size:8px;color:#64748b;padding-top:4px;flex-wrap:wrap}
+.map-legends .l{display:flex;align-items:center;gap:3px}
+.map-legends .dot{width:8px;height:8px;border-radius:50%}
+/* 右侧面板 */
+.side{width:300px;border-left:1px solid #1e293b;display:flex;flex-direction:column;overflow:hidden}
+.side .tabs{display:flex;border-bottom:1px solid #1e293b;flex-shrink:0}
+.side .tabs .tab{flex:1;padding:6px;text-align:center;font-size:9px;cursor:pointer;color:#64748b;border-bottom:2px solid transparent;transition:all .15s}
+.side .tabs .tab.active{color:#22c55e;border-bottom-color:#22c55e}
+.side .tab-content{flex:1;overflow-y:auto;padding:8px;font-size:9px}
+/* 设备卡片 */
+.dev-card{background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:8px;margin-bottom:6px}
+.dev-card .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.dev-card .header .name{font-size:10px;font-weight:600}
+.dev-card .header .name.rd2450{color:#22c55e}
+.dev-card .header .name.ar780{color:#8b5cf6}
+.dev-card .header .status-badge{padding:1px 5px;border-radius:3px;font-size:7px}
+.dev-card .header .status-badge.on{background:#22c55e22;color:#22c55e}
+.dev-card .header .status-badge.off{background:#ef444422;color:#ef4444}
+.dev-card .metrics{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.dev-card .metrics .m{background:#1e293b;border-radius:3px;padding:3px;text-align:center}
+.dev-card .metrics .m .v{font-size:12px;font-weight:600}
+.dev-card .metrics .m .v.g{color:#22c55e}
+.dev-card .metrics .m .v.b{color:#60a5fa}
+.dev-card .metrics .m .v.p{color:#8b5cf6}
+.dev-card .metrics .m .l{font-size:6px;color:#64748b;margin-top:1px}
+/* 算法对比 */
+.algo-row{display:flex;gap:4px;margin-bottom:4px;padding:4px 6px;background:#0f172a;border-radius:4px;align-items:center}
+.algo-row .an{min-width:60px;font-size:8px;color:#94a3b8}
+.algo-row .av{flex:1;font-size:10px;font-weight:600;text-align:center}
+.algo-row .av.agree{color:#22c55e}
+.algo-row .av.disagree{color:#ef4444}
+.algo-row .abar{flex:1;height:4px;background:#1e293b;border-radius:2px;overflow:hidden}
+.algo-row .abar .fill{height:100%;border-radius:2px;transition:width .3s}
+.algo-row .abar .fill.high{background:#22c55e}
+.algo-row .abar .fill.med{background:#f59e0b}
+.algo-row .abar .fill.low{background:#ef4444}
+/* 原始数据流 */
+.data-line{padding:2px 0;font-family:monospace;font-size:7px;color:#64748b;border-bottom:1px solid #0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.data-line .ts{color:#475569}
+.data-line .key{color:#60a5fa}
+.data-line .val{color:#e2e8f0}
+.data-line .diff{color:#ef4444}
+/* 偏差统计 */
+.dev-stats{padding:6px;background:#0f172a;border-radius:6px;margin-bottom:6px}
+.dev-stats .row{display:flex;justify-content:space-between;font-size:8px;padding:3px 0;border-bottom:1px solid #1e293b}
+.dev-stats .row:last-child{border-bottom:none}
+.dev-stats .row .sval{font-weight:600}
+.dev-stats .row .sval.g{color:#22c55e}
+.dev-stats .row .sval.r{color:#ef4444}
+.dev-stats .row .sval.y{color:#f59e0b}
+/* 设备注册 */
+.add-dev{padding:6px;background:#1e293b;border-radius:6px;margin-top:4px}
+.add-dev input{width:100%;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:4px 6px;border-radius:3px;font-size:9px;margin-bottom:4px}
+.add-dev button{width:100%;background:#22c55e;border:none;color:#000;padding:4px;border-radius:3px;font-size:9px;cursor:pointer;font-weight:600}
+/* 视图选择 */
+.view-mode{display:flex;gap:3px;margin-bottom:4px}
+.view-mode .vm{padding:2px 8px;border-radius:3px;font-size:8px;cursor:pointer;border:1px solid #334155;color:#64748b;background:transparent}
+.view-mode .vm.active{background:#22c55e11;border-color:#22c55e44;color:#22c55e}
+/* 模拟数据控制 */
+.mock-ctrl{display:flex;gap:4px;margin-top:6px}
+.mock-ctrl button{padding:3px 8px;border-radius:3px;font-size:8px;border:1px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer}
+.mock-ctrl button:hover{border-color:#22c55e44}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">🦞 <span>雷达感知调试台</span> · Radar Perception Debug</div>
+  <div class="nav">
+    <div class="status" id="statusBar">
+      <span><span class="dot on"></span>API <span id="apiStatus">在线</span></span>
+      <span><span class="dot" id="connDot"></span><span id="connStatus">等待数据</span></span>
+      <span>设备 <span id="devCount">0</span></span>
+    </div>
+    <div class="btn" onclick="addMockDevice()">➕ 模拟雷达</div>
+    <div class="btn danger" onclick="clearData()">清除</div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- 雷达地图 -->
+  <div class="map-area">
+    <div class="map-header">
+      <div class="title">📍 空间俯视图 · 实时感知</div>
+      <div class="controls">
+        <select id="viewSelect"><option value="all">全部雷达叠加</option></select>
+        <div class="view-mode" id="viewMode">
+          <span class="vm active" onclick="setView('2d',this)">2D定位</span>
+          <span class="vm" onclick="setView('heat',this)">热力</span>
+          <span class="vm" onclick="setView('path',this)">轨迹</span>
+        </div>
+      </div>
+    </div>
+    <div class="map-canvas-wrap">
+      <canvas id="mapCanvas"></canvas>
+    </div>
+    <div class="map-legends">
+      <span class="l"><span class="dot" style="background:#22c55e"></span>RD2450</span>
+      <span class="l"><span class="dot" style="background:#8b5cf6"></span>AR780</span>
+      <span class="l"><span class="dot" style="background:#f59e0b"></span>算法融合</span>
+      <span class="l"><span class="dot" style="background:#ef4444"></span>偏差报警</span>
+      <span class="l" id="legendExtra">等待数据中...</span>
+    </div>
+  </div>
+
+  <!-- 右侧面板 -->
+  <div class="side">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('devices',this)">📡 设备</div>
+      <div class="tab" onclick="switchTab('algo',this)">🧮 算法对比</div>
+      <div class="tab" onclick="switchTab('data',this)">📊 原始数据</div>
+    </div>
+    <div class="tab-content" id="tabContent">
+      <div id="devicesTab"></div>
+      <div id="algoTab" style="display:none"></div>
+      <div id="dataTab" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 设备管理 =====
+var devices = {};
+var dataHistory = [];
+var viewMode = '2d';
+var animFrame = null;
+var selectedDev = 'all';
+
+// 设备类型配置
+var DEVICE_TYPES = {
+  rd2450: {name:'RD2450',color:'#22c55e',glow:'#22c55e44',range:6,angle:120,fov:[30,150]},
+  ar780: {name:'AR780',color:'#8b5cf6',glow:'#8b5cf644',range:8,angle:180,fov:[0,180]}
+};
+
+// 算法配置
+var ALGORITHMS = [
+  {id:'basic_peak',name:'峰值检测',desc:'信号峰值定位',color:'#22c55e'},
+  {id:'weighted_center',name:'加权中心',desc:'多波束加权平均',color:'#60a5fa'},
+  {id:'doa_music',name:'MUSIC谱',desc:'空间谱估计',color:'#8b5cf6'},
+  {id:'cfar',name:'CFAR检测',desc:'恒虚警率检测',color:'#f59e0b'},
+  {id:'kalman',name:'卡尔曼滤波',desc:'轨迹平滑跟踪',color:'#ec4899'},
+  {id:'fusion_avg',name:'融合平均',desc:'多雷达平均偏差',color:'#22c55e'},
+];
+
+// ===== 初始化 =====
+window.onload = function(){
+  initCanvas();
+  // 默认添加模拟设备
+  addMockDevice('RD2450-01','rd2450');
+  addMockDevice('RD2450-02','rd2450');
+  addMockDevice('AR780-01','ar780');
+  updateSelect();
+  startSimulation();
+};
+
+// ===== Canvas 绘制 =====
+var ctx, cw, ch, scaleX, scaleY;
+
+function initCanvas(){
+  var canvas = document.getElementById('mapCanvas');
+  ctx = canvas.getContext('2d');
+  resizeCanvas();
+  window.onresize = resizeCanvas;
+  drawFrame();
+}
+
+function resizeCanvas(){
+  var wrap = document.querySelector('.map-canvas-wrap');
+  var canvas = document.getElementById('mapCanvas');
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  cw = canvas.width;
+  ch = canvas.height;
+  scaleX = cw / 200;
+  scaleY = ch / 200;
+}
+
+// ===== 绘制 =====
+function drawFrame(){
+  ctx.clearRect(0,0,cw,ch);
+  
+  // 背景网格
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 0.5;
+  for(var x=0;x<=200;x+=20){ ctx.beginPath(); ctx.moveTo(x*scaleX,0); ctx.lineTo(x*scaleX,ch); ctx.stroke(); }
+  for(var y=0;y<=200;y+=20){ ctx.beginPath(); ctx.moveTo(0,y*scaleY); ctx.lineTo(cw,y*scaleY); ctx.stroke(); }
+  
+  // 中心十字
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cw/2,0); ctx.lineTo(cw/2,ch); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,ch/2); ctx.lineTo(cw,ch/2); ctx.stroke();
+  
+  // 距离标注
+  ctx.fillStyle = '#475569';
+  ctx.font = '7px system-ui';
+  ctx.fillText('0m', cw/2+2, ch/2-2);
+  ctx.fillText('2m', cw/2+2, ch/2-40);
+  ctx.fillText('4m', cw/2+2, ch/2-80);
+  ctx.fillText('2m', cw/2+2, ch/2+38);
+  
+  // 绘制每个设备检测到的点
+  var devIds = Object.keys(devices);
+  var allPoints = [];
+  devIds.forEach(function(id){
+    var dev = devices[id];
+    if(!dev || !dev.lastData) return;
+    var pts = dev.lastData.points || [];
+    pts.forEach(function(p){
+      var color = DEVICE_TYPES[dev.type] ? DEVICE_TYPES[dev.type].color : '#64748b';
+      if(viewMode==='2d') drawPoint(p, color, id);
+      allPoints.push({x:p.x,y:p.y,dev:id,type:dev.type,conf:p.conf||50});
+    });
+  });
+  
+  // 显示选中设备
+  if(selectedDev!=='all'){
+    // 高亮选中设备
+  }
+  
+  // 热力图模式
+  if(viewMode==='heat' && allPoints.length>0){
+    drawHeatmap(allPoints);
+  }
+  
+  // 轨迹
+  if(viewMode==='path'){
+    devIds.forEach(function(id){
+      if(devices[id] && devices[id].trail && devices[id].trail.length>1){
+        drawTrail(devices[id].trail, DEVICE_TYPES[devices[id].type]?DEVICE_TYPES[devices[id].type].color:'#64748b');
+      }
+    });
+  }
+  
+  // 设备标注
+  devIds.forEach(function(id){
+    var dev = devices[id];
+    if(!dev) return;
+    var dt = DEVICE_TYPES[dev.type] || {color:'#64748b'};
+    ctx.fillStyle = dt.color;
+    ctx.font = '7px system-ui';
+    ctx.fillText(dev.name||id, 10, 15*devIds.indexOf(id)+20);
+    ctx.fillStyle = '#475569';
+    ctx.fillText('范围: '+((dt.range||5)*2)+'m', 10, 15*devIds.indexOf(id)+30);
+  });
+  
+  // 更新状态
+  updateStatus();
+  
+  animFrame = requestAnimationFrame(drawFrame);
+}
+
+function drawPoint(p, color, id){
+  var x = cw/2 + p.x * scaleX * 10;  // p.x in meters * 10 pixels/meter
+  var y = ch/2 - p.y * scaleY * 10;  // p.y in meters, y inverted
+  var conf = p.conf || 50;
+  var radius = 3 + conf/30;
+  
+  // 光晕
+  var grad = ctx.createRadialGradient(x,y,0,x,y,radius*3);
+  grad.addColorStop(0, color+'44');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.beginPath(); ctx.arc(x,y,radius*3,0,Math.PI*2); ctx.fill();
+  
+  // 填充点
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(x,y,radius,0,Math.PI*2); ctx.fill();
+  
+  // 轮廓
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.arc(x,y,radius,0,Math.PI*2); ctx.stroke();
+}
+
+function drawHeatmap(points){
+  var width = 40, height = 40;
+  var grid = [];
+  for(var i=0;i<width;i++){ grid[i]=[]; for(var j=0;j<height;j++) grid[i][j]=0; }
+  
+  points.forEach(function(p){
+    var gx = Math.floor((p.x+10)/20*width);
+    var gy = Math.floor((10-p.y)/20*height);
+    if(gx>=0&&gx<width&&gy>=0&&gy<height){
+      grid[gx][gy] += (p.conf||50)/100;
+    }
+  });
+  
+  var cellW = cw/width, cellH = ch/height;
+  for(var i=0;i<width;i++){
+    for(var j=0;j<height;j++){
+      if(grid[i][j]>0){
+        var alpha = Math.min(grid[i][j]*0.3, 0.6);
+        ctx.fillStyle = 'rgba(34,197,94,'+alpha+')';
+        ctx.fillRect(i*cellW, j*cellH, cellW, cellH);
+      }
+    }
+  }
+}
+
+function drawTrail(trail, color){
+  ctx.strokeStyle = color+'66';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  trail.forEach(function(p,i){
+    var x = cw/2 + p.x * scaleX * 10;
+    var y = ch/2 - p.y * scaleY * 10;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  
+  // 起点和终点
+  if(trail.length>0){
+    var first = trail[0], last = trail[trail.length-1];
+    ctx.fillStyle = color+'88';
+    ctx.beginPath(); ctx.arc(cw/2+first.x*scaleX*10, ch/2-first.y*scaleY*10, 2, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(cw/2+last.x*scaleX*10, ch/2-last.y*scaleY*10, 3, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+// ===== 设备管理 =====
+function addMockDevice(name, type){
+  if(!name) name = 'RD2450-'+(Object.keys(devices).length+1).toString().padStart(2,'0');
+  if(!type) type = Object.keys(DEVICE_TYPES)[Object.keys(devices).length%2];
+  
+  var id = name;
+  devices[id] = {
+    name: name,
+    type: type,
+    lastSeen: Date.now(),
+    online: true,
+    trail: [],
+    lastData: null,
+    algoOutputs: {}
+  };
+  
+  updateSelect();
+  renderDevices();
+  updateStatus();
+}
+
+function addDeviceFromInput(){
+  var input = document.getElementById('newDevInput');
+  var name = input.value.trim();
+  if(!name) return;
+  var type = document.getElementById('newDevType').value;
+  addMockDevice(name, type);
+  input.value = '';
+}
+
+function updateSelect(){
+  var sel = document.getElementById('viewSelect');
+  sel.innerHTML = '<option value="all">全部叠加比较</option>';
+  Object.keys(devices).forEach(function(id){
+    sel.innerHTML += '<option value="'+id+'">'+devices[id].name+'</option>';
+  });
+  sel.onchange = function(){ selectedDev = sel.value; };
+}
+
+// ===== 模拟数据 =====
+var simRunning = true;
+var simTime = 0;
+
+function startSimulation(){
+  setInterval(function(){
+    if(!simRunning) return;
+    simTime++;
+    Object.keys(devices).forEach(function(id){
+      var dev = devices[id];
+      if(!dev) return;
+      
+      // 模拟人的位置
+      var person = {
+        x: 2 + Math.sin(simTime*0.05 + Object.keys(devices).indexOf(id)*2)*1.5,
+        y: 1 + Math.cos(simTime*0.03 + Object.keys(devices).indexOf(id)*1.5)*1.0,
+        conf: 70 + Math.random()*25
+      };
+      
+      // 每个设备报告同样的人，但加入偏差
+      var noise = Object.keys(devices).indexOf(id) * 0.2;  // 设备间偏差
+      var detection = {
+        people: 1,
+        points: [{
+          x: person.x + noise + (Math.random()-0.5)*0.3,
+          y: person.y + (Math.random()-0.5)*0.3,
+          conf: person.conf - Math.random()*10
+        }],
+        ts: Date.now(),
+        algoOutputs: {}
+      };
+      
+      // 各算法输出（模拟）
+      ALGORITHMS.forEach(function(algo){
+        var algoNoise = Object.keys(devices).indexOf(id) * 0.1 + Math.random()*0.15;
+        detection.algoOutputs[algo.id] = {
+          x: person.x + algoNoise,
+          y: person.y + algoNoise*0.5,
+          conf: 85 - Math.random()*20
+        };
+      });
+      
+      dev.lastData = detection;
+      dev.algoOutputs = detection.algoOutputs;
+      dev.lastSeen = Date.now();
+      
+      // 轨迹
+      dev.trail.push({x:detection.points[0].x, y:detection.points[0].y, ts:Date.now()});
+      if(dev.trail.length > 50) dev.trail.shift();
+    });
+    
+    renderDevices();
+    renderAlgo();
+    renderDataStream();
+  }, 300);  // 每300ms更新一次
+}
+
+// ===== 渲染 =====
+function renderDevices(){
+  var html = '<div class="add-dev">';
+  html += '<input id="newDevInput" placeholder="设备名称，如 RD2450-03" style="margin-bottom:3px">';
+  html += '<select id="newDevType" style="width:100%;background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:3px;border-radius:3px;font-size:9px;margin-bottom:3px">';
+  html += '<option value="rd2450">RD2450</option><option value="ar780">AR780</option>';
+  html += '</select><button onclick="addDeviceFromInput()">➕ 添加</button></div>';
+  
+  Object.keys(devices).forEach(function(id){
+    var dev = devices[id];
+    var dt = DEVICE_TYPES[dev.type] || {color:'#64748b',name:'未知'};
+    var colorClass = dev.type==='rd2450'?'rd2450':'ar780';
+    var pd = dev.lastData;
+    html += '<div class="dev-card"><div class="header">'+
+      '<span class="name '+colorClass+'">'+dev.name+'</span>'+
+      '<span class="status-badge on" style="color:'+dt.color+'">'+dt.name+'</span>'+
+    '</div><div class="metrics">';
+    if(pd){
+      html += '<div class="m"><div class="v g">'+(pd.people||0)+'</div><div class="l">人数</div></div>';
+      html += '<div class="m"><div class="v b">'+(pd.points&&pd.points[0]?pd.points[0].conf.toFixed(0):'--')+'%</div><div class="l">置信度</div></div>';
+      if(pd.points&&pd.points[0]){
+        html += '<div class="m"><div class="v p">'+(dev.trail.length>1?((Math.abs(pd.points[0].x-dev.trail[dev.trail.length-2].x)*100).toFixed(1)):'0.0')+'</div><div class="l">速度 cm/s</div></div>';
+      } else {
+        html += '<div class="m"><div class="v">--</div><div class="l">速度</div></div>';
+      }
+      html += '<div class="m"><div class="v">'+(pd.points?pd.points.length:0)+'</div><div class="l">检测点</div></div>';
+    } else {
+      html += '<div class="m"><div class="v">--</div><div class="l">人数</div></div>';
+      html += '<div class="m"><div class="v">--</div><div class="l">置信度</div></div>';
+      html += '<div class="m"><div class="v">--</div><div class="l">速度</div></div>';
+      html += '<div class="m"><div class="v">--</div><div class="l">检测点</div></div>';
+    }
+    html += '</div></div>';
+  });
+  
+  document.getElementById('devicesTab').innerHTML = html;
+}
+
+function renderAlgo(){
+  var html = '<div style="font-size:10px;font-weight:600;color:#e2e8f0;margin-bottom:6px">🧮 算法对比 · 多雷达同位置</div>';
+  
+  // 对于每个算法，显示所有设备的结果
+  ALGORITHMS.forEach(function(algo){
+    html += '<div style="font-size:9px;font-weight:600;color:'+algo.color+';margin:6px 0 3px">'+algo.name+' ('+algo.desc+')</div>';
+    
+    var devIds = Object.keys(devices);
+    var vals = [];
+    devIds.forEach(function(id){
+      var dev = devices[id];
+      if(dev && dev.algoOutputs && dev.algoOutputs[algo.id]){
+        vals.push({dev:id, x:dev.algoOutputs[algo.id].x, y:dev.algoOutputs[algo.id].y, conf:dev.algoOutputs[algo.id].conf});
+      }
+    });
+    
+    if(vals.length>1){
+      // 计算偏差
+      var xVals = vals.map(function(v){return v.x;});
+      var yVals = vals.map(function(v){return v.y;});
+      var xMean = xVals.reduce(function(a,b){return a+b;})/xVals.length;
+      var yMean = yVals.reduce(function(a,b){return a+b;})/yVals.length;
+      var xDev = Math.sqrt(xVals.map(function(v){return (v-xMean)*(v-xMean);}).reduce(function(a,b){return a+b;})/xVals.length);
+      var yDev = Math.sqrt(yVals.map(function(v){return (v-yMean)*(v-yMean);}).reduce(function(a,b){return a+b;})/yVals.length);
+      var totalDev = Math.sqrt(xDev*xDev + yDev*yDev);
+      
+      html += '<div class="dev-stats">';
+      html += '<div class="row"><span>X轴偏差(σ)</span><span class="sval '+(xDev<0.2?'g':xDev<0.4?'y':'r')+'">±'+(xDev*100).toFixed(1)+' cm</span></div>';
+      html += '<div class="row"><span>Y轴偏差(σ)</span><span class="sval '+(yDev<0.2?'g':yDev<0.4?'y':'r')+'">±'+(yDev*100).toFixed(1)+' cm</span></div>';
+      html += '<div class="row"><span>综合偏差</span><span class="sval '+(totalDev<0.3?'g':totalDev<0.5?'y':'r')+'">±'+(totalDev*100).toFixed(1)+' cm</span></div>';
+      html += '<div class="row"><span>一致率</span><span class="sval g">'+(Math.max(0,100-totalDev*80)).toFixed(1)+'%</span></div>';
+      html += '</div>';
+      
+      // 每个设备的具体值
+      vals.forEach(function(v){
+        var xDelta = ((v.x - xMean)*100).toFixed(1);
+        var yDelta = ((v.y - yMean)*100).toFixed(1);
+        html += '<div class="algo-row"><span class="an" style="color:'+DEVICE_TYPES[devices[v.dev]?devices[v.dev].type:'rd2450']?.color+'">'+v.dev+'</span>'+
+          '<span class="av '+(Math.abs(xDelta)<15?'agree':'disagree')+'">('+xDelta+', '+yDelta+')cm</span>'+
+          '<div class="abar"><div class="fill '+(v.conf>80?'high':v.conf>60?'med':'low')+'" style="width:'+v.conf+'%"></div></div></div>';
+      });
+    } else {
+      html += '<div style="color:#64748b;font-size:8px;padding:4px">需要至少2个设备进行比较</div>';
+    }
+  });
+  
+  document.getElementById('algoTab').innerHTML = html;
+}
+
+function renderDataStream(){
+  var lines = dataHistory.slice(-20);
+  var html = '<div style="font-size:10px;font-weight:600;color:#e2e8f0;margin-bottom:4px">📊 原始数据流</div>';
+  lines.forEach(function(l){
+    var ts = new Date(l.ts).toLocaleTimeString();
+    html += '<div class="data-line">'+
+      '<span class="ts">['+ts+']</span> '+
+      '<span class="key">'+l.dev+'</span> → '+
+      '<span class="val">'+l.people+'人</span> '+
+      (l.point ? '<span class="val">@('+l.point.x.toFixed(2)+','+l.point.y.toFixed(2)+')</span> ' : '')+
+      '<span class="val">'+l.conf.toFixed(0)+'%</span>'+
+      (l.deviation>0.3 ? ' <span class="diff">⚠️偏差'+(l.deviation*100).toFixed(1)+'cm</span>' : '')+
+    '</div>';
+  });
+  document.getElementById('dataTab').innerHTML = html;
+  
+  // 记录历史
+  var devIds = Object.keys(devices);
+  if(devIds.length>1 && devices[devIds[0]] && devices[devIds[0]].lastData){
+    var dev = devices[devIds[0]];
+    var pd = dev.lastData;
+    if(pd && pd.points && pd.points[0]){
+      // 计算帧间偏差
+      var allPts = [];
+      devIds.forEach(function(id2){
+        var d2 = devices[id2];
+        if(d2 && d2.lastData && d2.lastData.points && d2.lastData.points[0]){
+          allPts.push({dev:id2, point:d2.lastData.points[0], conf:d2.lastData.points[0].conf});
+        }
+      });
+      if(allPts.length>1){
+        var xM = allPts.map(function(p){return p.point.x;}).reduce(function(a,b){return a+b;})/allPts.length;
+        var yM = allPts.map(function(p){return p.point.y;}).reduce(function(a,b){return a+b;})/allPts.length;
+        var devSum = allPts.map(function(p){return Math.sqrt((p.point.x-xM)*(p.point.x-xM)+(p.point.y-yM)*(p.point.y-yM));}).reduce(function(a,b){return a+b;});
+        var avgDev = devSum/allPts.length;
+        
+        dataHistory.push({
+          ts: Date.now(),
+          dev: devIds.length+'台',
+          people: pd.people||0,
+          point: {x:xM,y:yM},
+          conf: pd.points[0].conf,
+          deviation: avgDev
+        });
+        if(dataHistory.length > 200) dataHistory.splice(0, 100);
+      }
+    }
+  }
+}
+
+function updateStatus(){
+  var count = Object.keys(devices).length;
+  document.getElementById('devCount').textContent = count;
+  var anyOnline = false;
+  Object.keys(devices).forEach(function(id){
+    if(devices[id].online) anyOnline = true;
+  });
+  document.getElementById('connDot').className = 'dot '+(anyOnline?'on':'off');
+  document.getElementById('connStatus').textContent = anyOnline?(count+'台设备')+'在线':'无数据';
+  
+  // 更新图例
+  var legend = document.getElementById('legendExtra');
+  var devIds = Object.keys(devices);
+  if(devIds.length>1 && devices[devIds[0]] && devices[devIds[0]].lastData){
+    var allPts = [];
+    devIds.forEach(function(id){
+      var d = devices[id];
+      if(d && d.lastData && d.lastData.points && d.lastData.points[0]){
+        allPts.push(d.lastData.points[0]);
+      }
+    });
+    if(allPts.length>1){
+      var xM = allPts.map(function(p){return p.x;}).reduce(function(a,b){return a+b;})/allPts.length;
+      var yM = allPts.map(function(p){return p.y;}).reduce(function(a,b){return a+b;})/allPts.length;
+      var dev = allPts.map(function(p){return Math.sqrt((p.x-xM)*(p.x-xM)+(p.y-yM)*(p.y-yM));}).reduce(function(a,b){return a+b;})/allPts.length;
+      legend.innerHTML = '⚠️ 设备间偏差 '+(dev*100).toFixed(1)+'cm';
+      legend.style.color = dev<0.2?'#22c55e':dev<0.4?'#f59e0b':'#ef4444';
+    }
+  }
+}
+
+function setView(mode, el){
+  viewMode = mode;
+  document.querySelectorAll('.view-mode .vm').forEach(function(e){e.classList.remove('active');});
+  if(el) el.classList.add('active');
+}
+
+function switchTab(tab, el){
+  document.querySelectorAll('.side .tabs .tab').forEach(function(t){t.classList.remove('active');});
+  if(el) el.classList.add('active');
+  ['devices','algo','data'].forEach(function(t){
+    document.getElementById(t+'Tab').style.display = t===tab?'block':'none';
+  });
+}
+
+function clearData(){
+  dataHistory = [];
+  Object.keys(devices).forEach(function(id){
+    devices[id].trail = [];
+    devices[id].lastData = null;
+  });
+}
+</script>
+</body>
+</html>

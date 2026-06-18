@@ -7,569 +7,137 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0b1120;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
-.page{max-width:960px;margin:0 auto;padding:24px 20px 80px}
+.page{max-width:800px;margin:0 auto;padding:24px 20px 60px}
 
-/* 头部 */
-.hero{text-align:center;padding:48px 0 36px}
-.hero h1{font-size:32px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px}
-.hero .sub{color:#64748b;font-size:14px;margin-top:6px}
-.hero .tagline{color:#94a3b8;font-size:15px;margin-top:12px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6}
+.hero{text-align:center;padding:48px 0 32px}
+.hero h1{font-size:28px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .sub{color:#64748b;font-size:13px;margin-top:4px}
+.hero .desc{color:#94a3b8;font-size:14px;margin-top:10px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6}
 
-/* 导航卡片网格 */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:8px}
-.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px;transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;display:block}
-.card:hover{transform:translateY(-2px);border-color:#6366f1;box-shadow:0 6px 24px #6366f118}
-.card .icon{font-size:24px;margin-bottom:8px}
-.card .title{font-size:15px;font-weight:600;color:#f1f5f9;margin-bottom:4px}
-.card .desc{font-size:12px;color:#64748b;line-height:1.5}
-.card .tags{margin-top:8px;display:flex;gap:4px;flex-wrap:wrap}
-.tag{font-size:10px;padding:2px 7px;border-radius:4px;background:#334155;color:#94a3b8}
-
-/* 章节标题 */
-.section{margin-top:36px;margin-bottom:12px}
-.section h2{font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px;color:#e2e8f0}
+.section{margin:28px 0 10px}
+.section h2{font-size:16px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:8px}
 .section h2 .line{flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
-.section .hint{font-size:12px;color:#64748b;margin-top:2px}
 
-/* 架构图 */
-.arch{margin-top:8px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;overflow-x:auto}
-.arch-svg{min-width:700px}
-.arch-row{display:flex;justify-content:center;gap:12px;margin:8px 0;position:relative}
-.arch-box{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 14px;text-align:center;min-width:100px;flex-shrink:0}
-.arch-box .ab-title{font-size:11px;font-weight:600;color:#60a5fa}
-.arch-box .ab-desc{font-size:10px;color:#64748b;margin-top:2px}
-.arch-box.green{border-color:#22c55e44}
-.arch-box.green .ab-title{color:#22c55e}
-.arch-box.purple{border-color:#a78bfa44}
-.arch-box.purple .ab-title{color:#a78bfa}
-.arch-box.yellow{border-color:#f59e0b44}
-.arch-box.yellow .ab-title{color:#f59e0b}
-.arch-arrow{text-align:center;color:#475569;font-size:10px;padding:2px 0}
-.arch-label{font-size:10px;color:#475569;text-align:center;margin:4px 0 2px;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:6px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:14px;transition:all .2s;cursor:pointer;text-decoration:none;color:inherit;display:block}
+.card:hover{transform:translateY(-2px);border-color:#6366f1;box-shadow:0 4px 16px #6366f118}
+.card .icon{font-size:20px;margin-bottom:6px}
+.card .title{font-size:13px;font-weight:600;color:#f1f5f9;margin-bottom:2px}
+.card .desc{font-size:11px;color:#64748b;line-height:1.4}
 
-/* 模块表 */
-.mtable{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
-.mtable th{padding:8px 10px;text-align:left;color:#94a3b8;font-weight:500;border-bottom:1px solid #334155;font-size:11px}
-.mtable td{padding:8px 10px;border-bottom:1px solid #1e293b;color:#cbd5e1;vertical-align:top}
-.mtable tr:hover td{background:#1e293b55}
-.mtable .mname{color:#60a5fa;font-weight:500;white-space:nowrap}
-.mtable .mstatus{font-size:10px;padding:1px 6px;border-radius:4px}
-.mtable .mstatus.ok{background:#22c55e22;color:#22c55e}
-.mtable .mstatus.pending{background:#f59e0b22;color:#f59e0b}
-.mtable .mstatus.proto{background:#60a5fa22;color:#60a5fa}
-
-/* 外部架构 */
-.ext-list{margin-top:8px}
-.ext-item{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px}
-.ext-item .ei-icon{font-size:18px;flex-shrink:0;margin-top:1px}
-.ext-item .ei-body{flex:1;min-width:0}
-.ext-item .ei-title{font-size:13px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.ext-item .ei-title a{color:#60a5fa;text-decoration:none;font-weight:400;font-size:11px}
-.ext-item .ei-title a:hover{text-decoration:underline}
-.ext-item .ei-desc{font-size:11px;color:#64748b;margin-top:2px}
-.ext-item .ei-status{font-size:10px;padding:1px 6px;border-radius:4px;white-space:nowrap}
-.ext-item .ei-status.on{background:#22c55e22;color:#22c55e}
-.ext-item .ei-status.off{background:#ef444422;color:#ef4444}
-
-/* 演示列表 */
-.demo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px}
+.demo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:6px}
 .demo-card{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:12px;transition:all .2s;text-decoration:none;color:inherit;display:block}
-.demo-card:hover{transform:translateY(-1px);border-color:#60a5fa66;box-shadow:0 4px 16px #60a5fa0d}
+.demo-card:hover{transform:translateY(-1px);border-color:#60a5fa66}
 .demo-card .dc-icon{font-size:18px;margin-bottom:4px}
 .demo-card .dc-title{font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:2px}
 .demo-card .dc-desc{font-size:10px;color:#64748b;line-height:1.4}
-.demo-card .dc-badge{font-size:9px;padding:1px 5px;border-radius:3px;margin-top:6px;display:inline-block}
-.badge-demo{background:#60a5fa22;color:#60a5fa}
-.badge-new{background:#22c55e22;color:#22c55e}
 
-/* 硬件表 */
-.hw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:8px}
-.hw-card{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:12px}
-.hw-card .hw-name{font-size:12px;font-weight:600;color:#f1f5f9}
-.hw-card .hw-cost{font-size:10px;color:#22c55e}
-.hw-card .hw-desc{font-size:10px;color:#64748b;margin-top:2px;line-height:1.4}
-
-/* 页脚 */
-.footer{text-align:center;margin-top:48px;padding-top:24px;border-top:1px solid #1e293b;font-size:11px;color:#475569}
-.footer a{color:#475569;text-decoration:none}
-.footer a:hover{color:#64748b}
+.footer{text-align:center;margin-top:48px;padding-top:20px;border-top:1px solid #1e293b;font-size:11px;color:#475569}
 
 @media(max-width:640px){
-  .page{padding:16px 12px 60px}
   .hero{padding:32px 0 24px}
-  .hero h1{font-size:24px}
-  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:22px}
+  .grid{grid-template-columns:1fr 1fr}
   .demo-grid{grid-template-columns:1fr 1fr}
-  .hw-grid{grid-template-columns:1fr}
-  .arch-box{padding:6px 8px;min-width:70px}
-  .arch-box .ab-title{font-size:9px}
-  .arch-box .ab-desc{display:none}
 }
 </style>
 </head>
 <body>
 <div class="page">
 
-<!-- 英雄区 -->
 <div class="hero">
   <h1>🦞 灵犀 · Lingxi</h1>
-  <div class="sub">酒店房间空间感知系统 · v0.3</div>
-  <div class="tagline">
-    一块板子装进客房，感知有没有人、温度、门窗状态，自动控空调节省10-20%电费。<br>
-    同时识别语音指令，提供场景化服务。空间知道你在做什么。
-  </div>
+  <div class="sub">酒店房间空间感知系统</div>
+  <div class="desc">一块板子感知房间有没有人、温度、状态，自动控空调节能。空间知道你在做什么。</div>
 </div>
 
-<!-- ===== 快速导航 ===== -->
-<div class="section"><h2>📋 快速导航 <span class="line"></span></h2></div>
-<div class="grid">
-  <a href="#architecture" class="card">
-    <div class="icon">🏗️</div>
-    <div class="title">系统架构</div>
-    <div class="desc">端到端架构图：设备端 → 网关 → 云端 → 客户端</div>
-  </a>
-  <a href="#modules" class="card">
-    <div class="icon">📦</div>
-    <div class="title">模块说明</div>
-    <div class="desc">雷达感知、传感器融合、节能控制、语音识别等各模块详情</div>
-  </a>
-  <a href="#external" class="card">
-    <div class="icon">🔗</div>
-    <div class="title">外部架构 &amp; 集成</div>
-    <div class="desc">服务器部署、MQTT、Cloudflare Tunnel、Gateway API 等</div>
-  </a>
-  <a href="#demos" class="card">
-    <div class="icon">🖥️</div>
-    <div class="title">演示中心</div>
-    <div class="desc">所有在线演示页面：雷达调试台、节能看板、IPS UI 等</div>
-  </a>
-  <a href="#hardware" class="card">
-    <div class="icon">🔧</div>
-    <div class="title">硬件方案 / BOM</div>
-    <div class="desc">ESP32-S3 + 双雷达 + 触摸屏 + 语音 · 三档成本方案</div>
-  </a>
-  <a href="#firmware" class="card">
-    <div class="icon">📡</div>
-    <div class="title">固件下载</div>
-    <div class="desc">OTA 固件、测试固件、烧录脚本</div>
-  </a>
-</div>
-
-<!-- ===== 系统架构 ===== -->
-<div class="section" id="architecture"><h2>🏗️ 系统架构 <span class="line"></span></h2></div>
-<div class="arch">
-<div class="arch-svg">
-
-<div class="arch-label">设备端（酒店客房）</div>
-<div class="arch-row">
-  <div class="arch-box"><div class="ab-title">ESP32-S3</div><div class="ab-desc">主控 · N16R8</div></div>
-  <div class="arch-box green"><div class="ab-title">RD2450/MS24</div><div class="ab-desc">雷达1 · 存在检测</div></div>
-  <div class="arch-box green"><div class="ab-title">AR780</div><div class="ab-desc">雷达2 · 微动感知</div></div>
-  <div class="arch-box purple"><div class="ab-title">ST7789</div><div class="ab-desc">2.8寸触摸屏</div></div>
-  <div class="arch-box yellow"><div class="ab-title">ES7210</div><div class="ab-desc">语音ADC · 3麦</div></div>
-</div>
-<div class="arch-arrow">⬇ 传感器融合 · 节能策略 · MQTT ⬇</div>
-<div class="arch-label">通信层</div>
-<div class="arch-row">
-  <div class="arch-box"><div class="ab-title">Air780EPM</div><div class="ab-desc">4G Cat.1 · AT指令</div></div>
-  <div class="arch-box" style="border-color:#6366f144"><div class="ab-title" style="color:#818cf8">MQTT</div><div class="ab-desc">JSON协议</div></div>
-</div>
-<div class="arch-arrow">⬇ ⬇</div>
-<div class="arch-label">云端（韩国首尔 · 43.155.153.59）</div>
-<div class="arch-row">
-  <div class="arch-box purple"><div class="ab-title">EMQX Broker</div><div class="ab-desc">:1883 · 设备消息</div></div>
-  <div class="arch-box"><div class="ab-title">Gateway</div><div class="ab-desc">Vue + Node</div></div>
-  <div class="arch-box purple"><div class="ab-title">后端API</div><div class="ab-desc">:3001</div></div>
-  <div class="arch-box"><div class="ab-title">ASR服务</div><div class="ab-desc">语音识别</div></div>
-</div>
-<div class="arch-arrow">⬇ Cloudflare Tunnel ⬇</div>
-<div class="arch-label">对外访问</div>
-<div class="arch-row">
-  <div class="arch-box green"><div class="ab-title">trycloudflare.com</div><div class="ab-desc">隧道 · 国内可达</div></div>
-  <div class="arch-box green"><div class="ab-title">GitHub Pages</div><div class="ab-desc">静态演示 · 公开</div></div>
-  <div class="arch-box yellow"><div class="ab-title">Caddy :80</div><div class="ab-desc">反向代理</div></div>
-</div>
-<div class="arch-arrow">⬇ ⬇ ⬇</div>
-<div class="arch-label">客户端</div>
-<div class="arch-row">
-  <div class="arch-box"><div class="ab-title">Web UI</div><div class="ab-desc">能源看板 · 设备管理</div></div>
-  <div class="arch-box"><div class="ab-title">OTA</div><div class="ab-desc">固件升级</div></div>
-  <div class="arch-box"><div class="ab-title">飞书Bot</div><div class="ab-desc">告警 · 群聊</div></div>
-</div>
-</div>
-</div>
-
-<!-- ===== 模块说明 ===== -->
-<div class="section" id="modules"><h2>📦 模块说明 <span class="line"></span></h2></div>
-<div class="hint">固件模块（C语言，ESP-IDF框架）</div>
-<table class="mtable">
-<thead><tr><th>模块</th><th>功能</th><th>状态</th><th>说明</th></tr></thead>
-<tbody>
-<tr>
-  <td class="mname">rd2450.c</td>
-  <td>RD2450雷达驱动</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>UART协议解析，目标坐标/速度提取，多目标跟踪</td>
-</tr>
-<tr>
-  <td class="mname">ms24.c</td>
-  <td>觅感MS24雷达驱动</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>Signed Magnitude编码解析，坐标/能量/运动检测</td>
-</tr>
-<tr>
-  <td class="mname">ar780.c</td>
-  <td>AR780雷达驱动</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>微动感知，低功耗唤醒</td>
-</tr>
-<tr>
-  <td class="mname">fusion.c</td>
-  <td>传感器融合</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>状态机：无人→有人→微动→稳定→睡眠→离床检测</td>
-</tr>
-<tr>
-  <td class="mname">energy.c</td>
-  <td>节能控制</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>三模式：深度节能/舒适节能/性能模式，空调联动</td>
-</tr>
-<tr>
-  <td class="mname">mqtt.c</td>
-  <td>MQTT通信</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>Air780E AT指令驱动，JSON消息上报/接收</td>
-</tr>
-<tr>
-  <td class="mname">display.c</td>
-  <td>ST7789屏幕驱动</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>2.8寸SPI屏，中文显示，系统状态</td>
-</tr>
-<tr>
-  <td class="mname">touch.c</td>
-  <td>FT6336U触摸</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>I2C接口，电容触摸，手势识别</td>
-</tr>
-<tr>
-  <td class="mname">voice.c</td>
-  <td>语音识别</td>
-  <td><span class="mstatus proto">🔧 原型</span></td>
-  <td>ES7210 ADC + INMP441×3，离线识别"太冷了""需要打扫"等</td>
-</tr>
-<tr>
-  <td class="mname">main.c</td>
-  <td>主程序</td>
-  <td><span class="mstatus ok">✅ 完成</span></td>
-  <td>系统初始化、任务调度、看门狗</td>
-</tr>
-</tbody>
-</table>
-
-<br>
-<div class="hint">后端服务（服务器端）</div>
-<table class="mtable">
-<thead><tr><th>服务</th><th>技术栈</th><th>状态</th><th>说明</th></tr></thead>
-<tbody>
-<tr>
-  <td class="mname">EMQX Broker</td>
-  <td>EMQX 5.x</td>
-  <td><span class="mstatus ok">✅ 运行</span></td>
-  <td>MQTT消息中间件，端口1883</td>
-</tr>
-<tr>
-  <td class="mname">Gateway</td>
-  <td>Vue + Node</td>
-  <td><span class="mstatus ok">✅ 运行</span></td>
-  <td>Web网关，设备管理，状态面板</td>
-</tr>
-<tr>
-  <td class="mname">后端API</td>
-  <td>Node.js</td>
-  <td><span class="mstatus ok">✅ 运行</span></td>
-  <td>REST API，端口3001</td>
-</tr>
-<tr>
-  <td class="mname">ASR服务</td>
-  <td>Python</td>
-  <td><span class="mstatus ok">✅ 运行</span></td>
-  <td>离线语音识别服务</td>
-</tr>
-<tr>
-  <td class="mname">Hermes Agent</td>
-  <td>Python</td>
-  <td><span class="mstatus ok">✅ 运行</span></td>
-  <td>AI运维机器人，群消息回复</td>
-</tr>
-</tbody>
-</table>
-
-<!-- ===== 外部架构 & 集成 ===== -->
-<div class="section" id="external"><h2>🔗 外部架构 &amp; 集成 <span class="line"></span></h2></div>
-<div class="ext-list">
-
-<div class="ext-item">
-  <div class="ei-icon">🖥️</div>
-  <div class="ei-body">
-    <div class="ei-title">
-      演示服务器 <span class="ei-status on">🟢 在线</span>
-    </div>
-    <div class="ei-desc">
-      韩国首尔 · IP: 43.155.153.59 · 端口开放: 22(SSH) 80(HTTP)<br>
-      ⚠️ 国内需翻墙访问 · 已通过Cloudflare Tunnel提供国内可达路径
-    </div>
-  </div>
-</div>
-
-<div class="ext-item">
-  <div class="ei-icon">🌐</div>
-  <div class="ei-body">
-    <div class="ei-title">
-      Cloudflare Tunnel <a href="https://correspondence-radios-pollution-less.trycloudflare.com" target="_blank">→ 打开</a>
-      <span class="ei-status on">🟢 运行</span>
-    </div>
-    <div class="ei-desc">
-      trycloudflare.com 隧道 · 国内可直连 · 反向代理至本地服务
-    </div>
-  </div>
-</div>
-
-<div class="ext-item">
-  <div class="ei-icon">📡</div>
-  <div class="ei-body">
-    <div class="ei-title">
-      EMQX MQTT Broker <span class="ei-status on">🟢 运行</span>
-    </div>
-    <div class="ei-desc">
-      :1883 · 设备消息中转 · JSON协议 · 设备心跳/状态/指令
-    </div>
-  </div>
-</div>
-
-<div class="ext-item">
-  <div class="ei-icon">🤖</div>
-  <div class="ei-body">
-    <div class="ei-title">
-      飞书Bot · Hermes Agent <span class="ei-status on">🟢 在线</span>
-    </div>
-    <div class="ei-desc">
-      项目群自动回复 · 监控设备状态 · 定时任务 · 心跳检查<br>
-      关联群: 回响技术交流 (飞书)
-    </div>
-  </div>
-</div>
-
-<div class="ext-item">
-  <div class="ei-icon">🔐</div>
-  <div class="ei-body">
-    <div class="ei-title">
-      GitHub 私有仓库 <a href="https://github.com/licoo12580-source/lingxi" target="_blank">→ 打开</a>
-      <span class="ei-status on">🟢 活跃</span>
-    </div>
-    <div class="ei-desc">
-      源码仓库 · 固件代码 · 设计文档 · 仅协作者可访问
-    </div>
-  </div>
-</div>
-
-<div class="ext-item">
-  <div class="ei-icon">📄</div>
-  <div class="ei-body">
-    <div class="ei-title">
-      GitHub Pages（本网站） <a href="https://licoo12580-source.github.io/lingxi-pages/" target="_blank">→ 打开</a>
-      <span class="ei-status on">🟢 在线</span>
-    </div>
-    <div class="ei-desc">
-      公开仓库 licoo12580-source/lingxi-pages · 演示页面 · 固件下载 · 项目文档
-    </div>
-  </div>
-</div>
-
-</div>
-
-<!-- ===== 演示中心 ===== -->
-<div class="section" id="demos"><h2>🖥️ 演示中心 <span class="line"></span></h2></div>
-<div class="hint">所有在线演示页面（点击即可打开）</div>
+<div class="section"><h2>🖥️ 演示中心 <span class="line"></span></h2></div>
 <div class="demo-grid">
 
 <a class="demo-card" href="docs/energy-demo.html" target="_blank">
   <div class="dc-icon">⚡</div>
   <div class="dc-title">节能看板</div>
   <div class="dc-desc">空调节能状态 · 省电金额 · 模式切换</div>
-  <span class="dc-badge badge-demo">演示</span>
 </a>
 
 <a class="demo-card" href="docs/energy-admin.html" target="_blank">
   <div class="dc-icon">📊</div>
   <div class="dc-title">节能管理后台</div>
-  <div class="dc-desc">多房间节能数据 · 趋势分析 · 排行</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-desc">多房间节能数据 · 趋势分析</div>
 </a>
 
 <a class="demo-card" href="docs/radar-debug.html" target="_blank">
   <div class="dc-icon">📡</div>
   <div class="dc-title">雷达调试台</div>
-  <div class="dc-desc">双雷达目标跟踪 · 坐标可视化 · 算法对比</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-desc">双雷达目标跟踪 · 坐标可视化</div>
 </a>
 
 <a class="demo-card" href="docs/design-system.html" target="_blank">
   <div class="dc-icon">🎨</div>
   <div class="dc-title">空间感知设计系统</div>
-  <div class="dc-desc">220+场景卡片 · 节能/安防/感知/前端分类</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-desc">200+场景卡片设计</div>
 </a>
 
 <a class="demo-card" href="docs/ips-touch.html" target="_blank">
   <div class="dc-icon">🖐️</div>
   <div class="dc-title">IPS触摸屏UI</div>
-  <div class="dc-desc">设备端触摸交互 · 空调控制 · 场景切换</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-desc">设备端触摸交互设计</div>
 </a>
 
 <a class="demo-card" href="docs/ips-gallery.html" target="_blank">
   <div class="dc-icon">🖼️</div>
-  <div class="dc-title">IPS屏幕画廊 (v1)</div>
-  <div class="dc-desc">2.8寸屏幕布局 · 多页面切换</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-title">屏幕画廊</div>
+  <div class="dc-desc">2.8寸屏幕布局展示</div>
 </a>
 
 <a class="demo-card" href="docs/ips-gallery-v3.html" target="_blank">
   <div class="dc-icon">✨</div>
-  <div class="dc-title">IPS屏幕画廊 (v3)</div>
-  <div class="dc-desc">新版屏幕布局 · 更丰富的UI</div>
-  <span class="dc-badge badge-new">新版</span>
+  <div class="dc-title">屏幕画廊 v3</div>
+  <div class="dc-desc">新版屏幕布局</div>
 </a>
 
 <a class="demo-card" href="docs/demo-space.html" target="_blank">
   <div class="dc-icon">🌌</div>
   <div class="dc-title">空间感知演示</div>
-  <div class="dc-desc">空间感知场景 · 多维度数据展示</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-desc">多维度数据展示</div>
 </a>
 
 <a class="demo-card" href="docs/spatial-showcase.html" target="_blank">
   <div class="dc-icon">🏠</div>
   <div class="dc-title">空间展示</div>
-  <div class="dc-desc">全面的空间感知能力展示</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-desc">空间感知能力展示</div>
 </a>
 
 <a class="demo-card" href="docs/prototype-guide.html" target="_blank">
   <div class="dc-icon">🔨</div>
-  <div class="dc-title">手搓装配指南</div>
-  <div class="dc-desc">硬件装配步骤 · 接线图 · 注意事项</div>
-  <span class="dc-badge badge-demo">演示</span>
-</a>
-
-<a class="demo-card" href="docs/project-overview.html" target="_blank">
-  <div class="dc-icon">📋</div>
-  <div class="dc-title">项目总览（给虾条）</div>
-  <div class="dc-desc">项目定位 · 硬件方案 · 分工说明</div>
-  <span class="dc-badge badge-demo">演示</span>
-</a>
-
-<a class="demo-card" href="docs/project-vision.html" target="_blank">
-  <div class="dc-icon">🔭</div>
-  <div class="dc-title">项目介绍（虾条）</div>
-  <div class="dc-desc">一句话定位 · 市场 · 成本 · 感知能力</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-title">装配指南</div>
+  <div class="dc-desc">硬件装配步骤</div>
 </a>
 
 <a class="demo-card" href="docs/style-a-dashboard.html" target="_blank">
   <div class="dc-icon">📈</div>
-  <div class="dc-title">风格看板</div>
-  <div class="dc-desc">数据可视化看板样式</div>
-  <span class="dc-badge badge-demo">演示</span>
-</a>
-
-<a class="demo-card" href="docs/proposal.html" target="_blank">
-  <div class="dc-icon">📄</div>
-  <div class="dc-title">方案书</div>
-  <div class="dc-desc">完整方案提案</div>
-  <span class="dc-badge badge-demo">演示</span>
+  <div class="dc-title">看板样式</div>
+  <div class="dc-desc">数据可视化样式</div>
 </a>
 
 </div>
 
-<!-- ===== 硬件方案 / BOM ===== -->
-<div class="section" id="hardware"><h2>🔧 硬件方案 <span class="line"></span></h2></div>
-<div class="hint">三档成本方案 · 最新BOM（RD2450→MS24更新中）</div>
-
-<div class="hw-grid">
-
-<div class="hw-card" style="border-left:3px solid #64748b">
-  <div class="hw-name">基础版 · ¥69</div>
-  <div class="hw-desc">
-    纯节能方案 · ESP32-S3 + MS24雷达 + 无屏<br>
-    MQTT上报 · 空调联动 · 省电10-15%
-  </div>
+<div class="section"><h2>📡 固件 <span class="line"></span></h2></div>
+<div class="grid">
+  <a class="card" href="firmware/test-all-merged.bin">
+    <div class="icon">⏬</div>
+    <div class="title">test-all-merged.bin</div>
+    <div class="desc">综合测试固件</div>
+  </a>
+  <a class="card" href="firmware/ms24-test-only.bin">
+    <div class="icon">⏬</div>
+    <div class="title">ms24-test-only.bin</div>
+    <div class="desc">雷达测试固件</div>
+  </a>
 </div>
 
-<div class="hw-card" style="border-left:3px solid #60a5fa">
-  <div class="hw-name">标准版 · ~¥135</div>
-  <div class="hw-desc">
-    双雷达 + 2.8寸触摸屏 + ES7210语音<br>
-    空间感知 · 触摸交互 · 离线语音
-  </div>
-</div>
-
-<div class="hw-card" style="border-left:3px solid #a78bfa">
-  <div class="hw-name">旗舰版 · ~¥198</div>
-  <div class="hw-desc">
-    全配 · 双雷达 + 双屏 + 三麦语音 + 更多传感器<br>
-    完整空间感知能力 · 最丰富的交互
-  </div>
-</div>
-
-</div>
-
-<div class="arch" style="margin-top:8px;padding:14px">
-<table class="mtable">
-<thead><tr><th>器件</th><th>型号</th><th>单价</th><th>说明</th></tr></thead>
-<tbody>
-<tr><td class="mname">主控</td><td>ESP32-S3 N16R8</td><td>¥25</td><td>双核240MHz · 16MB Flash · 8MB PSRAM</td></tr>
-<tr><td class="mname">雷达1</td><td>RD2450 / MS24</td><td>¥25 / ~¥19</td><td>存在检测 · 改为MS24成本更低</td></tr>
-<tr><td class="mname">雷达2</td><td>AR780</td><td>¥12</td><td>微动感知 · 低功耗唤醒</td></tr>
-<tr><td class="mname">屏幕</td><td>ST7789 2.8寸</td><td>¥25</td><td>SPI · 带FT6336U电容触摸</td></tr>
-<tr><td class="mname">通信</td><td>Air780EPM</td><td>¥20</td><td>4G Cat.1 · AT指令</td></tr>
-<tr><td class="mname">语音</td><td>ES7210 + INMP441×3</td><td>¥8</td><td>SNR 102dB · 离线识别</td></tr>
-<tr><td class="mname">电源</td><td>AC-DC 5V 2A</td><td>¥8</td><td>宽电压输入</td></tr>
-</tbody>
-</table>
-</div>
-
-<!-- ===== 固件下载 ===== -->
-<div class="section" id="firmware"><h2>📡 固件下载 <span class="line"></span></h2></div>
-
-<div class="demo-grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">
-
-<a class="demo-card" href="firmware/test-all-merged.bin" style="border-left:3px solid #22c55e">
-  <div class="dc-title">📦 test-all-merged.bin</div>
-  <div class="dc-desc">MS24雷达 + ST7789屏 + FT6336U触摸 综合测试固件</div>
-  <span class="dc-badge badge-new">最新</span>
-</a>
-
-<a class="demo-card" href="firmware/ms24-test-only.bin">
-  <div class="dc-title">📦 ms24-test-only.bin</div>
-  <div class="dc-desc">仅MS24雷达测试固件（无屏）</div>
-</a>
-
-</div>
-
-<br>
-<div class="arch" style="padding:12px;font-size:11px;color:#94a3b8">
-  💡 烧录命令：<code style="background:#0f172a;padding:2px 6px;border-radius:4px">python3 esptool.py --chip esp32s3 --port /dev/ttyACM0 write_flash 0x0 test-all-merged.bin</code>
-</div>
-
-<!-- ===== 页脚 ===== -->
 <div class="footer">
-  <p>🦞 灵犀 · Lingxi 空间感知系统 · v0.3</p>
-  <p>私有仓库: <a href="https://github.com/licoo12580-source/lingxi" target="_blank">licoo12580-source/lingxi</a> · 
-  公开Pages: <a href="https://licoo12580-source.github.io/lingxi-pages/" target="_blank">lingxi-pages</a></p>
-  <p style="margin-top:4px">© 2026 licoo12580-source · 项目群: 回响技术交流 (飞书)</p>
+  <p>🦞 灵犀 · Lingxi 空间感知系统</p>
 </div>
 
 </div>

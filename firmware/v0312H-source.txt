@@ -1,0 +1,188 @@
+灵犀 v0312H - 固件源代码
+========================================
+版本: v0312H
+驱动: ILI9488 (规格书确认)
+状态: 🏗️ 硬件SPI + 最简初始化 + MADCTL多值测试
+
+========================================
+文件: test_all.cpp
+========================================
+
+// 灵犀 v0312H - ILI9488硬件SPI + 最简初始化
+// CS=45, DC=47, RST=4, MOSI=21, SCK=20
+// 用ESP32-S3原生硬件SPI代替软件bit-bang
+
+#include <Arduino.h>
+#include <SPI.h>
+#include <Adafruit_NeoPixel.h>
+
+Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
+
+#define PIN_CS   45
+#define PIN_DC   47
+#define PIN_RST  4
+#define PIN_MOSI 21
+#define PIN_SCLK 20
+
+void write_cmd(uint8_t cmd) {
+    digitalWrite(PIN_DC, LOW);
+    digitalWrite(PIN_CS, LOW);
+    SPI.transfer(cmd);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void write_data(uint8_t data) {
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    SPI.transfer(data);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void ILI9488_reset() {
+    digitalWrite(PIN_RST, LOW);
+    delay(50);
+    digitalWrite(PIN_RST, HIGH);
+    delay(150);
+}
+
+// 最简初始化 - 跳过gamma/电源，只留核心
+void ILI9488_init_minimal() {
+    ILI9488_reset();
+    write_cmd(0x11); delay(120);    // 退出睡眠
+    write_cmd(0x36); write_data(0x48);  // MADCTL: MX, BGR
+    write_cmd(0x3A); write_data(0x55);  // 16-bit 65K色
+    write_cmd(0x29); delay(50);         // 显示开
+}
+
+// 尝试不同MADCTL值
+bool try_madctl(uint8_t val) {
+    ILI9488_reset();
+    write_cmd(0x11); delay(120);
+    write_cmd(0x36); write_data(val);
+    write_cmd(0x3A); write_data(0x55);
+    write_cmd(0x29); delay(50);
+    // 填红色100x100区域
+    write_cmd(0x2A);
+    write_data(0x00); write_data(0x00);
+    write_data(0x00); write_data(0x63);  // X0-99
+    write_cmd(0x2B);
+    write_data(0x00); write_data(0x00);
+    write_data(0x00); write_data(0x63);  // Y0-99
+    write_cmd(0x2C);
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    for (int i = 0; i < 100 * 100; i++) {
+        SPI.write16(0xF800);  // 红色 16-bit
+    }
+    digitalWrite(PIN_CS, HIGH);
+    return true;
+}
+
+void setup() {
+    pixels.begin(); pixels.setBrightness(50);
+    pixels.setPixelColor(0, pixels.Color(100, 0, 0));
+    pixels.show();
+    
+    Serial.begin(115200); delay(2000);
+    Serial.println("\n=== 灵犀 v0312H 硬件SPI测试 ===");
+    Serial.println("驱动: ILI9488 (规格书确认)");
+    Serial.println("RST=4, CS=45, DC=47, MOSI=21, SCK=20");
+    
+    pinMode(PIN_CS, OUTPUT); digitalWrite(PIN_CS, HIGH);
+    pinMode(PIN_DC, OUTPUT); digitalWrite(PIN_DC, HIGH);
+    pinMode(PIN_RST, OUTPUT); digitalWrite(PIN_RST, HIGH);
+    
+    // 硬件SPI初始化 (1MHz低速起步)
+    SPI.begin(PIN_SCLK, -1, PIN_MOSI, PIN_CS);
+    SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
+    Serial.println("硬件SPI已开启 @1MHz");
+    
+    // 1. 最简初始化
+    Serial.print("最简初始化(0x48)... ");
+    ILI9488_init_minimal();
+    delay(200);
+    // 填红色测试
+    write_cmd(0x2A);
+    write_data(0x00); write_data(0x00);
+    write_data(0x01); write_data(0xDF);
+    write_cmd(0x2B);
+    write_data(0x00); write_data(0x00);
+    write_data(0x01); write_data(0x3F);
+    write_cmd(0x2C);
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    for (int i = 0; i < 480 * 320; i++) {
+        SPI.write16(0xF800);
+    }
+    digitalWrite(PIN_CS, HIGH);
+    Serial.println("全屏红 done");
+    delay(1000);
+    
+    // 2. 尝试不同MADCTL
+    uint8_t madctl_vals[] = {0x08, 0x48, 0x88, 0x28, 0x68, 0xA8, 0xE8};
+    const char* madctl_names[] = {"0x08", "0x48", "0x88", "0x28", "0x68", "0xA8", "0xE8"};
+    
+    for (int i = 0; i < 7; i++) {
+        Serial.printf("MADCTL=%s 绿 ", madctl_names[i]);
+        try_madctl(madctl_vals[i]);
+        Serial.println("OK");
+        delay(800);
+        
+        // 换蓝色
+        write_cmd(0x2A);
+        write_data(0x00); write_data(0x00);
+        write_data(0x00); write_data(0x63);
+        write_cmd(0x2B);
+        write_data(0x00); write_data(0x00);
+        write_data(0x00); write_data(0x63);
+        write_cmd(0x2C);
+        digitalWrite(PIN_DC, HIGH);
+        digitalWrite(PIN_CS, LOW);
+        for (int i2 = 0; i2 < 100 * 100; i2++) {
+            SPI.write16(0x001F);
+        }
+        digitalWrite(PIN_CS, HIGH);
+        delay(800);
+    }
+
+    pixels.setPixelColor(0, pixels.Color(0, 100, 0));
+    pixels.show();
+    
+    Serial.println("\n=== 测试完成 ===");
+    Serial.println("观察屏幕是否有彩色方块出现");
+    Serial.println("如果全黑: 可能是转接板引脚定义或接口模式问题");
+}
+
+void loop() {
+    static unsigned long last = 0;
+    if (millis() - last > 5000) {
+        last = millis();
+        Serial.printf("[♥] mem=%uKB\n", ESP.getFreeHeap() / 1024);
+    }
+    delay(100);
+}
+
+========================================
+platformio.ini (test-all env)
+========================================
+
+board = esp32-s3-devkitc-1
+flash_mode = dio, flash_freq = 40m, flash_size = 16MB
+psram = disable
+usb_mode = 0
+build_flags = -DCORE_DEBUG_LEVEL=5 -DARDUINO_USB_MODE=0 
+              -DARDUINO_USB_CDC_ON_BOOT=1 -DCONFIG_SPIRAM=n 
+              -DUSE_HSPI_PORT
+lib_deps = TFT_eSPI @ ^2.5.43, Adafruit NeoPixel @ ^1.12.0
+
+========================================
+更新内容
+========================================
+v0312H vs v0312G 的改动：
+1. 改用ESP32-S3硬件SPI（SPI.transfer），替代软件bit-bang
+2. 最简初始化序列：只保留0x11/0x36/0x3A/0x29四个命令
+   （去掉所有gamma/电源/帧率/VCOM等扩展指令）
+3. MADCTL遍历7个不同值（0x08/0x48/0x88/0x28/0x68/0xA8/0xE8）
+   每个值填充绿色100x100方块后转蓝色，持续3秒
+4. SPI频率降至1MHz起步
+5. RST保持在GPIO4（v0312G已改）

@@ -155,9 +155,76 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:13px
 
 </div>
 <script>
-var DATA = {"hotels":[{"id":"lanwei","name":"兰威酒店","region":"广州","rooms":91,"online":89,"offline":2,"version":"v0307E","saved_today_kwh":68,"saved_month_kwh":1872,"install_date":"2026-06-01","status":"active","ota_history":[{"date":"06-16","version":"v0307E","result":"success","count":91},{"date":"06-10","version":"v0307D","result":"rollback","reason":"假目标bug"}]},{"id":"rujia-gz","name":"如家广州火车站店","region":"广州","rooms":60,"online":55,"offline":5,"version":"v0307D","saved_today_kwh":42,"saved_month_kwh":1080,"install_date":"2026-05-20","status":"active","ota_history":[{"date":"05-25","version":"v0307D","result":"success","count":60}]},{"id":"qitian-sz","name":"7天深圳华强北店","region":"深圳","rooms":45,"online":42,"offline":3,"version":"v0307E","saved_today_kwh":31,"saved_month_kwh":720,"install_date":"2026-06-05","status":"active","ota_history":[{"date":"06-17","version":"v0307E","result":"success","count":45}]},{"id":"hanting-gz","name":"汉庭广州体育中心店","region":"广州","rooms":80,"online":78,"offline":2,"version":"v0307E","saved_today_kwh":56,"saved_month_kwh":1440,"install_date":"2026-05-15","status":"active","ota_history":[{"date":"06-18","version":"v0307E","result":"success","count":80}]},{"id":"jinjiang-sz","name":"锦江之星深圳南山店","region":"深圳","rooms":55,"online":50,"offline":5,"version":"v0307D","saved_today_kwh":38,"saved_month_kwh":960,"install_date":"2026-05-28","status":"active","ota_history":[{"date":"06-02","version":"v0307D","result":"success","count":55}]},{"id":"vienna-dg","name":"维也纳东莞厚街店","region":"东莞","rooms":70,"online":65,"offline":5,"version":"v0307E","saved_today_kwh":48,"saved_month_kwh":1152,"install_date":"2026-06-10","status":"active","ota_history":[{"date":"06-15","version":"v0307E","result":"success","count":70}]},{"id":"lavande-fs","name":"丽枫佛山祖庙店","region":"佛山","rooms":35,"online":33,"offline":2,"version":"v0307D","saved_today_kwh":24,"saved_month_kwh":540,"install_date":"2026-06-12","status":"active","ota_history":[]}],"regions":[{"name":"广州","count":3,"rooms":231,"online":222},{"name":"深圳","count":2,"rooms":100,"online":92},{"name":"东莞","count":1,"rooms":70,"online":65},{"name":"佛山","count":1,"rooms":35,"online":33}],"ota_tasks":[{"task_id":"ota_20260618_001","version":"v0310A","hotel":"兰威酒店","batch":1,"batch_total":3,"progress":80,"status":"in_progress","started":"10:30","devices_ok":73,"devices_total":91},{"task_id":"ota_20260617_001","version":"v0307E","hotel":"7天深圳华强北店","batch":"全量","progress":100,"status":"completed","started":"14:00","devices_ok":45,"devices_total":45}],"stats":{"total_devices":1247,"online_devices":1183,"hotel_count":23,"saved_today_kwh":2184,"saved_month_kwh":58392,"versions":{"v0307E":1023,"v0307D":224}}};
+// 后端API地址（本地运行时有后端服务才生效）
+var API = window.location.origin.replace('licoo12580-source.github.io', 'localhost:3000');
+var USE_API = false;
 
-function init() {
+// ===== 尝试从后端加载数据，失败则用本地数据 =====
+async function loadData() {
+  try {
+    var stats = await fetch(API+'/api/stats').then(r=>r.json());
+    var hotelsRes = await fetch(API+'/api/hotels', {headers:{'Authorization':'Bearer lingxi-2026'}}).then(r=>r.json());
+    var otaRes = await fetch(API+'/api/ota/tasks', {headers:{'Authorization':'Bearer lingxi-2026'}}).then(r=>r.json());
+    USE_API = true;
+    renderFromAPI(stats, hotelsRes.hotels, otaRes.tasks);
+  } catch(e) {
+    // API不可用，使用本地数据
+    renderFromLocal();
+  }
+}
+
+// ===== 用API数据渲染 =====
+function renderFromAPI(stats, hotels, otaTasks) {
+  // 统计数据
+  document.querySelector('#statsRow .stat-card:nth-child(1) .stat-value').textContent = stats.total_devices.toLocaleString();
+  document.querySelector('#statsRow .stat-card:nth-child(2) .stat-value').textContent = stats.online_devices.toLocaleString();
+  document.querySelector('#statsRow .stat-card:nth-child(2) .stat-sub').textContent = '离线 '+stats.offline_devices+' 台';
+  document.querySelector('#statsRow .stat-card:nth-child(3) .stat-value').textContent = stats.hotel_count;
+  document.querySelector('#statsRow .stat-card:nth-child(4) .stat-value').textContent = (stats.saved_today_kwh||0).toLocaleString()+' kWh';
+  document.querySelector('#statsRow .stat-card:nth-child(5) .stat-value').textContent = (stats.saved_month_kwh||0).toLocaleString()+' kWh';
+
+  // 区域分布
+  var rl = '', colors = {'广州':'gz','深圳':'sz','东莞':'dg','佛山':'fs'};
+  (stats.regions||[]).forEach(function(r){
+    var pct = Math.round(r.online/r.rooms*100);
+    rl += '<div class="region-item"><div class="region-name">'+r.name+'</div><div class="region-bar"><div class="region-bar-fill '+(colors[r.name]||'gz')+'" style="width:'+(r.rooms/231*100)+'%">'+r.rooms+'间</div></div><div class="region-detail">'+r.count+'家 · '+r.online+'/'+r.rooms+'在线 · '+pct+'%</div></div>';
+  });
+  document.getElementById('regionList').innerHTML = rl || '<div class="empty">暂无可区域</div>';
+
+  // 固件版本
+  var vc = '', total = stats.total_devices, i = 0;
+  (stats.versions||[]).forEach(function(v){
+    var cnt = v.count, pct = Math.round(cnt/total*100);
+    vc += '<div class="version-row"><div class="version-label">'+v.version+'</div><div class="version-bar"><div class="version-fill v'+(++i)+'" style="width:'+pct+'%"></div></div><div class="version-count">'+cnt+'台 · '+pct+'%</div></div>';
+  });
+  document.getElementById('versionChart').innerHTML = vc || '<div class="empty">暂无版本数据</div>';
+
+  // OTA任务
+  var tl = '';
+  (otaTasks||[]).slice(0,5).forEach(function(t){
+    var done = t.status==='completed';
+    tl += '<div class="task-item"><div class="task-top"><span class="task-version">'+t.version+'</span><span class="task-hotel">'+(t.hotel_name||'-')+'</span><span class="task-batch">第'+(t.batch||'?')+'/'+(t.batch_total||'?')+'批</span></div><div class="task-meta"><span>'+(done?'✅ 已完成':'⏳ 进行中')+'</span><span>'+(t.devices_ok||0)+'/'+(t.devices_total||0)+'台</span><span>'+(t.started||'')+'</span></div>'+(done?'':'<div class="progress"><div class="progress-fill" style="width:'+Math.round((t.devices_ok||0)/(t.devices_total||1)*100)+'%;background:var(--accent)"></div></div>')+'</div>';
+  });
+  document.getElementById('taskList').innerHTML = tl || '<div class="empty">暂无OTA任务</div>';
+
+  // 省电Top
+  var sorted = (hotels||[]).slice().sort(function(a,b){return (b.saved_today_kwh||0)-(a.saved_today_kwh||0)}).slice(0,3);
+  var th = '';
+  sorted.forEach(function(h,i){th += '<div class="task-item"><div class="task-top"><span>'+['🥇','🥈','🥉'][i]+' <strong>'+h.name+'</strong></span><span class="task-version" style="color:var(--green)">+'+(h.saved_today_kwh||0)+' kWh</span></div><div class="task-meta"><span>'+(h.region||'-')+'</span><span>'+(h.online_devices||0)+'/'+(h.total_devices||0)+'在线</span><span>'+(h.version||'-')+'</span></div></div>';});
+  document.getElementById('topHotels').innerHTML = th || '<div class="empty">暂无数据</div>';
+
+  // 酒店表格
+  var h = '';
+  (hotels||[]).forEach(function(hotel){
+    var rate = hotel.total_devices?Math.round((hotel.online_devices||0)/hotel.total_devices*100):0;
+    h += '<tr><td><strong>'+hotel.name+'</strong></td><td>'+(hotel.region||'-')+'</td><td>'+(hotel.rooms||0)+'</td><td><span style="color:'+(rate>95?'var(--green)':rate>80?'var(--orange)':'var(--red)')+'">'+rate+'%</span> ('+(hotel.online_devices||0)+'/'+(hotel.total_devices||0)+')</td><td><span class="tag tag-success">'+(hotel.version||'-')+'</span></td><td style="color:var(--green);font-weight:500">+'+(hotel.saved_today_kwh||0)+' kWh</td></tr>';
+  });
+  document.getElementById('hotelTableBody').innerHTML = h;
+}
+
+// ===== 用本地数据渲染（原逻辑，保持向后兼容） =====
+function renderFromLocal() {
+  var DATA = {"hotels":[{"id":"lanwei","name":"兰威酒店","region":"广州","rooms":91,"online":89,"offline":2,"version":"v0307E","saved_today_kwh":68,"saved_month_kwh":1872,"install_date":"2026-06-01","status":"active","ota_history":[{"date":"06-16","version":"v0307E","result":"success","count":91},{"date":"06-10","version":"v0307D","result":"rollback","reason":"假目标bug"}]},{"id":"rujia-gz","name":"如家广州火车站店","region":"广州","rooms":60,"online":55,"offline":5,"version":"v0307D","saved_today_kwh":42,"saved_month_kwh":1080,"install_date":"2026-05-20","status":"active","ota_history":[{"date":"05-25","version":"v0307D","result":"success","count":60}]},{"id":"qitian-sz","name":"7天深圳华强北店","region":"深圳","rooms":45,"online":42,"offline":3,"version":"v0307E","saved_today_kwh":31,"saved_month_kwh":720,"install_date":"2026-06-05","status":"active","ota_history":[{"date":"06-17","version":"v0307E","result":"success","count":45}]},{"id":"hanting-gz","name":"汉庭广州体育中心店","region":"广州","rooms":80,"online":78,"offline":2,"version":"v0307E","saved_today_kwh":56,"saved_month_kwh":1440,"install_date":"2026-05-15","status":"active","ota_history":[{"date":"06-18","version":"v0307E","result":"success","count":80}]},{"id":"jinjiang-sz","name":"锦江之星深圳南山店","region":"深圳","rooms":55,"online":50,"offline":5,"version":"v0307D","saved_today_kwh":38,"saved_month_kwh":960,"install_date":"2026-05-28","status":"active","ota_history":[{"date":"06-02","version":"v0307D","result":"success","count":55}]},{"id":"vienna-dg","name":"维也纳东莞厚街店","region":"东莞","rooms":70,"online":65,"offline":5,"version":"v0307E","saved_today_kwh":48,"saved_month_kwh":1152,"install_date":"2026-06-10","status":"active","ota_history":[{"date":"06-15","version":"v0307E","result":"success","count":70}]},{"id":"lavande-fs","name":"丽枫佛山祖庙店","region":"佛山","rooms":35,"online":33,"offline":2,"version":"v0307D","saved_today_kwh":24,"saved_month_kwh":540,"install_date":"2026-06-12","status":"active","ota_history":[]}],"regions":[{"name":"广州","count":3,"rooms":231,"online":222},{"name":"深圳","count":2,"rooms":100,"online":92},{"name":"东莞","count":1,"rooms":70,"online":65},{"name":"佛山","count":1,"rooms":35,"online":33}],"stats":{"total_devices":436,"online_devices":412,"offline_devices":24,"hotel_count":7,"saved_today_kwh":2184,"saved_month_kwh":58392,"active_ota":1},"ota_tasks":[{"id":"ota-001","version":"v0307E","hotel":"兰威酒店","batch":1,"batch_total":1,"status":"completed","devices_ok":91,"devices_total":91,"progress":100,"started":"06-16 10:00"},{"id":"ota-002","version":"v0307D","hotel":"兰威酒店","batch":1,"batch_total":1,"status":"completed","devices_ok":85,"devices_total":91,"progress":100,"started":"06-10 14:00"},{"id":"ota-003","version":"v0307E","hotel":"7天深圳","batch":1,"batch_total":10,"status":"in_progress","devices_ok":14,"devices_total":45,"progress":31,"started":"今天 08:00"}]};
   var s = DATA.stats;
   document.querySelector('#statsRow .stat-card:nth-child(1) .stat-value').textContent = s.total_devices.toLocaleString();
   document.querySelector('#statsRow .stat-card:nth-child(2) .stat-value').textContent = s.online_devices.toLocaleString();
@@ -223,7 +290,7 @@ function switchPage(page) {
   document.getElementById('page-'+page).style.display='block';
   document.querySelectorAll('.nav-item')[page==='dashboard'?0:page==='hotels'?1:2].classList.add('active');
 }
-init();
+loadData();
 </script>
 </body>
 </html>

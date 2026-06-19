@@ -3,70 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🦞 灵犀 · 演示中心</title>
+<title>🦞 灵犀 · 空间感知节能系统</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b1120;color:#e2e8f0;font-family:system-ui,sans-serif;padding:30px 20px;max-width:800px;margin:0 auto}
-h1{font-size:24px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.sub{color:#64748b;font-size:13px;margin-bottom:6px}
-.tagline{color:#22c55e;font-size:12px;margin-bottom:24px;padding:8px 12px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px}
-.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+body{background:#0b1120;color:#e2e8f0;font-family:system-ui,sans-serif;padding:30px 20px;max-width:900px;margin:0 auto}
+
+/* 头部 */
+.header{text-align:center;margin-bottom:32px}
+.header h1{font-size:26px;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+.header .sub{color:#64748b;font-size:13px}
+.header .tagline{color:#22c55e;font-size:12px;margin-top:8px;padding:8px 16px;background:#22c55e11;border:1px solid #22c55e33;border-radius:8px;display:inline-block}
+
+/* 分层导航 */
+.section-label{font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:2px;margin:28px 0 12px;padding-bottom:8px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:8px}
+.section-label .badge{font-size:8px;padding:2px 8px;border-radius:99px}
+.section-label .badge.green{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+.section-label .badge.blue{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
+.section-label .badge.dim{background:#47556922;color:#64748b;border:1px solid #47556944}
+
+/* 卡片网格 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;cursor:pointer;transition:all .2s}
 .card:hover{border-color:#3b82f6;transform:translateY(-1px)}
-.card-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.card-desc{font-size:12px;color:#94a3b8;line-height:1.6}
+.card.promo{border-color:#22c55e44}
+.card .icon{font-size:22px;margin-bottom:6px}
+.card-title{font-size:14px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card-desc{font-size:11px;color:#94a3b8;line-height:1.6}
 .card-tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
-.tag{padding:2px 8px;border-radius:4px;font-size:10px;background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
-.tag.green{background:#22c55e22;color:#22c55e;border-color:#22c55e44}
-.tag.orange{background:#f59e0b22;color:#f59e0b;border-color:#f59e0b44}
-.tag.purple{background:#8b5cf622;color:#8b5cf6;border-color:#8b5cf644}
-.footer{margin-top:30px;padding-top:16px;border-top:1px solid #1e293b;font-size:11px;color:#64748b;text-align:center}
+.tag{padding:2px 8px;border-radius:4px;font-size:9px}
+.tag.green{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+.tag.blue{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
+.tag.purple{background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644}
+.tag.orange{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+.tag.eco{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+.tag.sec{background:#ef444422;color:#ef4444;border:1px solid #ef444444}
+
+.footer{margin-top:40px;padding-top:16px;border-top:1px solid #1e293b;font-size:11px;color:#64748b;text-align:center}
+
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr}
+  body{padding:16px 12px}
+}
 </style>
 </head>
 <body>
-<h1>🦞 灵犀 · 演示中心</h1>
-<p class="sub">给酒店老板看的演示版本 · 点开即用 · 无需登录</p>
-<div class="tagline">🔥 核心卖点：节能省电 · 2个月回本 · 客人无感</div>
 
-<div class="card" onclick="location='energy-demo.html'" style="border-color:#22c55e44">
-  <div class="card-title">⚡ <strong style="color:#22c55e">节能演示（核心卖点）</strong></div>
-  <div class="card-desc">每间房的省电故事：客人设定22°C→出门15min自动调26°C→深睡调24°C→返回恢复→退房关闭<br>
-  省电偏移+4°C · 入眠检测30min · 夜间调高+2°C · 50间房年省¥7.6万</div>
-  <div class="card-tags"><span class="tag green">推荐 · 给老板看这个</span></div>
+<div class="header">
+  <h1>🦞 灵犀 · 空间感知节能系统</h1>
+  <div class="sub">让酒店每一间房都知道你在做什么</div>
+  <div class="tagline">🔥 核心卖点：节能省电 · 2个月回本 · 客人无感</div>
 </div>
 
-<div class="card" onclick="location='demo-space.html'">
-  <div class="card-title">🏨 酒店智能演示空间</div>
-  <div class="card-desc">楼层平面图 · 点击房间穿透查看 · 噪音时间线 · 人数/PMS比对 · 声音标签 · 安防联动</div>
-  <div class="card-tags"><span class="tag">综合演示</span></div>
+<!-- 第一层：给老板看 -->
+<div class="section-label">
+  <span>💰 给老板看 · 讲清楚省多少钱</span>
+  <span class="badge green">推荐</span>
 </div>
 
-<div class="card" onclick="location='ips-gallery.html'">
-  <div class="card-title">📱 IPS屏幕设计集 · 12种数据架构</div>
-  <div class="card-desc">12种完全不同数据布局的2.8寸屏方案 · 卡片瀑布/仪表群/时间线/轮播/双屏/波形/雷达…</div>
-  <div class="card-tags"><span class="tag purple">选屏幕风格</span></div>
+<div class="grid">
+  <div class="card promo" onclick="location='energy-demo.html'">
+    <div class="icon">⚡</div>
+    <div class="card-title"><strong style="color:#22c55e">节能演示（核心卖点）</strong></div>
+    <div class="card-desc">每间房省多少 · 50间房年省¥7.6万 · 2个月回本<br>给酒店老板看这一屏就够了</div>
+    <div class="card-tags"><span class="tag green">推荐 · 第一个打开</span></div>
+  </div>
+
+  <div class="card" onclick="location='spatial-showcase.html'">
+    <div class="icon">🌌</div>
+    <div class="card-title">空间感知 · 故事展</div>
+    <div class="card-desc">24个设计屏讲清楚灵犀能做什么<br>节能14屏 · 安防8屏 · 融合2屏</div>
+    <div class="card-tags"><span class="tag eco">节能</span><span class="tag sec">安防</span></div>
+  </div>
 </div>
 
-<div class="card" onclick="location='style-a-dashboard.html'">
-  <div class="card-title">📊 Style A · 专业商务后台</div>
-  <div class="card-desc">大盘看板 · 酒店管理 · OTA推送 · 区域→酒店→设备层级</div>
-  <div class="card-tags"><span class="tag orange">后台方案A</span></div>
+<!-- 第二层：给经理用 -->
+<div class="section-label">
+  <span>🏨 给经理用 · 日常管理</span>
+  <span class="badge blue">管理层</span>
 </div>
 
-<div class="card" onclick="location='firmware.html'" style="border-color:#8b5cf644">
-  <div class="card-title">📦 固件下载中心</div>
-  <div class="card-desc">所有历史固件BIN下载 · 每个版本附「📝 查看源码」按钮 · 可复制代码发给其他智能体审查</div>
-  <div class="card-tags"><span class="tag purple">技术向</span></div>
+<div class="grid">
+  <div class="card" onclick="location='demo-space.html'">
+    <div class="icon">🏨</div>
+    <div class="card-title">酒店智能演示空间</div>
+    <div class="card-desc">楼层平面图 · 点击房间穿透查看 · 噪音时间线 · 人数比对 · 安防联动</div>
+    <div class="card-tags"><span class="tag green">实时模拟</span></div>
+  </div>
+
+  <div class="card" onclick="location='style-a-dashboard.html'">
+    <div class="icon">📊</div>
+    <div class="card-title">管理后台 · Style A</div>
+    <div class="card-desc">大盘看板 · 酒店管理 · OTA推送 · 省电榜<br>区域→酒店→设备层级 · 多租户</div>
+    <div class="card-tags"><span class="tag orange">后台方案</span></div>
+  </div>
+
+  <div class="card" onclick="location='ips-gallery-v3.html'">
+    <div class="icon">📱</div>
+    <div class="card-title">IPS屏幕设计集</div>
+    <div class="card-desc">12种完全不同数据模型 · 能耗概况/酒店运营/安防监控/房态总览……</div>
+    <div class="card-tags"><span class="tag purple">屏幕风格</span></div>
+  </div>
 </div>
 
-<div class="card" onclick="location='upload.html'" style="border-color:#05966944">
-  <div class="card-title">📤 上传/粘贴资料</div>
-  <div class="card-desc">把屏幕规格书、代码片段、配置文件贴上来，风止自动读取处理</div>
-  <div class="card-tags"><span class="tag green">上传资料</span></div>
+<!-- 第三层：技术向 -->
+<div class="section-label">
+  <span>⚙️ 技术向</span>
+  <span class="badge dim">内部</span>
+</div>
+
+<div class="grid">
+  <div class="card" onclick="location='firmware.html'" style="border-color:#8b5cf644">
+    <div class="icon">📦</div>
+    <div class="card-title">固件下载中心</div>
+    <div class="card-desc">所有历史固件BIN · 版本号递增 · 源码可检视</div>
+    <div class="card-tags"><span class="tag purple">固件</span></div>
+  </div>
 </div>
 
 <div class="footer">
-  🦞 灵犀 · 酒店智能节能系统 · GitHub Pages托管的演示版本<br>
-  👉 跟老板谈的时候先打开 energy-demo.html，省电数据就是最好的销售
+  🦞 灵犀 · 酒店智能空间感知系统 · GitHub Pages 演示版<br>
+  👉 给老板谈先打开「节能演示」，省电数据就是最好的销售
 </div>
 </body>
 </html>

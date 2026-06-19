@@ -5,25 +5,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>🦞 灵犀 · 固件下载中心</title>
 <style>
+:root {
+  --bg:#0b1120; --card:#1e293b; --border:#334155;
+  --fg:#e2e8f0; --fg2:#94a3b8; --fg3:#64748b;
+  --accent:#3b82f6; --accent-lighter:#60a5fa; --green:#22c55e; --orange:#f59e0b;
+  --red:#ef4444; --purple:#8b5cf6;
+  --radius:10px; --pad:16px; --gap:12px;
+  --font:system-ui,-apple-system,sans-serif;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b1120;color:#e2e8f0;font-family:system-ui,sans-serif;padding:30px 20px;max-width:900px;margin:0 auto}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);padding:30px 20px;max-width:900px;margin:0 auto}
 h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 .sub{color:#64748b;font-size:13px;margin-bottom:6px}
 .nav{display:flex;gap:10px;margin-bottom:24px}
-.nav a{color:#94a3b8;font-size:13px;text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid #334155}
-.nav a:hover{border-color:#3b82f6;color:#60a5fa}
-.search-bar{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 14px;width:100%;color:#e2e8f0;font-size:13px;margin-bottom:16px}
-.search-bar:focus{outline:none;border-color:#3b82f6}
-.stats{color:#64748b;font-size:12px;margin-bottom:12px}
-.fw-card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.nav a{color:var(--fg2);font-size:13px;text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid var(--border)}
+.nav a:hover{border-color:var(--accent);color:var(--accent-lighter)}
+.sub{color:var(--fg3);font-size:13px;margin-bottom:6px}
+.fw-info{font-size:11px;color:var(--fg3);flex:1;display:flex;gap:10px;flex-wrap:wrap}
+.stats{color:var(--fg3);font-size:12px;margin-bottom:12px}
+.fw-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
 .fw-name{font-size:14px;font-weight:600;min-width:120px;font-family:'Courier New',monospace}
 .fw-info{font-size:11px;color:#64748b;flex:1;display:flex;gap:10px;flex-wrap:wrap}
 .fw-time{color:#60a5fa;font-weight:500}
 .fw-actions{display:flex;gap:6px;flex-shrink:0}
 .btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:6px;font-size:12px;border:none;cursor:pointer;text-decoration:none;transition:all .2s}
-.btn.dl{background:#3b82f6;color:#fff}
+.btn.dl{background:var(--accent);color:#fff}
 .btn.dl:hover{background:#2563eb}
-.btn.review{background:#8b5cf6;color:#fff}
+.btn.review{background:var(--purple);color:#fff}
 .btn.review:hover{background:#7c3aed}
 .btn.source{background:#059669;color:#fff}
 .btn.source:hover{background:#047857}
@@ -31,15 +39,22 @@ h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000}
 .modal.active{display:block}
 .modal-bg{position:absolute;width:100%;height:100%;background:rgba(0,0,0,0.7)}
-.modal-content{position:relative;width:90%;max-width:800px;max-height:85vh;margin:5vh auto;background:#0f172a;border:1px solid #334155;border-radius:12px;display:flex;flex-direction:column}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #334155}
+.modal-content{position:relative;width:90%;max-width:800px;max-height:85vh;margin:5vh auto;background:#0f172a;border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border)}
 .modal-title{font-size:14px;font-weight:600}
-.modal-close{background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer;padding:0 4px}
-.modal-close:hover{color:#ef4444}
+.modal-close{background:none;border:none;color:var(--fg2);font-size:20px;cursor:pointer;padding:0 4px}
+.modal-close:hover{color:var(--red)}
 .modal-body{padding:16px 20px;overflow:auto;flex:1}
-.modal-body pre{background:#020617;padding:14px;border-radius:8px;font-size:11px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:#e2e8f0;max-height:60vh}
-.copy-btn{margin-top:10px;padding:6px 14px;background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:6px;font-size:12px;cursor:pointer}
+.modal-body pre{background:#020617;padding:14px;border-radius:8px;font-size:11px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--fg);max-height:60vh}
+.copy-btn{margin-top:10px;padding:6px 14px;background:var(--border);color:var(--fg);border:1px solid #475569;border-radius:6px;font-size:12px;cursor:pointer}
 .copy-btn:hover{background:#475569}
+@media(max-width:600px){
+  body{padding:16px 12px}
+  .fw-card{flex-direction:column;align-items:flex-start;gap:8px}
+  .fw-name{min-width:auto;font-size:13px}
+  .fw-actions{align-self:stretch;justify-content:flex-end}
+  .nav{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
@@ -47,7 +62,6 @@ h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 <p class="sub">所有固件版本 · ⬇下载BIN · 📝查看源码发给其他智能体审查</p>
 <div class="nav">
   <a href="index.html">← 返回首页</a>
-  <a href="upload.html">📤 上传/粘贴资料</a>
 </div>
 
 <input class="search-bar" type="text" id="search" placeholder="搜索固件版本..." oninput="filterFirmware()">

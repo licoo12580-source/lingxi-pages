@@ -276,19 +276,34 @@ void setup() {
     // 初始化屏
     lcd_init();
 
-    // 全红
-    Serial.println("→ 填充红色");
-    fill_screen(0xF800);
-    delay(3000);
-
-    // 六色条
-    color_bar_test();
-    delay(3000);
-
-    // 颜色循环
+    // 慢速刷屏测试：每刷一个颜色等3秒
+    Serial.println("→ 测试开始 (每色3秒间隔)");
+    
     while (true) {
-        color_test();
-        delay(1000);
+        Serial.println("[TEST] 红色");
+        fill_screen(0xF800);
+        delay(3000);
+        yield();  // 喂看门狗
+        
+        Serial.println("[TEST] 绿色");
+        fill_screen(0x07E0);
+        delay(3000);
+        yield();
+        
+        Serial.println("[TEST] 蓝色");
+        fill_screen(0x001F);
+        delay(3000);
+        yield();
+        
+        Serial.println("[TEST] 白色");
+        fill_screen(0xFFFF);
+        delay(3000);
+        yield();
+        
+        Serial.println("[TEST] 黑色");
+        fill_screen(0x0000);
+        delay(2000);
+        yield();
     }
 }
 

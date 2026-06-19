@@ -295,108 +295,259 @@ void cn_text(int x, int y, const char* s, uint8_t r, uint8_t g, uint8_t b) {
 #define T  cn_text
 
 void page_energy() {
-    fill(0, 0, W, H, 0x0B, 0x11, 0x20);
-    fill(0, 0, W, 44, 0x0B, 0x11, 0x20);
-    fill(0, 42, W, 2, 0x22, 0xC5, 0x5E);
+    // 深色渐变背景
+    fill(0, 0, W, H, 0x0A, 0x0E, 0x1A);
+    fill(0, 0, W, H/2, 0x0D, 0x18, 0x2A);
+
+    // 顶部装饰线
+    fill(0, 0, W, 3, 0x22, 0xC5, 0x5E);
+
+    // 标题栏
     cn_text(16, 14, "今日节能", 0x22, 0xC5, 0x5E);
-    cn_text(W - 100, 14, "房间", 0x64, 0x74, 0x8B);
-    cn_text(W - 60, 14, "1208", 0x94, 0xA3, 0xB8);
-    int cy = 60;
-    cn_text(16, cy, "今日已节能", 0x94, 0xA3, 0xB8); cy += 14;
-    cn_text(16, cy, "2.4", 0x22, 0xC5, 0x5E);
-    cn_text(70, cy+2, "kWh", 0x64, 0x74, 0x8B); cy += 20;
-    cn_text(16, cy, "省  4.20", 0x94, 0xA3, 0xB8);
-    cn_text(112, cy, "元", 0x60, 0xA5, 0xFA);
-    cn_text(160, cy, "CO2  -1.8kg", 0x64, 0x74, 0x8B); cy += 14;
-    fill(20, cy, 200, 6, 0x1E, 0x29, 0x3B);
-    fill(20, cy, 130, 6, 0x22, 0xC5, 0x5E);
-    cn_text(230, cy-3, "65%", 0x22, 0xC5, 0x5E); cy += 18;
-    int cw = (W - 40) / 2;
-    int ch = 52, cx = 20;
-    fill(cx, cy, cw, ch, 0x1E, 0x29, 0x3B);
-    cn_text(cx + 10, cy + 6, "设定", 0x94, 0xA3, 0xB8);
-    cn_text(cx + 10, cy + 24, "26", 0x22, 0xC5, 0x5E);
-    cn_text(cx + 40, cy + 26, "度", 0x64, 0x74, 0x8B);
-    fill(cx + cw + 4, cy, cw, ch, 0x1E, 0x29, 0x3B);
-    cn_text(cx + cw + 14, cy + 6, "深睡", 0x60, 0xA5, 0xFA);
-    cn_text(cx + cw + 14, cy + 24, "5h12m", 0x94, 0xA3, 0xB8);
-    cy += ch + 6;
-    fill(cx, cy, cw, ch, 0x1E, 0x29, 0x3B);
-    cn_text(cx + 10, cy + 6, "状态", 0x94, 0xA3, 0xB8);
-    cn_text(cx + 10, cy + 24, "节能", 0x22, 0xC5, 0x5E);
-    fill(cx + cw + 4, cy, cw, ch, 0x1E, 0x29, 0x3B);
-    cn_text(cx + cw + 14, cy + 6, "房门", 0x94, 0xA3, 0xB8);
-    cn_text(cx + cw + 14, cy + 24, "已关", 0x22, 0xC5, 0x5E);
-    cy += ch + 10;
-    fill(0, H - 32, W, 32, 0x06, 0x4E, 0x3B);
-    cn_text(16, H - 22, "空间感知", 0x22, 0xC5, 0x5E);
-    cn_text(W - 120, H - 22, "有人在房", 0xE2, 0xE8, 0xF0);
-}// === 页面2: 环境感知 (Environment - s7设计) ===
+    fill(16, 34, 60, 2, 0x22, 0xC5, 0x5E);
+    cn_text(W - 90, 14, "1208房", 0x64, 0x74, 0x8B);
+
+    // 圆形进度指示器 - 画半圆弧
+    int cx = 68, cy = 116, r = 46;
+    // 圆弧上的像素点 (模拟圆环进度)
+    for (int a = 0; a <= 270; a += 6) {
+        float rad = a * 3.14159 / 180.0;
+        int px = cx + (int)(r * cos(rad));
+        int py = cy + (int)(r * sin(rad));
+        if (px >= 0 && px < W && py >= 0 && py < H) {
+            pixel(px, py, 0x22, 0xC5, 0x5E);
+            pixel(px+1, py, 0x22, 0xC5, 0x5E);
+        }
+    }
+    // 中心数字
+    cn_text(cx - 14, cy - 10, "2.4", 0xE2, 0xE8, 0xF0);
+    cn_text(cx + 14, cy - 8, "kWh", 0x64, 0x74, 0x8B);
+    cn_text(cx - 10, cy + 10, "今日", 0x64, 0x74, 0x8B);
+
+    // 右侧指标卡片
+    int rx = 158, rw = W - rx - 12;
+    fill(rx, 72, rw, 48, 0x15, 0x22, 0x38);
+    cn_text(rx + 8, 80, "设定温度", 0x64, 0x74, 0x8B);
+    cn_text(rx + 8, 98, "26", 0x22, 0xC5, 0x5E);
+    cn_text(rx + 30, 100, "度", 0x94, 0xA3, 0xB8);
+
+    fill(rx, 126, rw, 48, 0x15, 0x22, 0x38);
+    cn_text(rx + 8, 134, "深睡时长", 0x64, 0x74, 0x8B);
+    cn_text(rx + 8, 152, "5h12m", 0x60, 0xA5, 0xFA);
+
+    // 隔断
+    fill(16, 194, W-32, 1, 0x1E, 0x2E, 0x42);
+
+    // 4个竖排指标条
+    int by = 210, bh = 80, bw = (W - 40) / 4, bx = 20;
+
+    // 卡片1
+    fill(bx, by, bw, bh, 0x15, 0x22, 0x38);
+    fill(bx, by, bw, 3, 0x22, 0xC5, 0x5E);
+    cn_text(bx + 8, by + 14, "省电", 0x64, 0x74, 0x8B);
+    cn_text(bx + 8, by + 36, "4.2", 0x22, 0xC5, 0x5E);
+    cn_text(bx + 8, by + 56, "元", 0x94, 0xA3, 0xB8);
+
+    // 卡片2
+    fill(bx + bw + 4, by, bw, bh, 0x15, 0x22, 0x38);
+    fill(bx + bw + 4, by, bw, 3, 0x60, 0xA5, 0xFA);
+    cn_text(bx + bw + 12, by + 14, "深睡", 0x64, 0x74, 0x8B);
+    cn_text(bx + bw + 12, by + 36, "6h", 0x60, 0xA5, 0xFA);
+    cn_text(bx + bw + 12, by + 56, "时长", 0x94, 0xA3, 0xB8);
+
+    // 卡片3
+    fill(bx + 2*(bw+4), by, bw, bh, 0x15, 0x22, 0x38);
+    fill(bx + 2*(bw+4), by, bw, 3, 0xF5, 0x9E, 0x0B);
+    cn_text(bx + 2*(bw+4) + 8, by + 14, "房门", 0x64, 0x74, 0x8B);
+    // 绿色小圆点 (表示已关)
+    pixel(bx + 2*(bw+4) + 16, by + 44, 0x22, 0xC5, 0x5E);
+    pixel(bx + 2*(bw+4) + 17, by + 44, 0x22, 0xC5, 0x5E);
+    pixel(bx + 2*(bw+4) + 16, by + 45, 0x22, 0xC5, 0x5E);
+    pixel(bx + 2*(bw+4) + 17, by + 45, 0x22, 0xC5, 0x5E);
+    cn_text(bx + 2*(bw+4) + 24, by + 38, "已关", 0x22, 0xC5, 0x5E);
+
+    // 卡片4
+    fill(bx + 3*(bw+4), by, bw, bh, 0x15, 0x22, 0x38);
+    fill(bx + 3*(bw+4), by, bw, 3, 0x8B, 0x5C, 0xF6);
+    cn_text(bx + 3*(bw+4) + 8, by + 14, "CO2", 0x64, 0x74, 0x8B);
+    cn_text(bx + 3*(bw+4) + 8, by + 36, "420", 0x22, 0xC5, 0x5E);
+    cn_text(bx + 3*(bw+4) + 8, by + 56, "ppm", 0x94, 0xA3, 0xB8);
+
+    // 底部状态栏
+    fill(0, H - 30, W, 30, 0x06, 0x4E, 0x3B);
+    // 绿色小圆点
+    pixel(16, H - 18, 0x22, 0xC5, 0x5E);
+    pixel(17, H - 18, 0x22, 0xC5, 0x5E);
+    pixel(16, H - 17, 0x22, 0xC5, 0x5E);
+    pixel(17, H - 17, 0x22, 0xC5, 0x5E);
+    cn_text(24, H - 24, "有人在房", 0x22, 0xC5, 0x5E);
+    cn_text(W - 100, H - 24, "节能运行", 0xE2, 0xE8, 0xF0);
+}
 void page_env() {
-    fill(0, 0, W, H, 0x0F, 0x17, 0x2A);
-    fill(0, 0, W, 44, 0x0F, 0x17, 0x2A);
-    fill(0, 42, W, 2, 0x60, 0xA5, 0xFA);
+    // 深蓝渐变背景
+    fill(0, 0, W, H, 0x08, 0x0F, 0x1E);
+    fill(0, 0, W, H/2, 0x0C, 0x18, 0x2E);
+
+    // 顶部装饰线
+    fill(0, 0, W, 3, 0x60, 0xA5, 0xFA);
+
     cn_text(16, 14, "环境监控", 0x60, 0xA5, 0xFA);
+    fill(16, 34, 60, 2, 0x60, 0xA5, 0xFA);
     cn_text(W - 80, 14, "舒适", 0x22, 0xC5, 0x5E);
-    int cy = 60;
-    fill(20, cy, W-40, 80, 0x1E, 0x29, 0x3B);
-    cn_text(36, cy + 10, "温度", 0x94, 0xA3, 0xB8);
-    cn_text(36, cy + 36, "24.5", 0x60, 0xA5, 0xFA);
-    cn_text(36 + 80, cy + 40, "度", 0x94, 0xA3, 0xB8);
-    cn_text(W - 140, cy + 40, "设定 26 度", 0x64, 0x74, 0x8B);
-    cy += 96;
-    int cw = (W - 44) / 2, ch = 48, cx = 22;
-    fill(cx, cy, cw, ch, 0x1E, 0x29, 0x3B);
-    cn_text(cx + 10, cy + 6, "湿度", 0x94, 0xA3, 0xB8);
-    cn_text(cx + 10, cy + 24, "45%", 0x60, 0xA5, 0xFA);
-    fill(cx + cw + 4, cy, cw, ch, 0x1E, 0x29, 0x3B);
-    cn_text(cx + cw + 14, cy + 6, "噪音", 0x94, 0xA3, 0xB8);
-    cn_text(cx + cw + 14, cy + 24, "38dB", 0x94, 0xA3, 0xB8);
+
+    // 温度大卡片 - 左侧大数字
+    fill(16, 56, W-32, 82, 0x12, 0x1D, 0x32);
+    fill(16, 56, 4, 82, 0x60, 0xA5, 0xFA);
+
+    cn_text(32, 68, "24.5", 0x60, 0xA5, 0xFA);
+    cn_text(100, 72, "度", 0x94, 0xA3, 0xB8);
+    // 温度条 (模拟进度)
+    fill(32, 104, 120, 4, 0x1E, 0x2E, 0x42);
+    fill(32, 104, 70, 4, 0x60, 0xA5, 0xFA);
+
+    cn_text(W - 90, 72, "26 度", 0x94, 0xA3, 0xB8);
+    cn_text(W - 90, 90, "设定", 0x64, 0x74, 0x8B);
+    fill(W - 90, 106, 50, 4, 0x1E, 0x2E, 0x42);
+    fill(W - 90, 106, 30, 4, 0x22, 0xC5, 0x5E);
+
+    // 4个环境指标卡 - 2x2
+    int cw = (W - 40) / 2, ch = 60;
+    int cx = 20, cy = 156;
+
+    // 湿度
+    fill(cx, cy, cw, ch, 0x12, 0x1D, 0x32);
+    fill(cx, cy, cw, 3, 0x06, 0xB7, 0xD0);
+    cn_text(cx + 10, cy + 10, "湿度", 0x64, 0x74, 0x8B);
+    // 湿度条
+    fill(cx + 10, cy + 30, cw - 20, 4, 0x1E, 0x2E, 0x42);
+    fill(cx + 10, cy + 30, (cw - 20) * 45 / 100, 4, 0x06, 0xB7, 0xD0);
+    cn_text(cx + cw - 50, cy + 36, "45%", 0x06, 0xB7, 0xD0);
+
+    // 噪音
+    fill(cx + cw + 4, cy, cw, ch, 0x12, 0x1D, 0x32);
+    fill(cx + cw + 4, cy, cw, 3, 0x8B, 0x5C, 0xF6);
+    cn_text(cx + cw + 14, cy + 10, "噪音", 0x64, 0x74, 0x8B);
+    fill(cx + cw + 14, cy + 30, cw - 20, 4, 0x1E, 0x2E, 0x42);
+    fill(cx + cw + 14, cy + 30, (cw - 20) * 38 / 60, 4, 0x8B, 0x5C, 0xF6);
+    cn_text(cx + cw + 14, cy + 36, "38dB", 0x8B, 0x5C, 0xF6);
+
     cy += ch + 6;
-    fill(cx, cy, cw, ch, 0x1E, 0x29, 0x3B);
-    cn_text(cx + 10, cy + 6, "CO2", 0x94, 0xA3, 0xB8);
-    cn_text(cx + 10, cy + 24, "420ppm", 0x22, 0xC5, 0x5E);
-    fill(cx + cw + 4, cy, cw, ch, 0x1E, 0x29, 0x3B);
-    cn_text(cx + cw + 14, cy + 6, "空气", 0x94, 0xA3, 0xB8);
-    cn_text(cx + cw + 14, cy + 24, "正常", 0x22, 0xC5, 0x5E);
-    cy += ch + 10;
-    fill(20, cy, W - 40, 40, 0x06, 0x4E, 0x3B);
-    cn_text(36, cy + 10, "空间感知", 0x22, 0xC5, 0x5E);
-    cn_text(W - 160, cy + 10, "有人在房", 0xE2, 0xE8, 0xF0);
-    cn_text(W - 80, cy + 10, "14:30", 0x94, 0xA3, 0xB8);
-}// === 页面3: 安防状态 (Security - s3设计) ===
+
+    // CO2
+    fill(cx, cy, cw, ch, 0x12, 0x1D, 0x32);
+    fill(cx, cy, cw, 3, 0xF5, 0x9E, 0x0B);
+    cn_text(cx + 10, cy + 10, "CO2", 0x64, 0x74, 0x8B);
+    fill(cx + 10, cy + 30, cw - 20, 4, 0x1E, 0x2E, 0x42);
+    fill(cx + 10, cy + 30, (cw - 20) * 42 / 100, 4, 0xF5, 0x9E, 0x0B);
+    cn_text(cx + cw - 50, cy + 36, "420ppm", 0xF5, 0x9E, 0x0B);
+
+    // 空气质量
+    fill(cx + cw + 4, cy, cw, ch, 0x12, 0x1D, 0x32);
+    fill(cx + cw + 4, cy, cw, 3, 0x22, 0xC5, 0x5E);
+    cn_text(cx + cw + 14, cy + 10, "空气", 0x64, 0x74, 0x8B);
+    fill(cx + cw + 14, cy + 30, cw - 20, 4, 0x1E, 0x2E, 0x42);
+    fill(cx + cw + 14, cy + 30, (cw - 20) * 80 / 100, 4, 0x22, 0xC5, 0x5E);
+    cn_text(cx + cw + 14, cy + 36, "正常", 0x22, 0xC5, 0x5E);
+
+    // 底部空间感知
+    cy += ch + 16;
+    fill(16, cy, W-32, 34, 0x12, 0x1D, 0x32);
+    fill(16, cy, 4, 34, 0x60, 0xA5, 0xFA);
+    // 小圆点
+    pixel(34, cy + 14, 0x22, 0xC5, 0x5E);
+    pixel(35, cy + 14, 0x22, 0xC5, 0x5E);
+    pixel(34, cy + 15, 0x22, 0xC5, 0x5E);
+    pixel(35, cy + 15, 0x22, 0xC5, 0x5E);
+    cn_text(44, cy + 6, "空间感知", 0x22, 0xC5, 0x5E);
+    cn_text(44, cy + 20, "有人在房 14:30 至 今", 0x94, 0xA3, 0xB8);
+    cn_text(W - 60, cy + 20, "舒适", 0x22, 0xC5, 0x5E);
+}
 void page_sec() {
-    fill(0, 0, W, H, 0x0A, 0x0A, 0x0A);
-    fill(0, 0, W, 44, 0x0A, 0x0A, 0x0A);
-    fill(0, 42, W, 2, 0xEF, 0x44, 0x44);
+    // 深色背景
+    fill(0, 0, W, H, 0x08, 0x08, 0x0A);
+    fill(0, 0, W, 140, 0x0D, 0x0A, 0x0A);
+
+    // 顶部红色装饰线
+    fill(0, 0, W, 3, 0xEF, 0x44, 0x44);
+
     cn_text(16, 14, "安防监控", 0xEF, 0x44, 0x44);
-    cn_text(W - 80, 14, "正常", 0x22, 0xC5, 0x5E);
-    int cy = 60;
-    fill(20, cy, W - 40, 65, 0x1E, 0x29, 0x3B);
-    cn_text(36, cy + 10, "房门状态", 0xE2, 0xE8, 0xF0);
-    cn_text(W - 100, cy + 10, "已关门", 0x22, 0xC5, 0x5E);
-    cn_text(36, cy + 34, "今日开启 12 次", 0x94, 0xA3, 0xB8);
-    cn_text(W - 100, cy + 34, "正常", 0x64, 0x74, 0x8B);
-    cy += 80;
-    int cw = (W - 44) / 2, ch = 42, cx = 22;
-    fill(cx, cy, cw, ch, 0x1E, 0x29, 0x3B);
+    fill(16, 34, 60, 2, 0xEF, 0x44, 0x44);
+    // 绿色小圆点 - 全正常
+    pixel(W - 72, 18, 0x22, 0xC5, 0x5E);
+    pixel(W - 71, 18, 0x22, 0xC5, 0x5E);
+    pixel(W - 72, 19, 0x22, 0xC5, 0x5E);
+    pixel(W - 71, 19, 0x22, 0xC5, 0x5E);
+    cn_text(W - 60, 14, "全正常", 0x22, 0xC5, 0x5E);
+
+    // 房门状态大卡片
+    fill(16, 56, W-32, 70, 0x15, 0x12, 0x12);
+    fill(16, 56, 4, 70, 0xEF, 0x44, 0x44);
+
+    cn_text(32, 66, "房门状态", 0xE2, 0xE8, 0xF0);
+    cn_text(32, 84, "已关门", 0x22, 0xC5, 0x5E);
+    cn_text(32, 102, "今日开 12 次", 0x94, 0xA3, 0xB8);
+    cn_text(W - 80, 102, "状态正常", 0x64, 0x74, 0x8B);
+
+    // 传感器网格 - 4个
+    int cw = (W - 40) / 2, ch = 52;
+    int cx = 20, cy = 144;
+
+    // 人体检测
+    fill(cx, cy, cw, ch, 0x15, 0x12, 0x12);
+    fill(cx, cy, cw, 3, 0x60, 0xA5, 0xFA);
     cn_text(cx + 10, cy + 8, "人体检测", 0x94, 0xA3, 0xB8);
-    cn_text(cx + cw - 60, cy + 8, "正常", 0x22, 0xC5, 0x5E);
-    fill(cx + cw + 4, cy, cw, ch, 0x1E, 0x29, 0x3B);
+    // 绿色小圆点
+    pixel(cx + 10, cy + 32, 0x22, 0xC5, 0x5E);
+    pixel(cx + 11, cy + 32, 0x22, 0xC5, 0x5E);
+    pixel(cx + 10, cy + 33, 0x22, 0xC5, 0x5E);
+    pixel(cx + 11, cy + 33, 0x22, 0xC5, 0x5E);
+    cn_text(cx + 18, cy + 28, "正常", 0x22, 0xC5, 0x5E);
+
+    // 门磁
+    fill(cx + cw + 4, cy, cw, ch, 0x15, 0x12, 0x12);
+    fill(cx + cw + 4, cy, cw, 3, 0x8B, 0x5C, 0xF6);
     cn_text(cx + cw + 14, cy + 8, "门磁", 0x94, 0xA3, 0xB8);
-    cn_text(cx + 2*cw - 60, cy + 8, "正常", 0x22, 0xC5, 0x5E);
+    pixel(cx + cw + 14, cy + 32, 0x22, 0xC5, 0x5E);
+    pixel(cx + cw + 15, cy + 32, 0x22, 0xC5, 0x5E);
+    pixel(cx + cw + 14, cy + 33, 0x22, 0xC5, 0x5E);
+    pixel(cx + cw + 15, cy + 33, 0x22, 0xC5, 0x5E);
+    cn_text(cx + cw + 22, cy + 28, "正常", 0x22, 0xC5, 0x5E);
+
     cy += ch + 6;
-    fill(cx, cy, cw, ch, 0x1E, 0x29, 0x3B);
+
+    // 紧急按钮
+    fill(cx, cy, cw, ch, 0x15, 0x12, 0x12);
+    fill(cx, cy, cw, 3, 0xEF, 0x44, 0x44);
     cn_text(cx + 10, cy + 8, "紧急按钮", 0x94, 0xA3, 0xB8);
-    cn_text(cx + cw - 60, cy + 8, "正常", 0x22, 0xC5, 0x5E);
-    fill(cx + cw + 4, cy, cw, ch, 0x1E, 0x29, 0x3B);
+    pixel(cx + 10, cy + 32, 0x22, 0xC5, 0x5E);
+    pixel(cx + 11, cy + 32, 0x22, 0xC5, 0x5E);
+    pixel(cx + 10, cy + 33, 0x22, 0xC5, 0x5E);
+    pixel(cx + 11, cy + 33, 0x22, 0xC5, 0x5E);
+    cn_text(cx + 18, cy + 28, "正常", 0x22, 0xC5, 0x5E);
+
+    // 烟雾检测
+    fill(cx + cw + 4, cy, cw, ch, 0x15, 0x12, 0x12);
+    fill(cx + cw + 4, cy, cw, 3, 0xF5, 0x9E, 0x0B);
     cn_text(cx + cw + 14, cy + 8, "烟雾", 0x94, 0xA3, 0xB8);
-    cn_text(cx + 2*cw - 60, cy + 8, "正常", 0x22, 0xC5, 0x5E);
-    cy += ch + 10;
-    fill(20, cy, W - 40, 36, 0x22, 0xC5, 0x5E);
-    cn_text(36, cy + 8, "全系统正常", 0x0A, 0x0A, 0x0A);
-    cn_text(W - 140, cy + 8, "运行时间 3d2h", 0x0F, 0x17, 0x2A);
-}// ==================== 主循环 ====================
+    pixel(cx + cw + 14, cy + 32, 0x22, 0xC5, 0x5E);
+    pixel(cx + cw + 15, cy + 32, 0x22, 0xC5, 0x5E);
+    pixel(cx + cw + 14, cy + 33, 0x22, 0xC5, 0x5E);
+    pixel(cx + cw + 15, cy + 33, 0x22, 0xC5, 0x5E);
+    cn_text(cx + cw + 22, cy + 28, "正常", 0x22, 0xC5, 0x5E);
+
+    // 底部运行状态
+    cy += ch + 16;
+    fill(16, cy, W-32, 34, 0x1E, 0x18, 0x0A);
+    fill(16, cy, 4, 34, 0xF5, 0x9E, 0x0B);
+    cn_text(32, cy + 6, "全系统正常", 0x22, 0xC5, 0x5E);
+    cn_text(32, cy + 20, "连续运行 3d 2h", 0x94, 0xA3, 0xB8);
+    // 绿色小圆点
+    pixel(W - 36, cy + 10, 0x22, 0xC5, 0x5E);
+    pixel(W - 35, cy + 10, 0x22, 0xC5, 0x5E);
+    pixel(W - 36, cy + 11, 0x22, 0xC5, 0x5E);
+    pixel(W - 35, cy + 11, 0x22, 0xC5, 0x5E);
+    cn_text(W - 28, cy + 6, "正常", 0x22, 0xC5, 0x5E);
+}
 void setup() {
     Serial.begin(115200);
     delay(500);

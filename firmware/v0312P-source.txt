@@ -1,0 +1,395 @@
+// 灵犀 v0312P - IPS滚动UI (3页自动滚动+平滑过渡)
+// 硬件: ESP32-S3 + CL40BC299-40A (ILI9488, SPI 4线, 320x480)
+// 引脚: RST=48 CS=45 DC=47 MOSI=21 SCK=20
+
+#include <Arduino.h>
+
+// ==================== 引脚定义 ====================
+#define PIN_CS    45
+#define PIN_DC    47
+#define PIN_RST   48
+#define PIN_MOSI  21
+#define PIN_SCLK  20
+
+#define WIDTH   320
+#define HEIGHT  480
+
+// ==================== 颜色（RGB666 18位，6bit/ch） ====================
+#define C_BLACK   0x00, 0x00, 0x00
+#define C_WHITE   0xFC, 0xFC, 0xFC
+#define C_RED     0xFC, 0x00, 0x00
+#define C_GREEN   0x00, 0xFC, 0x00
+#define C_BLUE    0x00, 0x00, 0xFC
+#define C_CYAN    0x00, 0xFC, 0xFC
+#define C_YELLOW  0xFC, 0xFC, 0x00
+#define C_DARK    0x10, 0x18, 0x28
+#define C_MID     0x20, 0x30, 0x48
+#define C_ACCENT  0x00, 0xD0, 0xA0   // 青绿
+#define C_WARM    0xF0, 0x80, 0x20   // 暖橙
+#define C_DIM     0x60, 0x70, 0x90   // 灰蓝
+#define C_SOFT    0x80, 0xA0, 0xC0   // 浅蓝
+
+// ==================== SPI ====================
+static void spi_byte(uint8_t d) {
+    for (int i = 0; i < 8; i++) {
+        digitalWrite(PIN_SCLK, LOW);
+        digitalWrite(PIN_MOSI, (d & 0x80) ? HIGH : LOW);
+        d <<= 1;
+        digitalWrite(PIN_SCLK, HIGH);
+    }
+}
+
+static void wr_cmd(uint8_t c) {
+    digitalWrite(PIN_DC, LOW);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(c);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+static void wr_data(uint8_t d) {
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(d);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+// 写3字节RGB666像素
+static void wr_pixel(uint8_t r, uint8_t g, uint8_t b) {
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(r);
+    spi_byte(g);
+    spi_byte(b);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+// ==================== 初始化（厂家4SPI序列） ====================
+void lcd_init() {
+    digitalWrite(PIN_RST, HIGH); delay(1);
+    digitalWrite(PIN_RST, LOW);  delay(10);
+    digitalWrite(PIN_RST, HIGH); delay(120);
+
+    wr_cmd(0xF7); wr_data(0xA9); wr_data(0x51); wr_data(0x2C); wr_data(0x82);
+    wr_cmd(0xEC); wr_data(0x00); wr_data(0x02); wr_data(0x03); wr_data(0x7A);
+    wr_cmd(0xC0); wr_data(0x13); wr_data(0x13);
+    wr_cmd(0xC1); wr_data(0x41);
+    wr_cmd(0xC5); wr_data(0x00); wr_data(0x28); wr_data(0x80);
+    wr_cmd(0xB0); wr_data(0x00);
+    wr_cmd(0xB1); wr_data(0xB0); wr_data(0x11);
+    wr_cmd(0xB4); wr_data(0x02);
+    wr_cmd(0xB6); wr_data(0x02); wr_data(0x22);
+    wr_cmd(0xB7); wr_data(0xC6);
+    wr_cmd(0xBE); wr_data(0x00); wr_data(0x04);
+    wr_cmd(0xE9); wr_data(0x00);
+    wr_cmd(0xF4); wr_data(0x00); wr_data(0x00); wr_data(0x0F);
+    wr_cmd(0xE0); wr_data(0x00); wr_data(0x04); wr_data(0x0E); wr_data(0x08);
+                  wr_data(0x17); wr_data(0x0A); wr_data(0x40); wr_data(0x79);
+                  wr_data(0x4D); wr_data(0x07); wr_data(0x0E); wr_data(0x0A);
+                  wr_data(0x1A); wr_data(0x1D); wr_data(0x0F);
+    wr_cmd(0xE1); wr_data(0x00); wr_data(0x1B); wr_data(0x1F); wr_data(0x02);
+                  wr_data(0x10); wr_data(0x05); wr_data(0x32); wr_data(0x34);
+                  wr_data(0x43); wr_data(0x02); wr_data(0x0A); wr_data(0x09);
+                  wr_data(0x33); wr_data(0x37); wr_data(0x0F);
+    wr_cmd(0xF4); wr_data(0x00); wr_data(0x00); wr_data(0x0F);
+    wr_cmd(0x36); wr_data(0x08);
+    wr_cmd(0x3A); wr_data(0x66);
+    wr_cmd(0x21);
+    wr_cmd(0x11); delay(120);
+    wr_cmd(0x29); delay(50);
+}
+
+// ==================== 区域绘制 ====================
+
+void set_win(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+    wr_cmd(0x2A);
+    wr_data(x0 >> 8); wr_data(x0 & 0xFF);
+    wr_data(x1 >> 8); wr_data(x1 & 0xFF);
+    wr_cmd(0x2B);
+    wr_data(y0 >> 8); wr_data(y0 & 0xFF);
+    wr_data(y1 >> 8); wr_data(y1 & 0xFF);
+    wr_cmd(0x2C);
+}
+
+void fill_rect(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b) {
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > WIDTH)  w = WIDTH - x;
+    if (y + h > HEIGHT) h = HEIGHT - y;
+    if (w <= 0 || h <= 0) return;
+    set_win(x, y, x + w - 1, y + h - 1);
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    int n = w * h;
+    for (int i = 0; i < n; i++) {
+        spi_byte(r); spi_byte(g); spi_byte(b);
+    }
+    digitalWrite(PIN_CS, HIGH);
+}
+
+// ==================== 5x7 英文字体（压缩嵌入） ====================
+// 每个字符5字节（每列1字节，bit7=顶部），ASCII 32~126
+static const uint8_t font5x7[] PROGMEM = {
+    0x00,0x00,0x00,0x00,0x00, // 20 space
+    0x00,0x00,0x5F,0x00,0x00, // 21 !
+    0x00,0x07,0x00,0x07,0x00, // 22 "
+    0x14,0x7F,0x14,0x7F,0x14, // 23 #
+    0x24,0x2A,0x7F,0x2A,0x12, // 24 $
+    0x23,0x13,0x08,0x64,0x62, // 25 %
+    0x36,0x49,0x55,0x22,0x50, // 26 &
+    0x00,0x05,0x03,0x00,0x00, // 27 '
+    0x00,0x1C,0x22,0x41,0x00, // 28 (
+    0x00,0x41,0x22,0x1C,0x00, // 29 )
+    0x08,0x2A,0x1C,0x2A,0x08, // 2A *
+    0x08,0x08,0x3E,0x08,0x08, // 2B +
+    0x00,0x50,0x30,0x00,0x00, // 2C ,
+    0x08,0x08,0x08,0x08,0x08, // 2D -
+    0x00,0x60,0x60,0x00,0x00, // 2E .
+    0x20,0x10,0x08,0x04,0x02, // 2F /
+    0x3E,0x51,0x49,0x45,0x3E, // 30 0
+    0x00,0x42,0x7F,0x40,0x00, // 31 1
+    0x42,0x61,0x51,0x49,0x46, // 32 2
+    0x21,0x41,0x45,0x4B,0x31, // 33 3
+    0x18,0x14,0x12,0x7F,0x10, // 34 4
+    0x27,0x45,0x45,0x45,0x39, // 35 5
+    0x3C,0x4A,0x49,0x49,0x30, // 36 6
+    0x01,0x71,0x09,0x05,0x03, // 37 7
+    0x36,0x49,0x49,0x49,0x36, // 38 8
+    0x06,0x49,0x49,0x29,0x1E, // 39 9
+    0x00,0x36,0x36,0x00,0x00, // 3A :
+    0x00,0x56,0x36,0x00,0x00, // 3B ;
+    0x00,0x08,0x14,0x22,0x41, // 3C <
+    0x14,0x14,0x14,0x14,0x14, // 3D =
+    0x41,0x22,0x14,0x08,0x00, // 3E >
+    0x02,0x01,0x51,0x09,0x06, // 3F ?
+    0x32,0x49,0x79,0x41,0x3E, // 40 @
+    0x7E,0x11,0x11,0x11,0x7E, // 41 A
+    0x7F,0x49,0x49,0x49,0x36, // 42 B
+    0x3E,0x41,0x41,0x41,0x22, // 43 C
+    0x7F,0x41,0x41,0x22,0x1C, // 44 D
+    0x7F,0x49,0x49,0x49,0x41, // 45 E
+    0x7F,0x09,0x09,0x01,0x01, // 46 F
+    0x3E,0x41,0x41,0x51,0x32, // 47 G
+    0x7F,0x08,0x08,0x08,0x7F, // 48 H
+    0x00,0x41,0x7F,0x41,0x00, // 49 I
+    0x20,0x40,0x41,0x3F,0x01, // 4A J
+    0x7F,0x08,0x14,0x22,0x41, // 4B K
+    0x7F,0x40,0x40,0x40,0x40, // 4C L
+    0x7F,0x02,0x04,0x02,0x7F, // 4D M
+    0x7F,0x04,0x08,0x10,0x7F, // 4E N
+    0x3E,0x41,0x41,0x41,0x3E, // 4F O
+    0x7F,0x09,0x09,0x09,0x06, // 50 P
+    0x3E,0x41,0x51,0x21,0x5E, // 51 Q
+    0x7F,0x09,0x19,0x29,0x46, // 52 R
+    0x46,0x49,0x49,0x49,0x31, // 53 S
+    0x01,0x01,0x7F,0x01,0x01, // 54 T
+    0x3F,0x40,0x40,0x40,0x3F, // 55 U
+    0x1F,0x20,0x40,0x20,0x1F, // 56 V
+    0x7F,0x20,0x18,0x20,0x7F, // 57 W
+    0x63,0x14,0x08,0x14,0x63, // 58 X
+    0x03,0x04,0x78,0x04,0x03, // 59 Y
+    0x61,0x51,0x49,0x45,0x43, // 5A Z
+    0x00,0x00,0x7F,0x41,0x41, // 5B [
+    0x02,0x04,0x08,0x10,0x20, // 5C backslash
+    0x41,0x41,0x7F,0x00,0x00, // 5D ]
+    0x04,0x02,0x01,0x02,0x04, // 5E ^
+    0x40,0x40,0x40,0x40,0x40, // 5F _
+    0x00,0x01,0x02,0x04,0x00, // 60 `
+    0x20,0x54,0x54,0x54,0x78, // 61 a
+    0x7F,0x48,0x44,0x44,0x38, // 62 b
+    0x38,0x44,0x44,0x44,0x20, // 63 c
+    0x38,0x44,0x44,0x48,0x7F, // 64 d
+    0x38,0x54,0x54,0x54,0x18, // 65 e
+    0x08,0x7E,0x09,0x01,0x02, // 66 f
+    0x08,0x14,0x54,0x54,0x3C, // 67 g
+    0x7F,0x08,0x04,0x04,0x78, // 68 h
+    0x00,0x44,0x7D,0x40,0x00, // 69 i
+    0x20,0x40,0x44,0x3D,0x00, // 6A j
+    0x00,0x7F,0x10,0x28,0x44, // 6B k
+    0x00,0x41,0x7F,0x40,0x00, // 6C l
+    0x7C,0x04,0x18,0x04,0x78, // 6D m
+    0x7C,0x08,0x04,0x04,0x78, // 6E n
+    0x38,0x44,0x44,0x44,0x38, // 6F o
+    0x7C,0x14,0x14,0x14,0x08, // 70 p
+    0x08,0x14,0x14,0x18,0x7C, // 71 q
+    0x7C,0x08,0x04,0x04,0x08, // 72 r
+    0x48,0x54,0x54,0x54,0x20, // 73 s
+    0x04,0x3F,0x44,0x40,0x20, // 74 t
+    0x3C,0x40,0x40,0x20,0x7C, // 75 u
+    0x1C,0x20,0x40,0x20,0x1C, // 76 v
+    0x3C,0x40,0x30,0x40,0x3C, // 77 w
+    0x44,0x28,0x10,0x28,0x44, // 78 x
+    0x0C,0x50,0x50,0x50,0x3C, // 79 y
+    0x44,0x64,0x54,0x4C,0x44, // 7A z
+    0x00,0x08,0x36,0x41,0x00, // 7B {
+    0x00,0x00,0x7F,0x00,0x00, // 7C |
+    0x00,0x41,0x36,0x08,0x00, // 7D }
+    0x08,0x08,0x2A,0x1C,0x08, // 7E ~
+};
+
+void draw_char(int x, int y, char c, uint8_t r, uint8_t g, uint8_t b) {
+    if (c < 32 || c > 126) c = ' ';
+    int idx = (c - 32) * 5;
+    for (int col = 0; col < 5; col++) {
+        uint8_t bits = pgm_read_byte(&font5x7[idx + col]);
+        for (int row = 0; row < 7; row++) {
+            if (bits & (0x01 << row)) {
+                set_win(x + col, y + (6 - row), x + col, y + (6 - row));
+                digitalWrite(PIN_DC, HIGH);
+                digitalWrite(PIN_CS, LOW);
+                spi_byte(r); spi_byte(g); spi_byte(b);
+                digitalWrite(PIN_CS, HIGH);
+            }
+        }
+    }
+}
+
+void draw_str(int x, int y, const char* s, uint8_t r, uint8_t g, uint8_t b) {
+    // 批量绘制：每行先计算所有字符的像素，然后一整行刷
+    // 对于5x7字体，7行，每行宽度=字符数*6
+    int len = strlen(s);
+    if (len == 0) return;
+    
+    // 对每个字符，按列逐行绘制
+    for (int col = 0; col < 5; col++) {
+        // 收集这一列所有字符的像素
+        for (int c = 0; c < len; c++) {
+            char ch = s[c];
+            if (ch < 32 || ch > 126) ch = ' ';
+            uint8_t bits = pgm_read_byte(&font5x7[(ch - 32) * 5 + col]);
+            
+            // 画这一列中所有需要亮的行
+            for (int row = 0; row < 7; row++) {
+                if (bits & (0x01 << row)) {
+                    int px = x + c * 6 + col;
+                    int py = y + (6 - row);
+                    set_win(px, py, px, py);
+                    digitalWrite(PIN_DC, HIGH);
+                    digitalWrite(PIN_CS, LOW);
+                    spi_byte(r); spi_byte(g); spi_byte(b);
+                    digitalWrite(PIN_CS, HIGH);
+                }
+            }
+        }
+        yield();
+    }
+}
+
+// ==================== 页面内容 ====================
+
+// 页面1: 房间状态
+void page_room_status(int page_y, uint8_t r, uint8_t g, uint8_t b) {
+    // 深色背景区
+    fill_rect(0, 0, WIDTH, HEIGHT, C_DARK);
+    
+    // 顶部标题栏
+    fill_rect(0, 0, WIDTH, 50, C_MID);
+    // 标题文字
+    // Room number
+    draw_str(20, 14, "Room 1208", C_WHITE);
+    
+    // 温度大数字
+    fill_rect(20, 80, 180, 120, C_MID);
+    draw_str(30, 90, "24.5", C_WHITE);  // temp
+    draw_str(110, 95, "C", C_SOFT);
+    
+    // 设定温度
+    draw_str(30, 130, "SET 26C", C_ACCENT);
+    
+    // 右侧状态
+    fill_rect(220, 80, 80, 80, 0x00, 0x60, 0x50); // 绿色节能状态框
+    draw_str(230, 95, "ECO", C_GREEN);
+    draw_str(230, 115, "ON", C_GREEN);
+    
+    // 底部信息栏
+    fill_rect(0, 380, WIDTH, 100, C_MID);
+    draw_str(20, 400, "Occupied", C_WHITE);
+    draw_str(180, 400, "WiFi", C_CYAN);
+    draw_str(20, 430, "Energy Saving: +4C", C_ACCENT);
+}
+
+// 页面2: 节能数据
+void page_energy(int page_y, uint8_t r, uint8_t g, uint8_t b) {
+    fill_rect(0, 0, WIDTH, HEIGHT, C_DARK);
+    
+    fill_rect(0, 0, WIDTH, 50, C_MID);
+    draw_str(20, 14, "Energy Savings", C_WHITE);
+    
+    // 今日节省
+    fill_rect(20, 80, 280, 80, C_MID);
+    draw_str(30, 95, "Today Saved", C_SOFT);
+    draw_str(30, 125, "2.4 kWh", C_GREEN);
+    
+    // 月度预估
+    fill_rect(20, 180, 280, 80, C_MID);
+    draw_str(30, 195, "Monthly Projection", C_SOFT);
+    draw_str(30, 225, "72.0 kWh", C_ACCENT);
+    
+    // CO2 减排
+    fill_rect(20, 280, 280, 80, C_MID);
+    draw_str(30, 295, "CO2 Reduced", C_SOFT);
+    draw_str(30, 325, "56.8 kg", C_GREEN);
+    
+    fill_rect(0, 380, WIDTH, 100, C_MID);
+    draw_str(20, 430, "Vertical scroll demo", C_DIM);
+}
+
+// 页面3: 系统信息
+void page_system(int page_y, uint8_t r, uint8_t g, uint8_t b) {
+    fill_rect(0, 0, WIDTH, HEIGHT, C_DARK);
+    
+    fill_rect(0, 0, WIDTH, 50, C_MID);
+    draw_str(20, 14, "Lingxi System", C_WHITE);
+    
+    fill_rect(20, 80, 280, 300, C_MID);
+    draw_str(30, 100, "Firmware: v0312P", C_WHITE);
+    draw_str(30, 130, "Screen: 4.0 IPS 320x480", C_SOFT);
+    draw_str(30, 160, "MCU: ESP32-S3", C_SOFT);
+    draw_str(30, 190, "Radar: MS24", C_SOFT);
+    draw_str(30, 220, "WiFi: Connected", C_GREEN);
+    draw_str(30, 250, "MQTT: Online", C_GREEN);
+    draw_str(30, 280, "Uptime: 00:00:00", C_DIM);
+    draw_str(30, 310, "Temp: 24.5C / Humidity: 45%", C_DIM);
+    draw_str(30, 340, "Energy Mode: ECO +4C", C_ACCENT);
+    
+    fill_rect(0, 400, WIDTH, 80, 0x00, 0x00, 0x00);
+    draw_str(20, 420, "Space Perception Active", 0x00, 0xD0, 0xA0);
+}
+
+// ==================== 主函数 ====================
+
+void setup() {
+    Serial.begin(115200);
+    delay(2000);
+    
+    Serial.println("灵犀 v0312P - IPS滚动UI");
+    
+    pinMode(PIN_CS, OUTPUT);   digitalWrite(PIN_CS, HIGH);
+    pinMode(PIN_DC, OUTPUT);   digitalWrite(PIN_DC, HIGH);
+    pinMode(PIN_RST, OUTPUT);  digitalWrite(PIN_RST, HIGH);
+    pinMode(PIN_MOSI, OUTPUT); digitalWrite(PIN_MOSI, LOW);
+    pinMode(PIN_SCLK, OUTPUT); digitalWrite(PIN_SCLK, LOW);
+    
+    lcd_init();
+    Serial.println("屏幕初始化完成");
+    
+    // 第一页直接画
+    fill_rect(0, 0, WIDTH, HEIGHT, C_DARK);
+    Serial.println("UI启动");
+}
+
+void loop() {
+    // 页面循环：每页停留4秒
+    while (true) {
+        page_room_status(0,0,0,0);
+        delay(4500);
+        yield();
+        
+        page_energy(0,0,0,0);
+        delay(4500);
+        yield();
+        
+        page_system(0,0,0,0);
+        delay(4500);
+        yield();
+    }
+}

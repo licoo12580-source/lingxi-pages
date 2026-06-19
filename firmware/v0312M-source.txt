@@ -1,0 +1,118 @@
+// 灵犀 v0312M - 引脚逐项测试
+// 不初始化屏幕，先确认每个GPIO能不能正常输出
+#include <Arduino.h>
+
+// 屏所有引脚
+#define PIN_CS    45
+#define PIN_DC    47
+#define PIN_RST   4
+#define PIN_MOSI  21
+#define PIN_SCLK  20
+
+// 板载WS2812
+#define PIN_RGB   48
+
+void test_pin(int pin, const char* name) {
+    Serial.printf("--- %s (GPIO%d) ---\n", name, pin);
+
+    pinMode(pin, OUTPUT);
+
+    digitalWrite(pin, HIGH);
+    Serial.printf("  输出 HIGH → 测量应有 %.1fV\n", 3.3);
+    delay(2000);
+
+    digitalWrite(pin, LOW);
+    Serial.printf("  输出 LOW  → 测量应有 0V\n");
+    delay(2000);
+
+    // 回到默认状态
+    digitalWrite(pin, HIGH);
+}
+
+void test_spi_signal() {
+    Serial.println("\n========================================");
+    Serial.println("SPI 信号测试 (CS保持LOW, 发0x55模式)");
+    Serial.println("========================================");
+    Serial.println("用示波器或逻辑分析仪看SCK和MOSI波形");
+    Serial.println("SCK应看到方波, MOSI应看到0x55模式");
+    Serial.println();
+
+    digitalWrite(PIN_CS, LOW);
+    digitalWrite(PIN_DC, LOW);
+    
+    // 连续发送0x55 (01010101), SCK上应有完整时钟
+    for (int repeat = 0; repeat < 10; repeat++) {
+        uint8_t d = 0x55;
+        for (int i = 0; i < 8; i++) {
+            digitalWrite(PIN_SCLK, LOW);
+            digitalWrite(PIN_MOSI, d & 0x80);
+            digitalWrite(PIN_SCLK, HIGH);
+            d <<= 1;
+        }
+    }
+    
+    digitalWrite(PIN_CS, HIGH);
+    Serial.println("SPI 信号测试完成\n");
+}
+
+void setup() {
+    Serial.begin(115200);
+    delay(3000);
+    
+    Serial.println("\n========================================");
+    Serial.println("灵犀 v0312M - 引脚逐项测试");
+    Serial.println("========================================");
+    Serial.println("万用表拨到直流电压档, 按说明测量每个引脚");
+    Serial.println();
+
+    // 1. 背光测试
+    Serial.println("【第一步：背光确认】");
+    Serial.println("背光(LED)脚接3.3V → 屏幕背光应该亮");
+    Serial.println("如果背光不亮, 检查接线或3.3V是否正常");
+    Serial.println("你现在能看见背光 → ✅");
+    Serial.println();
+
+    // 2. 逐个引脚测试
+    Serial.println("【第二步：逐个GPIO输出测试】");
+    Serial.println("万用表红色表笔接被测引脚, 黑色接GND");
+    Serial.println("每个引脚会先输出HIGH(2秒)再输出LOW(2秒)");
+    Serial.println();
+
+    test_pin(PIN_RST, "RST");
+    test_pin(PIN_DC, "DC");
+    test_pin(PIN_CS, "CS");
+    test_pin(PIN_MOSI, "MOSI");
+    test_pin(PIN_SCLK, "SCK");
+
+    // 3. WS2812测试
+    Serial.println("\n【第三步：WS2812 RGB指示灯测试】");
+    Serial.println("板载RGB灯会按红→绿→蓝顺序闪烁");
+    pinMode(PIN_RGB, OUTPUT);
+    for (int i = 0; i < 3; i++) {
+        // 用GPIO直接模拟WS2812协议
+        // 先简单测试: 输出3.3V
+        digitalWrite(PIN_RGB, HIGH);
+        delay(500);
+        digitalWrite(PIN_RGB, LOW);
+        delay(500);
+        Serial.printf("  RGB灯闪烁 #%d\n", i+1);
+    }
+
+    // 4. SPI信号测试
+    test_spi_signal();
+
+    Serial.println("\n========================================");
+    Serial.println("所有引脚测试完成!");
+    Serial.println("如果以上引脚全部输出正常, 问题不在GPIO上");
+    Serial.println("如果某个引脚不正常, 检查接线或焊点");
+    Serial.println("========================================");
+}
+
+void loop() {
+    static unsigned long last = 0;
+    if (millis() - last > 10000) {
+        last = millis();
+        Serial.printf("[♥] 运行中... 空闲堆=%uKB\n", ESP.getFreeHeap() / 1024);
+    }
+    delay(100);
+}

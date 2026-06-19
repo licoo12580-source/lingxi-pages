@@ -60,7 +60,20 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 <script>
 const versions = [
   {
-    ver: "v0312L",
+    ver: "v0312M",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["引脚测试"],
+    file: "v0312M.bin",
+    sha256: "85e3d78cc2a0e6a5ee1ab5fc3c028a6c68133288e608877ffd7948311b8b21c9",
+    size: "354KB",
+    driver: "-",
+    desc: "引脚逐项测试固件：逐个GPIO输出HIGH→LOW，串口提示用万用表测量",
+    changelog: "🔧 逐个测试RST/DC/CS/MOSI/SCK引脚\\n🔧 SPI信号模式测试(0x55)\\n🔧 背光确认\\n🔧 不初始化屏幕，只做GPIO电平测试",
+    hw: "HW-678A N16R8, 4寸屏",
+    recommend: true
+  },
+  {
     date: "2026-06-20",
     status: "latest",
     tags: ["bit-bang", "厂家序列"],

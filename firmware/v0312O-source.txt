@@ -130,8 +130,9 @@ void lcd_init() {
 
     // --- 3A: Interface Pixel Format ---
     wr_cmd(0x3A);
-    wr_data(0x55);  // 0x55 = 16-bit color (0x66 = 18-bit)
-    // 注：厂家4SPI程序用0x66(18bit)，但为匹配fill_screen的16bit模式用0x55
+    // 厂家4SPI测试程序用0x66(18bit)，每像素3字节
+    // fill_screen必须发3字节/像素
+    wr_data(0x66);
 
     // --- 21: Display Inversion ON ---
     wr_cmd(0x21);
@@ -149,9 +150,22 @@ void lcd_init() {
     Serial.println("[INIT] 初始化完成!");
 }
 
-// ==================== 填充屏幕 ====================
+// ==================== 填充屏幕（18位色） ====================
 
-void fill_screen(uint16_t color) {
+void fill_screen(uint16_t color565) {
+    // RGB565 → RGB666 (每像素3字节)
+    uint8_t r = (color565 >> 8) & 0xF8;  // R[7:3] top 5 bits
+    uint8_t g = (color565 >> 3) & 0xFC;  // G[7:2] top 6 bits
+    uint8_t b = (color565 << 3) & 0xF8;  // B[7:3] top 5 bits
+    // r/g/b now each have the top 8 bits with bottom bits = 0
+    // But we need 6-bit values shifted up by 2
+    // R: take top 5 bits (r), convert to 6 bits: r | (r >> 5)
+    // Actually simpler: just use the values directly
+    // R6 = r | (r >> 5), G6 = g, B6 = b | (b >> 5)
+    uint8_t r6 = r | (r >> 5);  // 5bit→6bit
+    uint8_t g6 = g;             // already 6bit
+    uint8_t b6 = b | (b >> 5);  // 5bit→6bit
+
     // CASET: Column Address Set
     wr_cmd(0x2A);
     wr_data(0x00); wr_data(0x00);
@@ -167,8 +181,9 @@ void fill_screen(uint16_t color) {
     digitalWrite(PIN_CS, LOW);
     digitalWrite(PIN_DC, HIGH);
     for (int i = 0; i < TFT_WIDTH * TFT_HEIGHT; i++) {
-        spi_byte(color >> 8);
-        spi_byte(color & 0xFF);
+        spi_byte(r6);  // R: 6 bits in top 6, bottom 2 = 0
+        spi_byte(g6);  // G: 6 bits in top 6, bottom 2 = 0
+        spi_byte(b6);  // B: 6 bits in top 6, bottom 2 = 0
     }
     digitalWrite(PIN_CS, HIGH);
 }
@@ -201,23 +216,34 @@ void color_bar_test() {
     // 画六条竖色带
     int bar_w = TFT_WIDTH / 6;
     
+    // RGB565颜色列表
+    uint16_t colors[] = {0xF800, 0x07E0, 0x001F, 0xFFE0, 0xF81F, 0xFFFF};
+    
     for (int bar = 0; bar < 6; bar++) {
-        uint16_t colors[] = {0xF800, 0x07E0, 0x001F, 0xFFE0, 0xF81F, 0xFFFF};
+        uint16_t c = colors[bar];
+        uint8_t r6 = ((c >> 8) & 0xF8) | (((c >> 8) & 0xF8) >> 5);
+        uint8_t g6 = (c >> 3) & 0xFC;
+        uint8_t b6 = ((c << 3) & 0xF8) | (((c << 3) & 0xF8) >> 5);
+        
+        int x0 = bar * bar_w;
+        int x1 = (bar + 1) * bar_w - 1;
+        if (bar == 5) x1 = TFT_WIDTH - 1;  // 确保最后一根填满
         
         wr_cmd(0x2A);
-        wr_data(0x00); wr_data(bar * bar_w);
-        wr_data(0x01); wr_data((bar + 1) * bar_w - 1);
+        wr_data(x0 >> 8); wr_data(x0 & 0xFF);
+        wr_data(x1 >> 8); wr_data(x1 & 0xFF);
         
         wr_cmd(0x2B);
         wr_data(0x00); wr_data(0x00);
-        wr_data(0x01); wr_data(0x3F);
+        wr_data(0x01); wr_data(0xDF);
         
         wr_cmd(0x2C);
         digitalWrite(PIN_CS, LOW);
         digitalWrite(PIN_DC, HIGH);
         for (int i = 0; i < bar_w * TFT_HEIGHT; i++) {
-            spi_byte(colors[bar] >> 8);
-            spi_byte(colors[bar] & 0xFF);
+            spi_byte(r6);
+            spi_byte(g6);
+            spi_byte(b6);
         }
         digitalWrite(PIN_CS, HIGH);
     }

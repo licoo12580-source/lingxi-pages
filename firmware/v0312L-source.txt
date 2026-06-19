@@ -1,0 +1,179 @@
+// 灵犀 v0312L - 全手撸GPIO bit-bang SPI，不使用任何SPI库
+#include <Arduino.h>
+#include <Adafruit_NeoPixel.h>
+
+Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
+
+#define PIN_CS    45
+#define PIN_DC    47
+#define PIN_RST   4
+#define PIN_MOSI  21
+#define PIN_SCLK  20
+
+void spi_byte(uint8_t d) {
+    for (int i = 0; i < 8; i++) {
+        digitalWrite(PIN_SCLK, LOW);
+        if (d & 0x80) digitalWrite(PIN_MOSI, HIGH);
+        else          digitalWrite(PIN_MOSI, LOW);
+        digitalWrite(PIN_SCLK, HIGH);
+        d <<= 1;
+    }
+}
+
+void spi_word(uint16_t d) {
+    spi_byte(d >> 8);
+    spi_byte(d & 0xFF);
+}
+
+void wr_cmd(uint8_t cmd) {
+    digitalWrite(PIN_DC, LOW);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(cmd);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void wr_data(uint8_t d) {
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(d);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void wr_data_ncs(uint8_t d) {
+    // 不 toggle CS，用于连续数据块
+    digitalWrite(PIN_DC, HIGH);
+    spi_byte(d);
+}
+
+void init_display() {
+    // Reset: HIGH(1ms) → LOW(10ms) → HIGH(120ms)
+    digitalWrite(PIN_RST, HIGH); delay(1);
+    digitalWrite(PIN_RST, LOW);  delay(10);
+    digitalWrite(PIN_RST, HIGH); delay(120);
+
+    // Gamma positive (0xE0)
+    wr_cmd(0xE0);
+    wr_data(0x00); wr_data(0x09); wr_data(0x0C); wr_data(0x03);
+    wr_data(0x10); wr_data(0x06); wr_data(0x34); wr_data(0x68);
+    wr_data(0x49); wr_data(0x02); wr_data(0x0A); wr_data(0x07);
+    wr_data(0x2C); wr_data(0x31); wr_data(0x0F);
+
+    // Gamma negative (0xE1)
+    wr_cmd(0xE1);
+    wr_data(0x00); wr_data(0x12); wr_data(0x15); wr_data(0x02);
+    wr_data(0x10); wr_data(0x06); wr_data(0x35); wr_data(0x35);
+    wr_data(0x4A); wr_data(0x05); wr_data(0x10); wr_data(0x0C);
+    wr_data(0x2F); wr_data(0x33); wr_data(0x0F);
+
+    // Power Control
+    wr_cmd(0xC0); wr_data(0x0F); wr_data(0x0F);
+    wr_cmd(0xC1); wr_data(0x44);
+    wr_cmd(0xC5); wr_data(0x00); wr_data(0x66); wr_data(0x80);
+
+    // MADCTL
+    wr_cmd(0x36); wr_data(0x48);
+
+    // Pixel format (16-bit)
+    wr_cmd(0x3A); wr_data(0x55);
+
+    // Frame rate
+    wr_cmd(0xB1); wr_data(0xA0); wr_data(0x11);
+
+    // Display inversion
+    wr_cmd(0xB4); wr_data(0x02);
+
+    // 0xEE
+    wr_cmd(0xEE); wr_data(0x00); wr_data(0x04);
+
+    // 0xE9
+    wr_cmd(0xE9); wr_data(0x00);
+
+    // 0xF7 - Panel Interface Control
+    wr_cmd(0xF7); wr_data(0xA9); wr_data(0x51); wr_data(0x2C); wr_data(0x82);
+
+    // Display inversion ON
+    wr_cmd(0x21);
+
+    // Sleep out
+    wr_cmd(0x11);
+    delay(120);
+
+    // Display ON
+    wr_cmd(0x29);
+    delay(50);
+}
+
+void fill_screen(uint16_t color) {
+    digitalWrite(PIN_CS, LOW);
+
+    // CASET
+    digitalWrite(PIN_DC, LOW); spi_byte(0x2A);
+    digitalWrite(PIN_DC, HIGH); spi_byte(0x00); spi_byte(0x00); spi_byte(0x01); spi_byte(0xDF);
+
+    // RASET
+    digitalWrite(PIN_DC, LOW); spi_byte(0x2B);
+    digitalWrite(PIN_DC, HIGH); spi_byte(0x00); spi_byte(0x00); spi_byte(0x01); spi_byte(0x3F);
+
+    // RAMWR - 连续像素数据，CS保持LOW
+    digitalWrite(PIN_DC, LOW); spi_byte(0x2C);
+    digitalWrite(PIN_DC, HIGH);
+    for (int i = 0; i < 480 * 320; i++) {
+        spi_word(color);
+    }
+
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void setup() {
+    // WS2812 RGB指示
+    pixels.begin(); pixels.setBrightness(50);
+    pixels.setPixelColor(0, pixels.Color(100, 0, 0)); pixels.show();
+
+    // 串口用 Serial (UART0 - 走COM口)
+    Serial.begin(115200); delay(2000);
+    Serial.println("\n=== v0312L 全手撸GPIO bit-bang SPI ===\n");
+
+    // 初始化GPIO
+    pinMode(PIN_CS, OUTPUT);   digitalWrite(PIN_CS, HIGH);
+    pinMode(PIN_DC, OUTPUT);   digitalWrite(PIN_DC, HIGH);
+    pinMode(PIN_RST, OUTPUT);  digitalWrite(PIN_RST, HIGH);
+    pinMode(PIN_MOSI, OUTPUT); digitalWrite(PIN_MOSI, LOW);
+    pinMode(PIN_SCLK, OUTPUT); digitalWrite(PIN_SCLK, LOW);
+
+    Serial.println("GPIO初始化完成");
+
+    // 初始化屏幕
+    Serial.print("初始化屏幕... ");
+    init_display();
+    Serial.println("OK");
+
+    // 填色
+    Serial.print("填红色... ");
+    fill_screen(0xF800);
+    Serial.println("OK");
+    pixels.setPixelColor(0, pixels.Color(0, 100, 0)); pixels.show();
+    delay(3000);
+
+    Serial.print("填绿色... ");
+    fill_screen(0x07E0);
+    Serial.println("OK");
+    delay(3000);
+
+    Serial.print("填蓝色... ");
+    fill_screen(0x001F);
+    Serial.println("OK");
+    delay(3000);
+
+    Serial.print("填白色... ");
+    fill_screen(0xFFFF);
+    Serial.println("OK");
+    delay(3000);
+
+    Serial.println("\n=== 测试完成 ===");
+    pixels.setPixelColor(0, pixels.Color(0, 0, 100)); pixels.show();
+}
+
+void loop() {
+    delay(5000);
+    Serial.printf("[♥] 空闲堆=%uKB\n", ESP.getFreeHeap() / 1024);
+}

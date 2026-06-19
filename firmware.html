@@ -60,7 +60,20 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 <script>
 const versions = [
   {
-    ver: "v0312K",
+    ver: "v0312L",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["bit-bang", "厂家序列"],
+    file: "v0312L.bin",
+    sha256: "192722920756a93c2382efa568d1d374946aa7bcfb19ec212319f8e3ae862fb0",
+    size: "350KB",
+    driver: "待定",
+    desc: "全手撸GPIO bit-bang SPI + 厂家初始化序列 + 串口走COM口",
+    changelog: "🔧 完全不用Arduino SPI库，手写GPIO电平控制\\n🔧 厂家完整初始化序列\\n🔧 PSRAM开启、USB CDC关闭\\n🔧 Serial走UART0(COM口)能看到完整输出",
+    hw: "HW-678A N16R8, 4寸屏",
+    recommend: true
+  },
+  {
     date: "2026-06-20",
     status: "latest",
     tags: ["厂家序列", "板型修正"],

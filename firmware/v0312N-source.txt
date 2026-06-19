@@ -1,0 +1,171 @@
+// 灵犀 v0312N - 引脚测试 + 厂家序列（RST修正为GPIO48）
+#include <Arduino.h>
+
+// 屏引脚（按用户实际接线）
+#define PIN_CS    45
+#define PIN_DC    47
+#define PIN_RST   48   // ← 用户实际接的是48！
+#define PIN_MOSI  21
+#define PIN_SCLK  20
+
+void spi_byte(uint8_t d) {
+    for (int i = 0; i < 8; i++) {
+        digitalWrite(PIN_SCLK, LOW);
+        if (d & 0x80) digitalWrite(PIN_MOSI, HIGH);
+        else          digitalWrite(PIN_MOSI, LOW);
+        digitalWrite(PIN_SCLK, HIGH);
+        d <<= 1;
+    }
+}
+
+void wr_cmd(uint8_t cmd) {
+    digitalWrite(PIN_DC, LOW);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(cmd);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void wr_data(uint8_t d) {
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(d);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void init_display() {
+    Serial.println("RST复位序列开始...");
+    digitalWrite(PIN_RST, HIGH); delay(1);
+    digitalWrite(PIN_RST, LOW);  delay(10);
+    digitalWrite(PIN_RST, HIGH); delay(120);
+    Serial.println("RST复位完成");
+
+    // Gamma positive
+    wr_cmd(0xE0);
+    wr_data(0x00); wr_data(0x09); wr_data(0x0C); wr_data(0x03);
+    wr_data(0x10); wr_data(0x06); wr_data(0x34); wr_data(0x68);
+    wr_data(0x49); wr_data(0x02); wr_data(0x0A); wr_data(0x07);
+    wr_data(0x2C); wr_data(0x31); wr_data(0x0F);
+
+    // Gamma negative
+    wr_cmd(0xE1);
+    wr_data(0x00); wr_data(0x12); wr_data(0x15); wr_data(0x02);
+    wr_data(0x10); wr_data(0x06); wr_data(0x35); wr_data(0x35);
+    wr_data(0x4A); wr_data(0x05); wr_data(0x10); wr_data(0x0C);
+    wr_data(0x2F); wr_data(0x33); wr_data(0x0F);
+
+    // Power Control
+    wr_cmd(0xC0); wr_data(0x0F); wr_data(0x0F);
+    wr_cmd(0xC1); wr_data(0x44);
+    wr_cmd(0xC5); wr_data(0x00); wr_data(0x66); wr_data(0x80);
+
+    // MADCTL
+    wr_cmd(0x36); wr_data(0x48);
+
+    // Pixel format (16-bit)
+    wr_cmd(0x3A); wr_data(0x55);
+
+    // Frame rate
+    wr_cmd(0xB1); wr_data(0xA0); wr_data(0x11);
+
+    // Display inversion
+    wr_cmd(0xB4); wr_data(0x02);
+
+    // 0xEE
+    wr_cmd(0xEE); wr_data(0x00); wr_data(0x04);
+
+    // 0xE9
+    wr_cmd(0xE9); wr_data(0x00);
+
+    // 0xF7
+    wr_cmd(0xF7); wr_data(0xA9); wr_data(0x51); wr_data(0x2C); wr_data(0x82);
+
+    // Display inversion ON
+    wr_cmd(0x21);
+
+    // Sleep out
+    Serial.println("发送 Sleep Out (0x11)...");
+    wr_cmd(0x11);
+    delay(120);
+    Serial.println("Sleep Out 完成");
+
+    // Display ON
+    Serial.println("发送 Display ON (0x29)...");
+    wr_cmd(0x29);
+    delay(50);
+    Serial.println("Display ON 完成");
+}
+
+void fill_screen(uint16_t color) {
+    digitalWrite(PIN_CS, LOW);
+
+    // CASET
+    digitalWrite(PIN_DC, LOW); spi_byte(0x2A);
+    digitalWrite(PIN_DC, HIGH); spi_byte(0x00); spi_byte(0x00); spi_byte(0x01); spi_byte(0xDF);
+
+    // RASET
+    digitalWrite(PIN_DC, LOW); spi_byte(0x2B);
+    digitalWrite(PIN_DC, HIGH); spi_byte(0x00); spi_byte(0x00); spi_byte(0x01); spi_byte(0x3F);
+
+    // RAMWR
+    digitalWrite(PIN_DC, LOW); spi_byte(0x2C);
+    digitalWrite(PIN_DC, HIGH);
+    for (int i = 0; i < 480 * 320; i++) {
+        spi_byte(color >> 8);
+        spi_byte(color & 0xFF);
+    }
+
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void setup() {
+    Serial.begin(115200);
+    delay(3000);
+
+    Serial.println("\n========================================");
+    Serial.println("灵犀 v0312N - RST修正为GPIO48");
+    Serial.println("========================================");
+
+    // 初始化GPIO
+    pinMode(PIN_CS, OUTPUT);   digitalWrite(PIN_CS, HIGH);
+    pinMode(PIN_DC, OUTPUT);   digitalWrite(PIN_DC, HIGH);
+    pinMode(PIN_RST, OUTPUT);  digitalWrite(PIN_RST, HIGH);
+    pinMode(PIN_MOSI, OUTPUT); digitalWrite(PIN_MOSI, LOW);
+    pinMode(PIN_SCLK, OUTPUT); digitalWrite(PIN_SCLK, LOW);
+
+    Serial.printf("RST=GPIO%d, DC=GPIO%d, CS=GPIO%d\n", PIN_RST, PIN_DC, PIN_CS);
+    Serial.printf("MOSI=GPIO%d, SCK=GPIO%d\n", PIN_MOSI, PIN_SCLK);
+    Serial.println();
+
+    // 初始化屏幕
+    Serial.print("初始化屏幕... ");
+    init_display();
+
+    // 填红色
+    Serial.print("填红色... ");
+    fill_screen(0xF800);
+    Serial.println("OK → 屏幕应该是全红");
+    delay(4000);
+
+    // 填绿色
+    Serial.print("填绿色... ");
+    fill_screen(0x07E0);
+    Serial.println("OK → 屏幕应该是全绿");
+    delay(4000);
+
+    // 填蓝色
+    Serial.print("填蓝色... ");
+    fill_screen(0x001F);
+    Serial.println("OK → 屏幕应该是全蓝");
+    delay(4000);
+
+    Serial.println("\n=== 测试完成 ===");
+}
+
+void loop() {
+    static unsigned long last = 0;
+    if (millis() - last > 5000) {
+        last = millis();
+        Serial.printf("[♥] 运行中 heap=%uKB\n", ESP.getFreeHeap() / 1024);
+    }
+    delay(100);
+}

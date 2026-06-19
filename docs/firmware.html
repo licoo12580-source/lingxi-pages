@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🦞 灵犀 · 固件下载中心</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:system-ui,sans-serif;padding:30px 20px;max-width:900px;margin:0 auto}
+h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sub{color:#64748b;font-size:13px;margin-bottom:6px}
+.nav{display:flex;gap:10px;margin-bottom:24px}
+.nav a{color:#94a3b8;font-size:13px;text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid #334155}
+.nav a:hover{border-color:#3b82f6;color:#60a5fa}
+.search-bar{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 14px;width:100%;color:#e2e8f0;font-size:13px;margin-bottom:16px}
+.search-bar:focus{outline:none;border-color:#3b82f6}
+.stats{color:#64748b;font-size:12px;margin-bottom:12px}
+.fw-card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.fw-name{font-size:14px;font-weight:600;min-width:110px;font-family:'Courier New',monospace}
+.fw-info{font-size:11px;color:#64748b;flex:1}
+.fw-info span{margin-right:12px}
+.fw-actions{display:flex;gap:6px;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:6px;font-size:12px;border:none;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn.dl{background:#3b82f6;color:#fff}
+.btn.dl:hover{background:#2563eb}
+.btn.review{background:#8b5cf6;color:#fff}
+.btn.review:hover{background:#7c3aed}
+.btn.source{background:#059669;color:#fff}
+.btn.source:hover{background:#047857}
+/* 源码弹窗 */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000}
+.modal.active{display:block}
+.modal-bg{position:absolute;width:100%;height:100%;background:rgba(0,0,0,0.7)}
+.modal-content{position:relative;width:90%;max-width:800px;max-height:85vh;margin:5vh auto;background:#0f172a;border:1px solid #334155;border-radius:12px;display:flex;flex-direction:column}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #334155}
+.modal-title{font-size:14px;font-weight:600}
+.modal-close{background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer;padding:0 4px}
+.modal-close:hover{color:#ef4444}
+.modal-body{padding:16px 20px;overflow:auto;flex:1}
+.modal-body pre{background:#020617;padding:14px;border-radius:8px;font-size:11px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:#e2e8f0;max-height:60vh}
+.copy-btn{margin-top:10px;padding:6px 14px;background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:6px;font-size:12px;cursor:pointer}
+.copy-btn:hover{background:#475569}
+.loading{text-align:center;padding:40px;color:#64748b}
+.empty{text-align:center;padding:40px;color:#64748b}
+</style>
+</head>
+<body>
+<h1>🦞 灵犀 · 固件下载中心</h1>
+<p class="sub">所有固件版本 · 点 ⬇下载BIN · 点 📝查看源码发给其他智能体审查</p>
+<div class="nav">
+  <a href="index.html">← 返回首页</a>
+  <a href="upload.html">📤 上传/粘贴资料</a>
+</div>
+
+<input class="search-bar" type="text" id="search" placeholder="搜索固件版本..." oninput="filterFirmware()">
+
+<div class="stats" id="stats"></div>
+<div id="fwList"></div>
+
+<!-- 源码弹窗 -->
+<div class="modal" id="sourceModal">
+  <div class="modal-bg" onclick="closeSource()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">源码</span>
+      <button class="modal-close" onclick="closeSource()">✕</button>
+    </div>
+    <div class="modal-body">
+      <pre id="sourceCode">加载中...</pre>
+      <button class="copy-btn" onclick="copySource()">📋 复制源码</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const OWNER = 'licoo12580-source';
+const REPO = 'lingxi-pages';
+const BRANCH = 'main';
+const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/firmware`;
+
+let firmwareList = [];
+
+async function loadFirmware() {
+  const listEl = document.getElementById('fwList');
+  const statsEl = document.getElementById('stats');
+  listEl.innerHTML = '<div class="loading">⏳ 加载固件列表...</div>';
+
+  try {
+    const resp = await fetch(API);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const files = await resp.json();
+    
+    // 过滤出 .bin 文件，排序（最新的排最前）
+    const bins = files.filter(f => f.name.endsWith('.bin')).sort((a, b) => b.name.localeCompare(a.name));
+    
+    // 对有 source 文件的版本做标记
+    firmwareList = bins.map(f => {
+      const base = f.name.replace('.bin', '');
+      const sourceUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/firmware/${base}-source.txt`;
+      return {
+        name: f.name,
+        size: f.size,
+        url: f.download_url,
+        base: base,
+        sourceUrl: sourceUrl,
+        hasSource: files.some(x => x.name === base + '-source.txt')
+      };
+    });
+
+    statsEl.textContent = `共 ${firmwareList.length} 个固件版本`;
+    renderList();
+  } catch (e) {
+    listEl.innerHTML = `<div class="empty">❌ 加载失败: ${e.message}</div>`;
+  }
+}
+
+function renderList() {
+  const listEl = document.getElementById('fwList');
+  const searchTerm = document.getElementById('search').value.toLowerCase();
+  
+  const filtered = firmwareList.filter(f => f.name.toLowerCase().includes(searchTerm));
+  
+  // 格式化大小
+  function fmtSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(0) + ' KB';
+    return (bytes/1024/1024).toFixed(1) + ' MB';
+  }
+  
+  listEl.innerHTML = filtered.map(f => `
+    <div class="fw-card">
+      <div class="fw-name">${f.name}</div>
+      <div class="fw-info">
+        <span>📦 ${fmtSize(f.size)}</span>
+        ${f.hasSource ? '<span>📄 有源码</span>' : ''}
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="${f.url}" download>⬇ 下载</a>
+        <button class="btn ${f.hasSource ? 'source' : 'review'}" onclick="${f.hasSource ? `viewSource('${f.name}', '${f.sourceUrl}')` : `viewSource('${f.name}', '')`}">
+          ${f.hasSource ? '📝 查看源码' : '📝 查看源码'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterFirmware() {
+  renderList();
+}
+
+let currentSource = '';
+
+async function viewSource(name, url) {
+  document.getElementById('modalTitle').textContent = `源码: ${name}`;
+  document.getElementById('sourceCode').textContent = '加载中...';
+  document.getElementById('sourceModal').classList.add('active');
+  
+  if (!url) {
+    document.getElementById('sourceCode').textContent = '⚠️ 该版本没有上传源码文件';
+    return;
+  }
+  
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('源码文件不存在 (HTTP ' + resp.status + ')');
+    const text = await resp.text();
+    currentSource = text;
+    document.getElementById('sourceCode').textContent = text;
+  } catch (e) {
+    document.getElementById('sourceCode').textContent = '⚠️ ' + e.message;
+    currentSource = '';
+  }
+}
+
+function closeSource() {
+  document.getElementById('sourceModal').classList.remove('active');
+}
+
+function copySource() {
+  if (!currentSource) return;
+  navigator.clipboard.writeText(currentSource).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ 已复制';
+    setTimeout(() => { btn.textContent = '📋 复制源码'; }, 2000);
+  }).catch(() => {
+    alert('复制失败，请手动选中文本复制');
+  });
+}
+
+// ESC关闭
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSource(); });
+
+loadFirmware();
+</script>
+</body>
+</html>

@@ -91,6 +91,19 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 <script>
 const versions = [
   {
+    ver: "v0312S",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["中文UI", "推荐"],
+    file: "v0312S.bin",
+    size: "287KB",
+    driver: "ILI9488 (bit-bang)",
+    desc: "中文UI三页空间感知（能耗概况+环境感知+安防），内嵌中文字库，方向修正，关闭PSRAM，合并镜像已解决SHA校验问题",
+    changelog: "✅ 中文UI：能耗概况/环境感知/安防 三页自动切换\\n✅ 内嵌59字16x16点阵中文\\n✅ 方向修正 MADCTL=0x48\\n✅ 关闭PSRAM（全擦+烧合并镜像可修复bootloader）\\n✅ 厂家4SPI初始化序列（18-bit色）\\n✅ v0312S = 中文版 v0312Q",
+    hw: "HW-678A N16R8, CL40BC299-40A ILI9488 4寸",
+    recommend: true
+  },
+  {
     ver: "v0312N",
     date: "2026-06-20",
     status: "latest",

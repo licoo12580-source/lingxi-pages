@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灵犀 · 节能管理后台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:system-ui,sans-serif;padding:0;min-height:100vh}
+/* 顶栏 */
+.top{background:#0f172a;border-bottom:1px solid #1e293b;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.top .ti{font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px}
+.top .ti span{color:#22c55e}
+.top .sr{display:flex;gap:8px;align-items:center;font-size:11px;color:#64748b}
+.top .sr .dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:3px}
+.top .sr .dot.on{background:#22c55e}
+/* 面板 */
+.p{max-width:1200px;margin:0 auto;padding:16px 20px}
+/* 统计卡片 */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.sc{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px}
+.sc .sl{font-size:10px;color:#64748b;margin-bottom:2px}
+.sc .sv{font-size:24px;font-weight:600}
+.sc .sv.g{color:#22c55e}
+.sc .sv.b{color:#60a5fa}
+.sc .sv.p{color:#8b5cf6}
+.sc .sv.o{color:#f59e0b}
+.sc .ss{font-size:9px;color:#475569;margin-top:2px}
+/* 图表占位 */
+.chart-wrap{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:14px}
+.chart-wrap .ct{font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.chart-wrap .ct .cct{font-size:10px;color:#64748b;font-weight:400}
+.chart-area{height:180px;display:flex;align-items:flex-end;gap:6px;padding:0 4px}
+.chart-area .bar{flex:1;display:flex;flex-direction:column;align-items:center}
+.chart-area .bar .bv{height:var(--h);background:linear-gradient(to top,#22c55e,#4ade80);border-radius:4px 4px 0 0;width:60%;min-height:4px;transition:height .3s}
+.chart-area .bar .bl{font-size:8px;color:#64748b;margin-top:4px}
+/* 房间列表 */
+.dev-table{width:100%;border-collapse:collapse;font-size:11px}
+.dev-table th{text-align:left;padding:8px 10px;color:#64748b;font-weight:500;border-bottom:1px solid #334155}
+.dev-table td{padding:7px 10px;border-bottom:1px solid #0f172a;color:#94a3b8}
+.dev-table tr:hover td{background:#1e293b44}
+.dev-table .status{padding:2px 8px;border-radius:4px;font-size:9px}
+.dev-table .status.on{background:#22c55e22;color:#22c55e}
+.dev-table .status.off{background:#ef444422;color:#ef4444}
+.dev-table .status.eco{background:#22c55e22;color:#22c55e}
+/* 时间选择 */
+.time-filter{display:flex;gap:4px;margin-bottom:10px}
+.time-filter .tf{padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;border:1px solid #334155;color:#64748b;background:transparent}
+.time-filter .tf.active{background:#22c55e11;border-color:#22c55e44;color:#22c55e}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="ti">🦞 <span>灵犀</span> · 节能管理</div>
+  <div class="sr">
+    <span><span class="dot on"></span>在线</span>
+    <span id="deviceCount">0台设备</span>
+    <span id="lastUpdate">刚刚</span>
+  </div>
+</div>
+<div class="p">
+
+<!-- 统计卡片 -->
+<div class="stats">
+  <div class="sc"><div class="sl">今日省电</div><div class="sv g" id="todaySaved">--</div><div class="ss">kWh</div></div>
+  <div class="sc"><div class="sl">本月省电</div><div class="sv b" id="monthSaved">--</div><div class="ss">kWh</div></div>
+  <div class="sc"><div class="sl">省电金额</div><div class="sv p" id="moneySaved">--</div><div class="ss">¥</div></div>
+  <div class="sc"><div class="sl">节能率</div><div class="sv o" id="savingRate">--</div><div class="ss">%</div></div>
+</div>
+
+<!-- 时间筛选 -->
+<div class="time-filter">
+  <div class="tf active" onclick="switchTime('24h',this)">24小时</div>
+  <div class="tf" onclick="switchTime('7d',this)">近7天</div>
+  <div class="tf" onclick="switchTime('30d',this)">近30天</div>
+</div>
+
+<!-- 趋势图 -->
+<div class="chart-wrap">
+  <div class="ct">节能趋势 <span class="cct" id="chartLabel">今日每时段省电量</span></div>
+  <div class="chart-area" id="chartArea"></div>
+</div>
+
+<!-- 设备列表 -->
+<div class="chart-wrap">
+  <div class="ct">设备列表 <span class="cct" id="deviceSub">实时数据</span></div>
+  <table class="dev-table">
+    <thead><tr><th>设备</th><th>房间</th><th>温度</th><th>人数</th><th>今日省电</th><th>状态</th><th>最后上报</th></tr></thead>
+    <tbody id="deviceList"></tbody>
+  </table>
+</div>
+
+</div>
+
+<script>
+// ===== 模拟数据生成 =====
+function rand(min,max){return Math.random()*(max-min)+min}
+
+function generateChartData(points){
+  var data=[];
+  for(var i=0;i<points;i++){
+    data.push({label:(6+i%24)+':00',value:rand(0.05,0.35)});
+  }
+  return data;
+}
+
+function generateDevices(count){
+  var names=['RD2450','AR780','S3主控'];
+  var rooms=['301','302','303','304','305','306','307','308'];
+  var devices=[];
+  for(var i=0;i<count;i++){
+    var h=rand(22,27).toFixed(1);
+    devices.push({
+      id:'LINGXI-'+(1001+i),
+      room: rooms[i%rooms.length],
+      temp: h,
+      people: Math.random()>0.4?1:0,
+      saved: rand(0.5,3.2).toFixed(2),
+      status: Math.random()>0.15?'on':'eco',
+      lastReport: Math.floor(Math.random()*120)+'秒前'
+    });
+  }
+  return devices;
+}
+
+// ===== 渲染 =====
+function renderChart(timeRange){
+  var points = timeRange==='24h'?12:timeRange==='7d'?7:30;
+  var data = generateChartData(points);
+  var area = document.getElementById('chartArea');
+  var maxVal = Math.max.apply(null,data.map(function(d){return d.value;}));
+  area.innerHTML = data.map(function(d){
+    var pct = (d.value/maxVal*100).toFixed(0);
+    return '<div class="bar"><div class="bv" style="--h:'+pct+'%"></div><div class="bl">'+d.label+'</div></div>';
+  }).join('');
+  document.getElementById('chartLabel').textContent = 
+    timeRange==='24h'?'今日每时段省电量':timeRange==='7d'?'近7天省电量':'近30天省电量';
+}
+
+function renderDevices(){
+  var devices = generateDevices(8);
+  var tbody = document.getElementById('deviceList');
+  tbody.innerHTML = devices.map(function(d){
+    var statusText = d.status==='on'?'在线':'节能中';
+    var statusClass = d.status==='on'?'on':'eco';
+    return '<tr><td style="font-family:monospace;color:#e2e8f0">'+d.id+'</td><td>'+d.room+'房</td><td>'+d.temp+'°C</td><td>'+(d.people>0?'👤 1人':'无人')+'</td><td style="color:#22c55e">'+d.saved+' kWh</td><td><span class="status '+statusClass+'">'+statusText+'</span></td><td>'+d.lastReport+'</td></tr>';
+  }).join('');
+  
+  document.getElementById('deviceCount').textContent = devices.length+'台设备';
+  document.getElementById('deviceSub').textContent = devices.length+'台在线 · 实时数据';
+  
+  // 统计
+  var totalToday = devices.reduce(function(s,d){return s+parseFloat(d.saved);},0);
+  document.getElementById('todaySaved').textContent = totalToday.toFixed(1);
+  document.getElementById('monthSaved').textContent = (totalToday*30).toFixed(0);
+  document.getElementById('moneySaved').textContent = (totalToday*1.75).toFixed(2);
+  document.getElementById('savingRate').textContent = (15+Math.random()*10).toFixed(1);
+  document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+}
+
+var currentTime = '24h';
+function switchTime(t,el){
+  currentTime = t;
+  document.querySelectorAll('.time-filter .tf').forEach(function(f){f.classList.remove('active');});
+  el.classList.add('active');
+  renderChart(t);
+}
+
+renderChart('24h');
+renderDevices();
+setInterval(function(){renderChart(currentTime);renderDevices();},10000);
+</script>
+</body>
+</html>

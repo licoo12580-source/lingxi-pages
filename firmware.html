@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📡 灵犀固件下载</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--fg:#e2e8f0;--m:#64748b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding:16px;max-width:900px;margin:0 auto;font-size:14px}
+h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sub{color:var(--m);font-size:12px;margin-bottom:16px}
+.back{color:var(--accent);text-decoration:none;font-size:13px;display:inline-block;margin-bottom:12px}
+.back:hover{text-decoration:underline}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card h3{font-size:14px;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.tag-green{background:#14532d;color:var(--green)}
+.tag-blue{background:#1e3a5f;color:var(--accent)}
+.tag-red{background:#450a0a;color:var(--red)}
+.tag-gray{background:var(--border);color:var(--m)}
+.tag-orange{background:#451a03;color:var(--orange)}
+.firmware-item{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:all 0.2s}
+.firmware-item:hover{border-color:var(--accent);background:rgba(59,130,246,0.03)}
+.fw-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.fw-name{font-size:15px;font-weight:600}
+.fw-status{font-size:11px}
+.fw-meta{font-size:12px;color:var(--m);margin-bottom:6px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.fw-desc{font-size:13px;color:var(--fg);margin-bottom:8px;line-height:1.5}
+.fw-changelog{background:var(--bg);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--m);font-family:monospace;margin-bottom:8px;white-space:pre-wrap;line-height:1.5}
+.fw-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;text-decoration:none;display:inline-block}
+.btn-download{background:var(--accent);color:#fff}
+.btn-copy{background:transparent;border:1px solid var(--border);color:var(--m)}
+.btn-copy:hover{border-color:var(--accent);color:var(--fg)}
+.sha-text{font-family:monospace;font-size:11px;color:var(--m);word-break:break-all;background:var(--bg);padding:4px 8px;border-radius:4px;margin-top:4px;display:none}
+.sha-text.show{display:block}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;background:transparent;color:var(--m)}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.empty{color:var(--m);text-align:center;padding:24px;font-size:13px}
+@media(max-width:640px){.fw-header{flex-direction:column;align-items:start}}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">← 返回主页</a>
+<h1>📡 灵犀固件下载</h1>
+<div class="sub">HW-678A N16R8 (ESP32-S3 · 16MB Flash · 8MB PSRAM) · ILI9488 4寸屏</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="filterFW('all')" id="f-all">全部</button>
+  <button class="filter-btn" onclick="filterFW('recommend')" id="f-recommend">推荐</button>
+  <button class="filter-btn" onclick="filterFW('latest')" id="f-latest">最新</button>
+  <button class="filter-btn" onclick="filterFW('tested')" id="f-tested">已验证</button>
+</div>
+
+<div id="fw-list"></div>
+
+<script>
+const versions = [
+  {
+    ver: "v0312G",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["裸SPI", "修RST"],
+    file: "v0312G.bin",
+    sha256: "41cd41703387d1d17d366039dd4e4654fbb18e8ec6ef175585537846bb8c2a44",
+    size: "380KB",
+    driver: "ILI9488",
+    desc: "裸SPI驱动，RST改GPIO4避免冲突，SPI降速，先填四角色块后全屏",
+    changelog: "🔧 RST从GPIO48改到GPIO4（解决与WS2812共用引脚）\n🔧 SPI每bit加1μs延迟降速\n🔧 先画四角100x100色块后全屏",
+    hw: "HW-678A N16R8, ILI9488 4寸",
+    recommend: true
+  },
+  {
+    ver: "v0312F",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["裸SPI"],
+    file: "v0312F.bin",
+    sha256: "4f0df0472c68259b1a4c0af2b076aa97d593afbb66dfb97d988f41f6cc45afdd",
+    size: "372KB",
+    driver: "ILI9488",
+    desc: "裸SPI测试，不用TFT_eSPI库，直接GPIO发指令驱动ILI9488，红→绿→蓝全屏切换",
+    changelog: "🔧 去掉TFT_eSPI库依赖\n🔧 软件SPI bit-bang直写\n🔧 顺序填红→绿→蓝",
+    hw: "HW-678A N16R8, ILI9488 4寸"
+  },
+  {
+    ver: "v0312E",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["自检"],
+    file: "v0312E.bin",
+    sha256: "be6690d1c37093d3ab51f6297b19d0e2df5a54e60dbd7f074aaf78749af74a07",
+    size: "420KB",
+    driver: "ILI9488",
+    desc: "屏幕自检固件：填蓝底 + 画白框 + 红对角线 + 黄色大字OK，串口输出自检报告",
+    changelog: "🔍 串口输出芯片/Flash/PSRAM/SPI引脚信息\n🔍 fillScreen蓝底\n🔍 drawRect白边框\ndrawLine红对角线\ndrawString大黄字",
+    hw: "HW-678A N16R8, ILI9488 4寸"
+  },
+  {
+    ver: "v0312D",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["备选"],
+    file: "v0312D.bin",
+    sha256: "b827bc6702dd5d0bfba95c926123cf2836c2b9451899befc960b6c7cc2a347e1",
+    size: "420KB",
+    driver: "ST7796",
+    desc: "ST7796驱动版本，4寸屏如果实际是ST7796可试这个",
+    changelog: "🔧 换用ST7796_DRIVER\n其余不变",
+    hw: "HW-678A N16R8, 4寸屏(假设ST7796)"
+  },
+  {
+    ver: "v0312C",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["ILI9488", "16-bit"],
+    file: "v0312C.bin",
+    sha256: "d46c14efefe282d7e4c4b0d546de1f73445c5c918f1f2cbb52ac1b2251542bb5",
+    size: "416KB",
+    driver: "ILI9488",
+    desc: "ILI9488驱动，强制16-bit色彩模式（0x55），TFT_eSPI库",
+    changelog: "🔧 像素格式从18-bit(0x66)改为16-bit(0x55)\n🧪 部分4寸ILI9488屏只认16-bit",
+    hw: "HW-678A N16R8, ILI9488 4寸"
+  },
+  {
+    ver: "v0312B",
+    date: "2026-06-20",
+    status: "tested",
+    tags: ["DIO", "USE_HSPI"],
+    file: "v0312B.bin",
+    sha256: "6e92661fa2d9f50eee4f5f611316139cbe0dc38f78af3d5c339976fa531202da",
+    size: "416KB",
+    driver: "ILI9488",
+    desc: "DIO 40MHz + USE_HSPI_PORT，完全复制v0310A验证环境，只换ILI9488",
+    changelog: "🔧 flash_mode = dio 40MHz\n🔧 USE_HSPI_PORT\n🔧 PSRAM关闭, USB_MODE=0\n📝 屏初始化OK但实际不显示",
+    hw: "HW-678A N16R8, ILI9488 4寸"
+  },
+  {
+    ver: "v0311A",
+    date: "2026-06-19",
+    status: "tested",
+    tags: ["最小化"],
+    file: "v0311A-corrected.bin",
+    sha256: "4061059767bc4517860618504ccc1b378a3ceb005ea17028fb66b601b4cc024e",
+    size: "352KB",
+    driver: "ILI9488",
+    desc: "最小化测试：仅ILI9488初始化 + 蓝底白字 + 串口心跳",
+    changelog: "🧪 去掉触摸/多页面，只亮屏\n📝 串口输出：屏初始化OK，运行20秒后看门狗重启",
+    hw: "HW-678A N16R8, ILI9488 4寸"
+  },
+  {
+    ver: "v0310D",
+    date: "2026-06-19",
+    status: "",
+    tags: ["UI", "触摸"],
+    file: "v0310D-merged.bin",
+    sha256: "b17174da2c27e6401bdc60a78e1562784cb31927eed2a90b96ea510b0519a525",
+    size: "393KB",
+    driver: "ILI9488",
+    desc: "20个UI页面 + FT6336U触摸滑动翻页（源码丢失）",
+    changelog: "🖼️ ILI9488驱动\n🖐️ FT6336U触摸 (I2C SDA=35, SCL=36)\n📄 20个不同UI页面+滑动翻页\n⚠️ 从未成功启动（SHA校验失败）",
+    hw: "HW-678A N16R8, ILI9488 4寸, FT6336U"
+  },
+  {
+    ver: "v0310A",
+    date: "2026-06-19",
+    status: "tested",
+    tags: ["已验证", "基准"],
+    file: "v0310A-test-all-merged.bin",
+    sha256: "84e27ac317e277480248de5fade7daa0900efec66ab45d353de2544eeed799e5",
+    size: "435KB",
+    driver: "ILI9341",
+    desc: "ILI9341诊断固件，唯一验证可启动的版本（3.2寸屏）",
+    changelog: "✅ 芯片诊断(Flash/PSRAM/引脚)\n✅ ILI9341驱动初始化\n✅ WS2812诊断(绿闪=OK)\n✅ 串口完整信息输出",
+    hw: "HW-678A N16R8, ILI9341 3.2寸屏",
+    tested: true
+  }
+];
+
+function render() {
+  const list = document.getElementById('fw-list');
+  const filter = document.querySelector('.filter-btn.active')?.id?.replace('f-', '') || 'all';
+  
+  let filtered = versions;
+  if (filter === 'recommend') filtered = versions.filter(v => v.recommend);
+  else if (filter === 'latest') filtered = versions.filter(v => v.status === 'latest');
+  else if (filter === 'tested') filtered = versions.filter(v => v.status === 'tested' || v.tested);
+  
+  list.innerHTML = '';
+  for (const v of filtered) {
+    const tagsHtml = v.tags.map(t => {
+      const color = t.includes('裸') || t.includes('修') ? 'orange' :
+                    t === '自检' ? 'blue' :
+                    t === '备选' ? 'red' :
+                    t === '已验证' || t === '基准' ? 'green' : 'gray';
+      return `<span class="tag tag-${color}">${t}</span>`;
+    }).join(' ');
+    
+    const statusHtml = v.recommend ? '<span class="tag tag-green" style="margin-left:6px">推荐</span>' :
+                        v.tested ? '<span class="tag tag-green" style="margin-left:6px">已验证</span>' : '';
+    
+    const dlUrl = `firmware/${v.file}`;
+    
+    list.innerHTML += `
+      <div class="firmware-item" data-ver="${v.ver}">
+        <div class="fw-header">
+          <div>
+            <span class="fw-name">${v.ver}</span>${statusHtml}
+            <span style="font-size:12px;color:var(--m);margin-left:8px">${v.date}</span>
+          </div>
+          <div class="fw-status">${tagsHtml}</div>
+        </div>
+        <div class="fw-meta">
+          <span>📟 ${v.driver}</span>
+          <span>📦 ${v.size}</span>
+          <span>🔧 ${v.hw}</span>
+        </div>
+        <div class="fw-desc">${v.desc}</div>
+        <div class="fw-changelog">${v.changelog}</div>
+        <div class="fw-actions">
+          <a class="btn btn-download" href="${dlUrl}" download>⬇️ 下载 ${v.file}</a>
+          <button class="btn btn-copy" onclick="toggleSHA('${v.ver}')">🔑 SHA256</button>
+          <button class="btn btn-copy" onclick="copyLink('${dlUrl}')">🔗 复制链接</button>
+        </div>
+        <div class="sha-text" id="sha-${v.ver}">SHA256: ${v.sha256}</div>
+      </div>
+    `;
+  }
+  
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty">没有匹配的固件版本</div>';
+  }
+}
+
+function filterFW(type) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('f-' + type).classList.add('active');
+  render();
+}
+
+function toggleSHA(ver) {
+  const el = document.getElementById('sha-' + ver);
+  el.classList.toggle('show');
+}
+
+function copyLink(path) {
+  const url = window.location.origin + '/' + (window.location.pathname.split('/').filter(p => p).slice(0, -1).join('/') ? '' : 'lingxi-pages/') + path;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✅ 已复制';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
+render();
+</script>
+</body>
+</html>

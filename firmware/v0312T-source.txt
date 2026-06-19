@@ -399,27 +399,27 @@ void page_sec() {
 }// ==================== 主循环 ====================
 void setup() {
     Serial.begin(115200);
-    delay(2000);
-    
+    delay(500);
     Serial.println("灵犀 v0312T - 中文UI空间感知");
-    
+
     pinMode(PIN_CS, OUTPUT);   digitalWrite(PIN_CS, HIGH);
     pinMode(PIN_DC, OUTPUT);   digitalWrite(PIN_DC, HIGH);
     pinMode(PIN_RST, OUTPUT);  digitalWrite(PIN_RST, HIGH);
     pinMode(PIN_MOSI, OUTPUT); digitalWrite(PIN_MOSI, LOW);
     pinMode(PIN_SCLK, OUTPUT); digitalWrite(PIN_SCLK, LOW);
-    
+
     lcd_init();
+    fill(0, 0, W, H, 0x0B, 0x11, 0x20);
     Serial.println("Screen ready");
 }
 
 void loop() {
     page_energy(); Serial.println("[UI] 节能状态");
-    delay(6000); yield();
-    
+    delay(3000); yield();
+
     page_env(); Serial.println("[UI] 环境");
-    delay(6000); yield();
-    
+    delay(3000); yield();
+
     page_sec(); Serial.println("[UI] 安防");
-    delay(6000); yield();
+    delay(3000); yield();
 }

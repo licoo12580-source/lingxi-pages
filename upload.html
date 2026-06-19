@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📤 灵犀上传</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--fg:#e2e8f0;--m:#64748b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding:16px;max-width:900px;margin:0 auto;font-size:14px}
+h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sub{color:var(--m);font-size:12px;margin-bottom:16px}
+.back{color:var(--accent);text-decoration:none;font-size:13px;display:inline-block;margin-bottom:12px}
+.back:hover{text-decoration:underline}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px}
+.card h3{font-size:14px;color:var(--accent);margin-bottom:12px}
+.dropzone{border:2px dashed var(--border);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:12px}
+.dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:rgba(59,130,246,0.05)}
+.dropzone-icon{font-size:48px;color:var(--m);margin-bottom:8px}
+.dropzone-text{color:var(--m);font-size:13px}
+.file-list{list-style:none;padding:0}
+.file-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.file-name{font-size:13px;color:var(--fg)}
+.file-size{font-size:11px;color:var(--m)}
+.file-status{font-size:11px}
+.file-status.done{color:var(--green)}
+.file-status.error{color:var(--red)}
+.upload-btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;margin-top:8px}
+.upload-btn:disabled{opacity:0.4;cursor:not-allowed}
+.upload-btn:hover:not(:disabled){opacity:0.9}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;color:var(--m);margin-bottom:4px}
+.form-input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--fg);font-size:13px}
+.form-input:focus{outline:none;border-color:var(--accent)}
+.form-select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--fg);font-size:13px}
+.tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border)}
+.tab{padding:8px 16px;cursor:pointer;font-size:13px;color:var(--m);border-bottom:2px solid transparent}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.token-hint{font-size:11px;color:var(--orange);margin-top:4px}
+.result-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;white-space:pre-wrap;margin-top:8px;display:none;max-height:300px;overflow:auto}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);width:0%;transition:width 0.3s}
+@media(max-width:640px){.dropzone{padding:20px}}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">← 返回主页</a>
+<h1>📤 上传文件</h1>
+<div class="sub">上传固件、源代码或文档到仓库</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('github')">GitHub API上传</div>
+  <div class="tab" onclick="switchTab('manual')">手动提交</div>
+</div>
+
+<!-- Tab 1: GitHub API Upload -->
+<div id="tab-github">
+  <div class="card">
+    <h3>① 选择上传位置</h3>
+    <div class="form-group">
+      <label>目标目录</label>
+      <select class="form-select" id="targetDir">
+        <option value="firmware/">firmware/ (固件BIN)</option>
+        <option value="docs/">docs/ (文档/源代码)</option>
+        <option value="">仓库根目录</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>② GitHub Token</h3>
+    <div class="form-group">
+      <label>Personal Access Token</label>
+      <input class="form-input" type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+      <div class="token-hint">需要 repo 权限。Token仅用于本次上传，不会保存。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>③ 上传文件</h3>
+    <div class="dropzone" id="dropzone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+      <div class="dropzone-icon">📁</div>
+      <div class="dropzone-text">拖拽文件到此处<br>或点击选择文件</div>
+    </div>
+    <ul class="file-list" id="fileList"></ul>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <button class="upload-btn" id="uploadBtn" onclick="uploadFiles()" disabled>上传到GitHub</button>
+    <div class="result-box" id="resultBox"></div>
+  </div>
+</div>
+
+<!-- Tab 2: Manual -->
+<div id="tab-manual" style="display:none">
+  <div class="card">
+    <h3>手动提交指引</h3>
+    <p style="font-size:13px;color:var(--m);line-height:1.6;margin-bottom:12px">
+      如果GitHub API方式不方便，可以按以下步骤手动提交：
+    </p>
+    <ol style="font-size:13px;color:var(--m);line-height:1.8;padding-left:20px">
+      <li>克隆仓库：<code style="background:var(--bg);padding:2px 6px;border-radius:4px">git clone https://github.com/licoo12580-source/lingxi-pages.git</code></li>
+      <li>将文件放入对应目录（firmware/ 或 docs/）</li>
+      <li>提交并推送：<code style="background:var(--bg);padding:2px 6px;border-radius:4px">git add . && git commit -m "描述" && git push</code></li>
+      <li>更新 firmware.html（如果是固件，需要添加版本条目到列表）</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>📋 固件条目模板</h3>
+    <p style="font-size:12px;color:var(--m);margin-bottom:8px">复制以下JSON模板，替换内容后添加到 firmware.html 的 versions 数组中：</p>
+<pre style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;overflow:auto;color:var(--m)">{
+  ver: "vXXXX",
+  date: "2026-06-20",
+  status: "latest",
+  tags: ["标签1", "标签2"],
+  file: "vXXXX.bin",
+  sha256: "sha256值",
+  size: "XXXKB",
+  driver: "ILI9488",
+  desc: "版本描述",
+  changelog: "🔧 改动1\\n🔧 改动2",
+  hw: "HW-678A N16R8, 4寸屏"
+}</pre>
+  </div>
+</div>
+
+<script>
+let filesToUpload = [];
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-github').style.display = name === 'github' ? 'block' : 'none';
+  document.getElementById('tab-manual').style.display = name === 'manual' ? 'block' : 'none';
+  event.target.classList.add('active');
+}
+
+document.getElementById('dropzone').addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.multiple = true;
+  input.onchange = e => handleFiles(e.target.files);
+  input.click();
+});
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+}
+
+function handleFiles(fileList) {
+  for (const f of fileList) {
+    // 检查是否已添加同名文件
+    if (!filesToUpload.find(x => x.name === f.name)) {
+      filesToUpload.push({ file: f, name: f.name, size: f.size, status: 'pending' });
+    }
+  }
+  renderFileList();
+}
+
+function renderFileList() {
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  filesToUpload.forEach((f, i) => {
+    const size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+'MB' : (f.size/1024).toFixed(0)+'KB';
+    const statusClass = f.status === 'done' ? 'done' : f.status === 'error' ? 'error' : '';
+    list.innerHTML += `
+      <li class="file-item">
+        <div>
+          <div class="file-name">${f.name}</div>
+          <div class="file-size">${size}</div>
+        </div>
+        <div>
+          <span class="file-status ${statusClass}">${f.status === 'done' ? '✅ 已上传' : f.status === 'error' ? '❌ 失败' : ''}</span>
+          <button onclick="removeFile(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;margin-left:8px">×</button>
+        </div>
+      </li>
+    `;
+  });
+  document.getElementById('uploadBtn').disabled = filesToUpload.length === 0;
+}
+
+function removeFile(idx) {
+  filesToUpload.splice(idx, 1);
+  renderFileList();
+}
+
+function updateProgress(pct) {
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+async function uploadFiles() {
+  const token = document.getElementById('ghToken').value.trim();
+  if (!token) { alert('请输入GitHub Token'); return; }
+  if (token.length < 20) { alert('Token格式不对，请检查'); return; }
+
+  const targetDir = document.getElementById('targetDir').value;
+  const btn = document.getElementById('uploadBtn');
+  const resultBox = document.getElementById('resultBox');
+  btn.disabled = true;
+  btn.textContent = '上传中...';
+  resultBox.style.display = 'block';
+  resultBox.textContent = '';
+  updateProgress(0);
+
+  const REPO_OWNER = 'licoo12580-source';
+  const REPO_NAME = 'lingxi-pages';
+  const BRANCH = 'main';
+  const API = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/`;
+
+  let successCount = 0;
+  let failCount = 0;
+
+  for (let i = 0; i < filesToUpload.length; i++) {
+    const f = filesToUpload[i];
+    resultBox.textContent += `📤 上传 ${f.name}...\n`;
+
+    try {
+      // 读取文件为base64
+      const reader = new FileReader();
+      const content = await new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(f.file);
+      });
+
+      const path = targetDir + f.name;
+      const response = await fetch(API + path, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `上传 ${f.name}`,
+          content: content,
+          branch: BRANCH
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok || response.status === 201 || response.status === 200) {
+        f.status = 'done';
+        successCount++;
+        resultBox.textContent += `   ✅ 上传成功\n`;
+      } else {
+        // 可能是文件已存在，需要先获取SHA
+        if (response.status === 422 && data.message && data.message.includes('already exists')) {
+          // 获取现有文件的SHA
+          const getResp = await fetch(API + path, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const getData = await getResp.json();
+          if (getData.sha) {
+            const updateResp = await fetch(API + path, {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                message: `更新 ${f.name}`,
+                content: content,
+                sha: getData.sha,
+                branch: BRANCH
+              })
+            });
+            if (updateResp.ok) {
+              f.status = 'done';
+              successCount++;
+              resultBox.textContent += `   ✅ 覆盖更新成功\n`;
+            } else {
+              throw new Error(`更新失败: ${updateResp.status}`);
+            }
+          }
+        } else {
+          throw new Error(data.message || `HTTP ${response.status}`);
+        }
+      }
+    } catch (e) {
+      f.status = 'error';
+      failCount++;
+      resultBox.textContent += `   ❌ ${e.message}\n`;
+    }
+
+    renderFileList();
+    updateProgress(((i + 1) / filesToUpload.length) * 100);
+  }
+
+  resultBox.textContent += `\n${'='.repeat(40)}\n`;
+  resultBox.textContent += `完成：${successCount}成功，${failCount}失败\n`;
+  if (successCount > 0) {
+    resultBox.textContent += `\n⏳ 等待GitHub Pages部署... (约1-2分钟)\n`;
+    resultBox.textContent += `🌐 https://licoo12580-source.github.io/lingxi-pages/\n`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '上传到GitHub';
+}
+</script>
+</body>
+</html>

@@ -35,6 +35,19 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 .btn-copy:hover{border-color:var(--accent);color:var(--fg)}
 .sha-text{font-family:monospace;font-size:11px;color:var(--m);word-break:break-all;background:var(--bg);padding:4px 8px;border-radius:4px;margin-top:4px;display:none}
 .sha-text.show{display:block}
+/* 审查弹窗 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;width:100%;max-width:800px;max-height:85vh;display:flex;flex-direction:column}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.modal-close{background:none;border:none;color:var(--m);font-size:20px;cursor:pointer;padding:4px}
+.modal-close:hover{color:var(--fg)}
+.modal-body{flex:1;overflow:auto;padding:0}
+.modal-body pre{margin:0;padding:16px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:12px;line-height:1.6;color:var(--fg);white-space:pre-wrap;word-break:break-all}
+.modal-footer{display:flex;gap:8px;padding:10px 16px;border-top:1px solid var(--border);justify-content:flex-end}
+.modal-footer .btn{font-size:12px}
+.modal-loading{text-align:center;padding:40px;color:var(--m);font-size:13px}
 .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;background:transparent;color:var(--m)}
 .filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -45,6 +58,7 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 <body>
 
 <a class="back" href="index.html">← 返回主页</a>
+<a class="back" href="upload.html" style="margin-left:12px">📤 上传</a>
 <h1>📡 灵犀固件下载</h1>
 <div class="sub">HW-678A N16R8 (ESP32-S3 · 16MB Flash · 8MB PSRAM) · ILI9488 4寸屏</div>
 
@@ -56,6 +70,23 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 </div>
 
 <div id="fw-list"></div>
+
+<!-- 审查弹窗 -->
+<div class="modal-overlay" id="reviewModal" onclick="if(event.target===this)closeReview()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📝 <span id="reviewTitle">审查</span></span>
+      <button class="modal-close" onclick="closeReview()">×</button>
+    </div>
+    <div class="modal-body" id="reviewBody">
+      <div class="modal-loading">⏳ 加载源码中...</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-copy" onclick="copyReviewCode()">📋 复制代码</button>
+      <button class="btn btn-copy" onclick="closeReview()">关闭</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const versions = [
@@ -304,6 +335,7 @@ function render() {
           <a class="btn btn-download" href="${dlUrl}" download>⬇️ 下载 ${v.file}</a>
           <button class="btn btn-copy" onclick="toggleSHA('${v.ver}')">🔑 SHA256</button>
           <button class="btn btn-copy" onclick="copyLink('${dlUrl}')">🔗 复制链接</button>
+          <button class="btn btn-copy" onclick="openReview('${v.ver}')">📝 审查</button>
         </div>
         <div class="sha-text" id="sha-${v.ver}">SHA256: ${v.sha256}</div>
       </div>
@@ -334,6 +366,62 @@ function copyLink(path) {
     btn.textContent = '✅ 已复制';
     setTimeout(() => btn.textContent = orig, 1500);
   });
+}
+
+// === 审查弹窗 ===
+let currentReviewVer = '';
+
+function openReview(ver) {
+  currentReviewVer = ver;
+  document.getElementById('reviewTitle').textContent = ver + ' 源码审查';
+  document.getElementById('reviewBody').innerHTML = '<div class="modal-loading">⏳ 加载源码中...</div>';
+  document.getElementById('reviewModal').classList.add('show');
+  
+  // 尝试加载 source.txt（并行尝试 .cpp.txt 和 .ino）
+  const srcUrl = `firmware/${ver}-source.txt`;
+  
+  fetch(srcUrl)
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(code => {
+      document.getElementById('reviewBody').innerHTML = `<pre>${escapeHtml(code)}</pre>`;
+    })
+    .catch(() => {
+      // 尝试加载 .ino（旧的命名方式）
+      const inoUrl = `firmware/${ver}.ino`;
+      return fetch(inoUrl).then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      }).then(code => {
+        document.getElementById('reviewBody').innerHTML = `<pre>${escapeHtml(code)}</pre>`;
+      }).catch(() => {
+        document.getElementById('reviewBody').innerHTML = `<div class="modal-loading" style="color:var(--red)">
+          ❌ 未找到 ${ver} 的源码文件<br>
+          <span style="font-size:12px">预期路径: firmware/${ver}-source.txt</span>
+        </div>`;
+      });
+    });
+}
+
+function closeReview() {
+  document.getElementById('reviewModal').classList.remove('show');
+}
+
+function copyReviewCode() {
+  const pre = document.querySelector('#reviewBody pre');
+  if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    const btn = document.querySelector('.modal-footer .btn:first-child');
+    const orig = btn.textContent;
+    btn.textContent = '✅ 已复制';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 render();

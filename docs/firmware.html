@@ -16,9 +16,9 @@ h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 .search-bar:focus{outline:none;border-color:#3b82f6}
 .stats{color:#64748b;font-size:12px;margin-bottom:12px}
 .fw-card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
-.fw-name{font-size:14px;font-weight:600;min-width:110px;font-family:'Courier New',monospace}
-.fw-info{font-size:11px;color:#64748b;flex:1}
-.fw-info span{margin-right:12px}
+.fw-name{font-size:14px;font-weight:600;min-width:120px;font-family:'Courier New',monospace}
+.fw-info{font-size:11px;color:#64748b;flex:1;display:flex;gap:10px;flex-wrap:wrap}
+.fw-time{color:#60a5fa;font-weight:500}
 .fw-actions{display:flex;gap:6px;flex-shrink:0}
 .btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:6px;font-size:12px;border:none;cursor:pointer;text-decoration:none;transition:all .2s}
 .btn.dl{background:#3b82f6;color:#fff}
@@ -40,13 +40,11 @@ h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 .modal-body pre{background:#020617;padding:14px;border-radius:8px;font-size:11px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:#e2e8f0;max-height:60vh}
 .copy-btn{margin-top:10px;padding:6px 14px;background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:6px;font-size:12px;cursor:pointer}
 .copy-btn:hover{background:#475569}
-.loading{text-align:center;padding:40px;color:#64748b}
-.empty{text-align:center;padding:40px;color:#64748b}
 </style>
 </head>
 <body>
 <h1>🦞 灵犀 · 固件下载中心</h1>
-<p class="sub">所有固件版本 · 点 ⬇下载BIN · 点 📝查看源码发给其他智能体审查</p>
+<p class="sub">所有固件版本 · ⬇下载BIN · 📝查看源码发给其他智能体审查</p>
 <div class="nav">
   <a href="index.html">← 返回首页</a>
   <a href="upload.html">📤 上传/粘贴资料</a>
@@ -54,8 +52,295 @@ h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 
 <input class="search-bar" type="text" id="search" placeholder="搜索固件版本..." oninput="filterFirmware()">
 
-<div class="stats" id="stats"></div>
-<div id="fwList"></div>
+<div class="stats">共 22 个固件版本 · 最新的排最前面</div>
+<div id="fwList">
+
+    <div class="fw-card">
+      <div class="fw-name">v0312O.bin</div>
+      <div class="fw-info">
+        <span>📦 282 KB</span>
+        <span class="fw-time">🕐 06-19 18:46</span>
+        <span>📄 有源码</span>
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312O.bin" download>⬇ 下载</a>
+        <button class="btn source" onclick="viewSource('v0312O.bin', 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312O-source.txt')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312N.bin</div>
+      <div class="fw-info">
+        <span>📦 347 KB</span>
+        <span class="fw-time">🕐 06-19 18:22</span>
+        <span>📄 有源码</span>
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312N.bin" download>⬇ 下载</a>
+        <button class="btn source" onclick="viewSource('v0312N.bin', 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312N-source.txt')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312M.bin</div>
+      <div class="fw-info">
+        <span>📦 347 KB</span>
+        <span class="fw-time">🕐 06-19 18:19</span>
+        <span>📄 有源码</span>
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312M.bin" download>⬇ 下载</a>
+        <button class="btn source" onclick="viewSource('v0312M.bin', 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312M-source.txt')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312L.bin</div>
+      <div class="fw-info">
+        <span>📦 350 KB</span>
+        <span class="fw-time">🕐 06-19 18:16</span>
+        <span>📄 有源码</span>
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312L.bin" download>⬇ 下载</a>
+        <button class="btn source" onclick="viewSource('v0312L.bin', 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312L-source.txt')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312K.bin</div>
+      <div class="fw-info">
+        <span>📦 377 KB</span>
+        <span class="fw-time">🕐 06-19 18:10</span>
+        <span>📄 有源码</span>
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312K.bin" download>⬇ 下载</a>
+        <button class="btn source" onclick="viewSource('v0312K.bin', 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312K-source.txt')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312J.bin</div>
+      <div class="fw-info">
+        <span>📦 373 KB</span>
+        <span class="fw-time">🕐 06-19 18:07</span>
+        <span>📄 有源码</span>
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312J.bin" download>⬇ 下载</a>
+        <button class="btn source" onclick="viewSource('v0312J.bin', 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312J-source.txt')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312I.bin</div>
+      <div class="fw-info">
+        <span>📦 376 KB</span>
+        <span class="fw-time">🕐 06-19 17:45</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312I.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0312I.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312H.bin</div>
+      <div class="fw-info">
+        <span>📦 376 KB</span>
+        <span class="fw-time">🕐 06-19 17:27</span>
+        <span>📄 有源码</span>
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312H.bin" download>⬇ 下载</a>
+        <button class="btn source" onclick="viewSource('v0312H.bin', 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312H-source.txt')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312G.bin</div>
+      <div class="fw-info">
+        <span>📦 372 KB</span>
+        <span class="fw-time">🕐 06-19 17:15</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312G.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0312G.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312F.bin</div>
+      <div class="fw-info">
+        <span>📦 372 KB</span>
+        <span class="fw-time">🕐 06-19 17:09</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312F.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0312F.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312E.bin</div>
+      <div class="fw-info">
+        <span>📦 420 KB</span>
+        <span class="fw-time">🕐 06-19 17:03</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312E.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0312E.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312D.bin</div>
+      <div class="fw-info">
+        <span>📦 420 KB</span>
+        <span class="fw-time">🕐 06-19 17:01</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312D.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0312D.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312C.bin</div>
+      <div class="fw-info">
+        <span>📦 416 KB</span>
+        <span class="fw-time">🕐 06-19 17:00</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312C.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0312C.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312B.bin</div>
+      <div class="fw-info">
+        <span>📦 416 KB</span>
+        <span class="fw-time">🕐 06-19 16:48</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312B.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0312B.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0312A.bin</div>
+      <div class="fw-info">
+        <span>📦 388 KB</span>
+        <span class="fw-time">🕐 06-19 16:43</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312A.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0312A.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0311E.bin</div>
+      <div class="fw-info">
+        <span>📦 434 KB</span>
+        <span class="fw-time">🕐 06-19 16:34</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0311E.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0311E.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0310C-test-all-merged.bin</div>
+      <div class="fw-info">
+        <span>📦 16.0 MB</span>
+        <span class="fw-time">🕐 06-19 16:03</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0310C-test-all-merged.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0310C-test-all-merged.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0310A-test-all-merged.bin</div>
+      <div class="fw-info">
+        <span>📦 434 KB</span>
+        <span class="fw-time">🕐 06-19 14:39</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0310A-test-all-merged.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0310A-test-all-merged.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">v0309H-test-all.bin</div>
+      <div class="fw-info">
+        <span>📦 769 KB</span>
+        <span class="fw-time">🕐 06-19 04:00</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0309H-test-all.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('v0309H-test-all.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">test-all-merged.bin</div>
+      <div class="fw-info">
+        <span>📦 16.0 MB</span>
+        <span class="fw-time">🕐 06-18 13:22</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/test-all-merged.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('test-all-merged.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">test-all-compact.bin</div>
+      <div class="fw-info">
+        <span>📦 441 KB</span>
+        <span class="fw-time">🕐 06-18 13:37</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/test-all-compact.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('test-all-compact.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+
+    <div class="fw-card">
+      <div class="fw-name">ms24-test-only.bin</div>
+      <div class="fw-info">
+        <span>📦 16.0 MB</span>
+        <span class="fw-time">🕐 06-18 12:22</span>
+        
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/ms24-test-only.bin" download>⬇ 下载</a>
+        <button class="btn review" onclick="viewSource('ms24-test-only.bin', '')">📝 查看源码</button>
+      </div>
+    </div>
+</div>
 
 <!-- 源码弹窗 -->
 <div class="modal" id="sourceModal">
@@ -73,93 +358,27 @@ h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 </div>
 
 <script>
-const OWNER = 'licoo12580-source';
-const REPO = 'lingxi-pages';
-const BRANCH = 'main';
-const API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/firmware`;
-
-let firmwareList = [];
-
-async function loadFirmware() {
-  const listEl = document.getElementById('fwList');
-  const statsEl = document.getElementById('stats');
-  listEl.innerHTML = '<div class="loading">⏳ 加载固件列表...</div>';
-
-  try {
-    const resp = await fetch(API);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const files = await resp.json();
-    
-    // 过滤出 .bin 文件，排序（最新的排最前）
-    const bins = files.filter(f => f.name.endsWith('.bin')).sort((a, b) => b.name.localeCompare(a.name));
-    
-    // 对有 source 文件的版本做标记
-    firmwareList = bins.map(f => {
-      const base = f.name.replace('.bin', '');
-      const sourceUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/firmware/${base}-source.txt`;
-      return {
-        name: f.name,
-        size: f.size,
-        url: f.download_url,
-        base: base,
-        sourceUrl: sourceUrl,
-        hasSource: files.some(x => x.name === base + '-source.txt')
-      };
-    });
-
-    statsEl.textContent = `共 ${firmwareList.length} 个固件版本`;
-    renderList();
-  } catch (e) {
-    listEl.innerHTML = `<div class="empty">❌ 加载失败: ${e.message}</div>`;
-  }
-}
-
-function renderList() {
-  const listEl = document.getElementById('fwList');
-  const searchTerm = document.getElementById('search').value.toLowerCase();
-  
-  const filtered = firmwareList.filter(f => f.name.toLowerCase().includes(searchTerm));
-  
-  // 格式化大小
-  function fmtSize(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024*1024) return (bytes/1024).toFixed(0) + ' KB';
-    return (bytes/1024/1024).toFixed(1) + ' MB';
-  }
-  
-  listEl.innerHTML = filtered.map(f => `
-    <div class="fw-card">
-      <div class="fw-name">${f.name}</div>
-      <div class="fw-info">
-        <span>📦 ${fmtSize(f.size)}</span>
-        ${f.hasSource ? '<span>📄 有源码</span>' : ''}
-      </div>
-      <div class="fw-actions">
-        <a class="btn dl" href="${f.url}" download>⬇ 下载</a>
-        <button class="btn ${f.hasSource ? 'source' : 'review'}" onclick="${f.hasSource ? `viewSource('${f.name}', '${f.sourceUrl}')` : `viewSource('${f.name}', '')`}">
-          ${f.hasSource ? '📝 查看源码' : '📝 查看源码'}
-        </button>
-      </div>
-    </div>
-  `).join('');
-}
+let currentSource = '';
+const TIME_DATA = {"v0312O.bin": {"time": "2026-06-19T18:46:14Z", "msg": "v0312O fix: 18-bit\u50cf\u7d20\u683c\u5f0f(0x66)+3\u5b57\u8282/\u50cf\u7d20"}, "v0312N.bin": {"time": "2026-06-19T18:22:30Z", "msg": "v0312N: RST\u4fee\u6b63\u4e3aGPIO48\uff08\u6309\u5b9e\u9645\u63a5\u7ebf\uff09"}, "v0312M.bin": {"time": "2026-06-19T18:19:58Z", "msg": "v0312M: \u5f15\u811a\u9010\u9879\u6d4b\u8bd5"}, "v0312L.bin": {"time": "2026-06-19T18:16:13Z", "msg": "v0312L: bit-bang SPI + Serial\u8d70COM\u53e3"}, "v0312K.bin": {"time": "2026-06-19T18:10:15Z", "msg": "add v0312K: board fix + factory init"}, "v0312J.bin": {"time": "2026-06-19T18:07:16Z", "msg": "add v0312J to download page"}, "v0312I.bin": {"time": "2026-06-19T17:45:27Z", "msg": "v0312I: SPI_MODE0 vs MODE3 \u5bf9\u6bd4\u6d4b\u8bd5"}, "v0312H.bin": {"time": "2026-06-19T17:27:11Z", "msg": "v0312H: \u786c\u4ef6SPI+\u6700\u7b80\u521d\u59cb\u5316+MADCTL\u591a\u503c\u6d4b\u8bd5"}, "v0312G.bin": {"time": "2026-06-19T17:15:08Z", "msg": "v0312G: RST\u6539GPIO4, SPI\u964d\u901f, \u586b\u56db\u89d2+\u5168\u5c4f"}, "v0312F.bin": {"time": "2026-06-19T17:09:07Z", "msg": "v0312F: \u88f8SPI\u6d4b\u8bd5(\u4e0d\u7528TFT_eSPI,\u76f4\u63a5GPIO\u9a71\u52a8ILI9488)"}, "v0312E.bin": {"time": "2026-06-19T17:03:05Z", "msg": "v0312E: \u5c4f\u5e55\u81ea\u68c0\u56fa\u4ef6(\u586b\u84dd\u753b\u767d\u6846\u7ea2\u5bf9\u89d2)"}, "v0312D.bin": {"time": "2026-06-19T17:01:41Z", "msg": "v0312C: ILI9488 16-bit\u8272\u5f69 / v0312D: ST7796\u9a71\u52a8"}, "v0312C.bin": {"time": "2026-06-19T17:00:39Z", "msg": "v0312C: ILI9488\u5f3a\u523616-bit\u8272\u5f69(0x55)"}, "v0312B.bin": {"time": "2026-06-19T16:48:48Z", "msg": "v0312B: DIO 40MHz, ILI9488, v0310A\u517c\u5bb9\u73af\u5883(USE_HSPI_PORT)"}, "v0312A.bin": {"time": "2026-06-19T16:43:37Z", "msg": "v0312A: \u4fee\u590d\u7f16\u8bd1\u73af\u5883#HW-678A N16R8 QIO 80MHz PSRAM OPI 4\u5bf8ILI9488"}, "v0311E.bin": {"time": "2026-06-19T16:34:17Z", "msg": "v0311E: working bootloader from v0310A + new app"}, "v0310C-test-all-merged.bin": {"time": "2026-06-19T16:03:42Z", "msg": "add v0310C ILI9488+FT6336U firmware"}, "v0310A-test-all-merged.bin": {"time": "2026-06-19T14:39:39Z", "msg": "[v0310A] ILI9341\u9a71\u52a8, USB_MODE=0, WS2812\u8bca\u65ad, \u5f15\u811a\u4fee\u6b63"}, "v0309H-test-all.bin": {"time": "2026-06-19T04:00:36Z", "msg": "v0309H: \u53bb\u6389Serial1(\u5f15\u811a\u51b2\u7a81),\u53ea\u8d70USB CDC"}, "test-all-merged.bin": {"time": "2026-06-18T13:22:36Z", "msg": "\u66f4\u65b0\u56fa\u4ef6\uff1a\u5f15\u811a\u8c03\u6574(\u5c4f45/47/48/21/20/19 \u89e638/40/37/39 \u96f7\u8fbe36/35)"}, "test-all-compact.bin": {"time": "2026-06-18T13:37:58Z", "msg": "\u4fee\u590dUSB\u51b2\u7a81\u91cd\u65b0\u7f16\u8bd1"}, "ms24-test-only.bin": {"time": "2026-06-18T12:22:35Z", "msg": "\u521d\u59cb\u5316\uff1a\u56fa\u4ef6+\u9875\u9762"}};
 
 function filterFirmware() {
-  renderList();
+  const term = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.fw-card').forEach(card => {
+    const name = card.querySelector('.fw-name').textContent.toLowerCase();
+    card.style.display = name.includes(term) ? 'flex' : 'none';
+  });
 }
 
-let currentSource = '';
-
 async function viewSource(name, url) {
-  document.getElementById('modalTitle').textContent = `源码: ${name}`;
+  document.getElementById('modalTitle').textContent = '源码: ' + name;
   document.getElementById('sourceCode').textContent = '加载中...';
   document.getElementById('sourceModal').classList.add('active');
-  
+
   if (!url) {
     document.getElementById('sourceCode').textContent = '⚠️ 该版本没有上传源码文件';
     return;
   }
-  
+
   try {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('源码文件不存在 (HTTP ' + resp.status + ')');
@@ -187,10 +406,7 @@ function copySource() {
   });
 }
 
-// ESC关闭
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSource(); });
-
-loadFirmware();
 </script>
 </body>
 </html>

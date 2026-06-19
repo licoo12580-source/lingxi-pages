@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>灵犀酒店节能系统 v4.0 — 赛博终端监控面板</title>
+<style>
+/* ===== 全局重置 ===== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background: #000;
+  color: #00ff41;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ===== CRT 扫描线效果 ===== */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.15) 0px,
+    rgba(0,0,0,0.15) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ===== 发光文字 ===== */
+.glow {
+  text-shadow:
+    0 0 4px #00ff41,
+    0 0 8px #00ff41,
+    0 0 12px #00ff41,
+    0 0 20px #00ff4180;
+}
+
+/* ===== 终端光标动画 ===== */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.cursor::after {
+  content: '\u258C';
+  color: #00ff41;
+  text-shadow: 0 0 6px #00ff41;
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+/* ===== 扫描线漂移（可选增强） ===== */
+@keyframes scanline-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100vh; }
+}
+
+/* ===== 淡入输入效果 ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.terminal-line {
+  animation: fadeIn 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+/* ===== 整体布局 ===== */
+#app {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "topbar topbar"
+    "sidebar main"
+    "bottombar bottombar";
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* ===== 顶部状态栏 ===== */
+#topbar {
+  grid-area: topbar;
+  background: #0a0a0a;
+  border-bottom: 1px solid #00ff4140;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+#topbar .terminal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#topbar .window-dots {
+  display: flex;
+  gap: 6px;
+}
+
+#topbar .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+
+#topbar .dot.red    { background: #ff5555; }
+#topbar .dot.yellow { background: #ffaa00; }
+#topbar .dot.green  { background: #55ff55; }
+
+#topbar .title-text {
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #00ff41;
+  text-shadow: 0 0 6px #00ff41;
+}
+
+#topbar .title-text .path {
+  color: #66ffaa;
+}
+
+#topbar .top-right-info {
+  font-size: 12px;
+  color: #00cc33;
+  text-shadow: 0 0 4px #00ff4160;
+}
+
+/* ===== 左侧设备列表 ===== */
+#sidebar {
+  grid-area: sidebar;
+  background: #050505;
+  border-right: 1px solid #00ff4140;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+#sidebar .sidebar-header {
+  font-size: 11px;
+  color: #00aa33;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #00ff4140;
+  padding-bottom: 6px;
+  text-shadow: 0 0 4px #00ff4160;
+}
+
+.device-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  font-size: 13px;
+  text-shadow: 0 0 3px #00ff4160;
+  animation: fadeIn 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+.device-item:hover {
+  background: #00ff4110;
+  border-left-color: #00ff41;
+  text-shadow:
+    0 0 6px #00ff41,
+    0 0 12px #00ff41;
+}
+
+.device-item .prefix {
+  color: #00aa33;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+.device-item .device-name {
+  flex: 1;
+}
+
+.device-item .device-status {
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.device-item .device-status.online {
+  color: #00ff41;
+}
+
+.device-item .device-status.offline {
+  color: #ff5555;
+}
+
+.device-item .device-status.standby {
+  color: #ffaa00;
+}
+
+.device-item.rev-hover:hover {
+  background: #00ff41;
+  color: #000;
+  border-left-color: #000;
+}
+
+.device-item.rev-hover:hover .prefix,
+.device-item.rev-hover:hover .device-name,
+.device-item.rev-hover:hover .device-status {
+  color: #000;
+}
+
+/* ===== 中央数据区 ===== */
+#main {
+  grid-area: main;
+  background: #000;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+/* 大数字展示 */
+.hero-section {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.hero-card {
+  background: #0a0a0a;
+  border: 1px solid #00ff4140;
+  padding: 14px 20px;
+  flex: 1;
+  min-width: 160px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.hero-card:hover {
+  border-color: #00ff41;
+  box-shadow: 0 0 16px #00ff4120;
+  text-shadow: 0 0 6px #00ff41;
+}
+
+.hero-card .label {
+  font-size: 11px;
+  color: #00aa33;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.hero-card .value {
+  font-size: 42px;
+  font-weight: bold;
+  color: #00ff41;
+  text-shadow:
+    0 0 6px #00ff41,
+    0 0 14px #00ff41,
+    0 0 24px #00ff4180;
+  line-height: 1.2;
+}
+
+.hero-card .value .unit {
+  font-size: 18px;
+  margin-left: 2px;
+}
+
+.hero-card .sub {
+  font-size: 11px;
+  color: #008822;
+  margin-top: 4px;
+}
+
+/* 终端表格 */
+.terminal-table-wrapper {
+  background: #0a0a0a;
+  border: 1px solid #00ff4140;
+  padding: 10px;
+  margin-bottom: 16px;
+}
+
+.terminal-table-wrapper:hover {
+  border-color: #00ff41;
+  box-shadow: 0 0 12px #00ff4110;
+}
+
+.terminal-table-header {
+  font-size: 11px;
+  color: #00aa33;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed #00ff4140;
+  padding-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.term-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.term-table th {
+  color: #00cc33;
+  font-weight: normal;
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 1px solid #00ff4140;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.term-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #00ff4110;
+  text-shadow: 0 0 2px #00ff4160;
+}
+
+.term-table tr {
+  transition: all 0.15s;
+}
+
+.term-table tr:hover {
+  background: #00ff41;
+  color: #000;
+  cursor: pointer;
+}
+
+.term-table tr:hover td {
+  color: #000;
+  text-shadow: none;
+}
+
+.term-table tr td:first-child::before {
+  content: '$ ';
+  color: #008822;
+}
+
+.term-table tr:hover td:first-child::before {
+  color: #004411;
+}
+
+.term-table .num {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+/* 状态条 */
+.stat-bar {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.stat-bar .bar-segment {
+  height: 8px;
+  background: #00ff41;
+  transition: all 0.2s;
+}
+
+.stat-bar .bar-segment.empty {
+  background: #0a0a0a;
+  border: 1px solid #00ff4140;
+}
+
+.stat-bar-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  margin: 6px 0;
+  padding: 4px 8px;
+  border-left: 1px solid #00ff4140;
+}
+
+.stat-bar-row:hover {
+  background: #00ff4110;
+  border-left-color: #00ff41;
+}
+
+/* 系统日志区 */
+.log-section {
+  margin-top: 10px;
+}
+
+.log-section .log-title {
+  font-size: 11px;
+  color: #00aa33;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed #00ff4140;
+  padding-bottom: 3px;
+}
+
+.log-line {
+  font-size: 12px;
+  color: #00cc33;
+  padding: 2px 6px;
+  border-left: 2px solid transparent;
+  animation: fadeIn 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+.log-line:hover {
+  background: #00ff4110;
+  border-left-color: #00ff41;
+  text-shadow: 0 0 4px #00ff41;
+}
+
+.log-line .timestamp {
+  color: #008822;
+}
+
+.log-line .level-info {
+  color: #00ff41;
+}
+
+.log-line .level-warn {
+  color: #ffaa00;
+}
+
+.log-line .level-err {
+  color: #ff5555;
+}
+
+/* ===== 底部状态栏 ===== */
+#bottombar {
+  grid-area: bottombar;
+  background: #0a0a0a;
+  border-top: 1px solid #00ff4140;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #00aa33;
+  user-select: none;
+}
+
+#bottombar .status-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border-right: 1px solid #00ff4120;
+}
+
+#bottombar .status-item:last-child {
+  border-right: none;
+}
+
+#bottombar .status-item .label {
+  color: #006622;
+}
+
+#bottombar .status-item .val {
+  color: #00ff41;
+  text-shadow: 0 0 4px #00ff41;
+}
+
+#bottombar .status-group {
+  display: flex;
+  align-items: center;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  #app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+      "topbar"
+      "sidebar"
+      "main"
+      "bottombar";
+  }
+  #sidebar {
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid #00ff4140;
+  }
+  .hero-card .value {
+    font-size: 30px;
+  }
+}
+
+/* ===== 滚动条 ===== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #00ff4140;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00ff41;
+}
+
+/* ===== 选中文本 ===== */
+::selection {
+  background: #00ff41;
+  color: #000;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== 顶部终端状态栏 ===== -->
+  <header id="topbar">
+    <div class="terminal-title">
+      <div class="window-dots">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+      </div>
+      <span class="title-text glow">
+        lingxi@hotel-energy:<span class="path">~</span>$ █
+      </span>
+    </div>
+    <div class="top-right-info">
+      <span>NODE: primary | SSL: ✓ | PROTO: v4.0</span>
+    </div>
+  </header>
+
+  <!-- ===== 左侧设备列表 ===== -->
+  <aside id="sidebar">
+    <div class="sidebar-header glow">> DEVICE LIST — 12 nodes online</div>
+
+    <div class="device-item rev-hover" style="animation-delay:0.05s">
+      <span class="prefix">$</span>
+      <span class="device-name">HVAC_MAIN_01</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.10s">
+      <span class="prefix">$</span>
+      <span class="device-name">HVAC_ZONE_A</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.15s">
+      <span class="prefix">$</span>
+      <span class="device-name">HVAC_ZONE_B</span>
+      <span class="device-status standby">○</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.20s">
+      <span class="prefix">$</span>
+      <span class="device-name">LIGHT_LOBBY_01</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.25s">
+      <span class="prefix">$</span>
+      <span class="device-name">LIGHT_LOBBY_02</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.30s">
+      <span class="prefix">$</span>
+      <span class="device-name">LIGHT_CORRIDOR</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.35s">
+      <span class="prefix">$</span>
+      <span class="device-name">LIGHT_ROOF</span>
+      <span class="device-status offline">✕</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.40s">
+      <span class="prefix">$</span>
+      <span class="device-name">POWER_SUB_01</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.45s">
+      <span class="prefix">$</span>
+      <span class="device-name">POWER_SUB_02</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.50s">
+      <span class="prefix">$</span>
+      <span class="device-name">WATER_HEATER</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.55s">
+      <span class="prefix">$</span>
+      <span class="device-name">ELEVATOR_01</span>
+      <span class="device-status standby">○</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.60s">
+      <span class="prefix">$</span>
+      <span class="device-name">ELEVATOR_02</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.65s">
+      <span class="prefix">$</span>
+      <span class="device-name">BACKUP_GEN</span>
+      <span class="device-status standby">○</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.70s">
+      <span class="prefix">$</span>
+      <span class="device-name">SOLAR_ARRAY</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.75s">
+      <span class="prefix">$</span>
+      <span class="device-name">BATTERY_BANK</span>
+      <span class="device-status online">●</span>
+    </div>
+    <div class="device-item rev-hover" style="animation-delay:0.80s">
+      <span class="prefix">$</span>
+      <span class="device-name">SMART_METER</span>
+      <span class="device-status online">●</span>
+    </div>
+  </aside>
+
+  <!-- ===== 中央数据区 ===== -->
+  <main id="main">
+
+    <!-- 大数字省电数据 -->
+    <div class="hero-section">
+      <div class="hero-card">
+        <div class="label">> 今日省电</div>
+        <div class="value">487<span class="unit">kWh</span></div>
+        <div class="sub">⏷ 12.4% vs 昨日</div>
+      </div>
+      <div class="hero-card">
+        <div class="label">> 当月累计</div>
+        <div class="value">12,846<span class="unit">kWh</span></div>
+        <div class="sub">⏷ ¥15,415.20 节省</div>
+      </div>
+      <div class="hero-card">
+        <div class="label">> 碳减排</div>
+        <div class="value">8.43<span class="unit">tCO₂</span></div>
+        <div class="sub">≈ 种植 386 棵树</div>
+      </div>
+    </div>
+
+    <!-- 终端表格 — 区域能耗 -->
+    <div class="terminal-table-wrapper">
+      <div class="terminal-table-header">
+        <span>$ cat zones/energy_report.dat</span>
+        <span class="cursor"></span>
+      </div>
+      <table class="term-table">
+        <thead>
+          <tr>
+            <th>> 区域</th>
+            <th>当前功率</th>
+            <th>今日能耗</th>
+            <th>去年同期</th>
+            <th>节省率</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>大堂</td>
+            <td class="num">12.4 kW</td>
+            <td class="num">186.0 kWh</td>
+            <td class="num">212.3 kWh</td>
+            <td class="num">12.4%</td>
+          </tr>
+          <tr>
+            <td>客房区A</td>
+            <td class="num">34.2 kW</td>
+            <td class="num">513.0 kWh</td>
+            <td class="num">602.8 kWh</td>
+            <td class="num">14.9%</td>
+          </tr>
+          <tr>
+            <td>客房区B</td>
+            <td class="num">28.7 kW</td>
+            <td class="num">430.5 kWh</td>
+            <td class="num">499.1 kWh</td>
+            <td class="num">13.7%</td>
+          </tr>
+          <tr>
+            <td>餐厅</td>
+            <td class="num">18.1 kW</td>
+            <td class="num">271.5 kWh</td>
+            <td class="num">305.8 kWh</td>
+            <td class="num">11.2%</td>
+          </tr>
+          <tr>
+            <td>会议室</td>
+            <td class="num">6.8 kW</td>
+            <td class="num">102.0 kWh</td>
+            <td class="num">134.6 kWh</td>
+            <td class="num">24.2%</td>
+          </tr>
+          <tr>
+            <td>地下车库</td>
+            <td class="num">9.3 kW</td>
+            <td class="num">139.5 kWh</td>
+            <td class="num">168.2 kWh</td>
+            <td class="num">17.1%</td>
+          </tr>
+          <tr>
+            <td>户外景观</td>
+            <td class="num">4.1 kW</td>
+            <td class="num">61.5 kWh</td>
+            <td class="num">89.7 kWh</td>
+            <td class="num">31.4%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 状态条 — 设备负荷 -->
+    <div class="terminal-table-wrapper">
+      <div class="terminal-table-header">
+        <span>$ watch -n1 load_avg</span>
+        <span class="cursor"></span>
+      </div>
+
+      <div class="stat-bar-row">
+        <span>HVAC 系统负荷</span>
+        <div class="stat-bar" style="flex:1; max-width:300px">
+          <div class="bar-segment" style="width:72%"></div>
+          <div class="bar-segment empty" style="width:28%"></div>
+        </div>
+        <span style="color:#00ff41">72%</span>
+      </div>
+
+      <div class="stat-bar-row">
+        <span>照明系统负荷</span>
+        <div class="stat-bar" style="flex:1; max-width:300px">
+          <div class="bar-segment" style="width:45%"></div>
+          <div class="bar-segment empty" style="width:55%"></div>
+        </div>
+        <span style="color:#00ff41">45%</span>
+      </div>
+
+      <div class="stat-bar-row">
+        <span>动力系统负荷</span>
+        <div class="stat-bar" style="flex:1; max-width:300px">
+          <div class="bar-segment" style="width:58%"></div>
+          <div class="bar-segment empty" style="width:42%"></div>
+        </div>
+        <span style="color:#00ff41">58%</span>
+      </div>
+
+      <div class="stat-bar-row">
+        <span>太阳能发电</span>
+        <div class="stat-bar" style="flex:1; max-width:300px">
+          <div class="bar-segment" style="width:34%"></div>
+          <div class="bar-segment empty" style="width:66%"></div>
+        </div>
+        <span style="color:#ffaa00">34%</span>
+      </div>
+    </div>
+
+    <!-- 系统日志 -->
+    <div class="log-section">
+      <div class="log-title glow">> /var/log/energy-daemon.log (tail -10)</div>
+      <div class="log-line" style="animation-delay:0.05s">
+        <span class="timestamp">[20:31:04]</span>
+        <span class="level-info">INFO</span> — HVAC_MAIN_01: setpoint adjusted to 22.5°C
+      </div>
+      <div class="log-line" style="animation-delay:0.10s">
+        <span class="timestamp">[20:30:52]</span>
+        <span class="level-info">INFO</span> — LIGHT_CORRIDOR: dim to 60% per schedule
+      </div>
+      <div class="log-line" style="animation-delay:0.15s">
+        <span class="timestamp">[20:30:41]</span>
+        <span class="level-warn">WARN</span> — LIGHT_ROOF: no response, last known OK
+      </div>
+      <div class="log-line" style="animation-delay:0.20s">
+        <span class="timestamp">[20:30:30]</span>
+        <span class="level-info">INFO</span> — SOLAR_ARRAY: peak gen 18.2 kW @ 12:34
+      </div>
+      <div class="log-line" style="animation-delay:0.25s">
+        <span class="timestamp">[20:30:18]</span>
+        <span class="level-info">INFO</span> — BATTERY_BANK: SoC 87%, charging mode
+      </div>
+      <div class="log-line" style="animation-delay:0.30s">
+        <span class="timestamp">[20:30:05]</span>
+        <span class="level-err">ERROR</span> — LIGHT_ROOF: ping timeout (attempt 2/3)
+      </div>
+      <div class="log-line" style="animation-delay:0.35s">
+        <span class="timestamp">[20:29:52]</span>
+        <span class="level-info">INFO</span> — POWER_SUB_01: load 182.4A, temp 41.2°C
+      </div>
+      <div class="log-line" style="animation-delay:0.40s">
+        <span class="timestamp">[20:29:40]</span>
+        <span class="level-info">INFO</span> — WATER_HEATER: tank temp 58.3°C, normal
+      </div>
+      <div class="log-line" style="animation-delay:0.45s">
+        <span class="timestamp">[20:29:28]</span>
+        <span class="level-warn">WARN</span> — ELEVATOR_01: standby power 2.1kW (elevated)
+      </div>
+      <div class="log-line" style="animation-delay:0.50s">
+        <span class="timestamp">[20:29:15]</span>
+        <span class="level-info">INFO</span> — HVAC_ZONE_B: occupancy dropped, eco mode
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ===== 底部状态栏 ===== -->
+  <footer id="bottombar">
+    <div class="status-group">
+      <div class="status-item">
+        <span class="label">运行时间:</span>
+        <span class="val" id="uptime">0d 00:00:00</span>
+      </div>
+      <div class="status-item">
+        <span class="label">设备在线:</span>
+        <span class="val">14/16</span>
+      </div>
+      <div class="status-item">
+        <span class="label">告警:</span>
+        <span class="val" style="color:#ff5555;text-shadow:0 0 4px #ff5555;">1</span>
+      </div>
+    </div>
+    <div class="status-group">
+      <div class="status-item">
+        <span class="label">> last commit:</span>
+        <span class="val">a3f8e21 — energy-opt 2026-06-20</span>
+      </div>
+      <div class="status-item">
+        <span class="label">MODE:</span>
+        <span class="val">AUTO ⚡</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ===== 运行时间计时器 =====
+  const startTime = new Date();
+  const uptimeEl = document.getElementById('uptime');
+
+  function updateUptime() {
+    const now = new Date();
+    const diff = Math.floor((now - startTime) / 1000);
+    const d = Math.floor(diff / 86400);
+    const h = String(Math.floor((diff % 86400) / 3600)).padStart(2, '0');
+    const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+    const s = String(diff % 60).padStart(2, '0');
+    uptimeEl.textContent = d + 'd ' + h + ':' + m + ':' + s;
+  }
+
+  updateUptime();
+  setInterval(updateUptime, 1000);
+
+  // ===== 模拟实时日志追加 =====
+  const logSection = document.querySelector('.log-section');
+  const logContainer = logSection ? logSection.querySelector('.log-title') : null;
+
+  const mockLogs = [
+    { level: 'info',  msg: 'SMART_METER: current draw 142.6A, PF 0.96' },
+    { level: 'info',  msg: 'HVAC_MAIN_01: compressor cycle start' },
+    { level: 'warn',  msg: 'BATTERY_BANK: temp rising, fan engaged' },
+    { level: 'info',  msg: 'LIGHT_LOBBY_01: occupancy pattern normal' },
+    { level: 'info',  msg: 'POWER_SUB_02: voltage 231V ± 1.2% stable' },
+    { level: 'err',   msg: 'LIGHT_ROOF: check scheduled @ 21:00' },
+    { level: 'info',  msg: 'SOLAR_ARRAY: irradiance 412 W/m²' },
+    { level: 'info',  msg: 'ELEVATOR_02: standby regenerative mode' },
+    { level: 'warn',  msg: 'HVAC_ZONE_B: filter pressure delta 142 Pa' },
+    { level: 'info',  msg: 'WATER_HEATER: circulation pump OK' },
+  ];
+
+  let logIdx = 0;
+
+  function appendLog() {
+    if (!logContainer) return;
+    const entry = mockLogs[logIdx % mockLogs.length];
+    logIdx++;
+
+    const now = new Date();
+    const ts = String(now.getHours()).padStart(2, '0') + ':'
+             + String(now.getMinutes()).padStart(2, '0') + ':'
+             + String(now.getSeconds()).padStart(2, '0');
+
+    let levelClass = 'level-info';
+    let levelText = 'INFO';
+    if (entry.level === 'warn') { levelClass = 'level-warn'; levelText = 'WARN'; }
+    if (entry.level === 'err')  { levelClass = 'level-err';  levelText = 'ERROR'; }
+
+    const div = document.createElement('div');
+    div.className = 'log-line';
+    div.innerHTML = '<span class="timestamp">[' + ts + ']</span> '
+                  + '<span class="' + levelClass + '">' + levelText + '</span> — '
+                  + entry.msg;
+    logContainer.parentNode.insertBefore(div, logContainer.nextSibling);
+
+    // 保留最多20条
+    const allLines = logContainer.parentNode.querySelectorAll('.log-line');
+    if (allLines.length > 20) {
+      allLines[0].remove();
+    }
+  }
+
+  // 每5秒追加一条
+  setInterval(appendLog, 5000);
+
+  // ===== 模拟省电数据微变 =====
+  const heroValues = document.querySelectorAll('.hero-card .value');
+
+  setInterval(function() {
+    heroValues.forEach(function(el) {
+      const text = el.textContent;
+      // 匹配 kWh / tCO₂
+      const match = text.match(/^([\d,]+\.?\d*)(kWh|tCO₂)$/);
+      if (!match) return;
+      const num = parseFloat(match[1].replace(/,/g, ''));
+      const unit = match[2];
+      if (unit === 'kWh') {
+        const delta = (Math.random() - 0.5) * 2;
+        const newNum = Math.max(0, num + delta);
+        el.textContent = newNum.toFixed(1) + ' ' + unit;
+      } else if (unit === 'tCO₂') {
+        const delta = (Math.random() - 0.5) * 0.05;
+        const newNum = Math.max(0, num + delta);
+        el.textContent = newNum.toFixed(2) + ' ' + unit;
+      }
+    });
+  }, 8000);
+
+  // ===== 终端光标在标题栏闪烁 =====
+  const cursorEls = document.querySelectorAll('.cursor');
+  // already handled by CSS animation
+
+  // ===== 告警数按时间衰减模拟 =====
+  const alertEl = document.querySelector('#bottombar .status-item:nth-child(3) .val');
+  // keep as is
+
+  // ===== 设备列表状态心跳 (每15秒随机切换一个设备状态) =====
+  setInterval(function() {
+    const statusEls = document.querySelectorAll('.device-status');
+    const idx = Math.floor(Math.random() * statusEls.length);
+    const el = statusEls[idx];
+    const states = ['online', 'online', 'online', 'standby'];
+    const newState = states[Math.floor(Math.random() * states.length)];
+    el.className = 'device-status ' + newState;
+    if (newState === 'online')  el.textContent = '●';
+    if (newState === 'standby') el.textContent = '○';
+    if (newState === 'offline') el.textContent = '✕';
+  }, 15000);
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+// 灵犀 v0312O - 厂家4线SPI正版初始化序列
+// 从厂家STM32F1 4SPI测试程序LCD.c逐行照抄
+// RST=GPIO48（匹配用户实际接线）
+
+#include <Arduino.h>
+
+// 屏引脚（按用户实际接线）
+#define PIN_CS    45
+#define PIN_DC    47
+#define PIN_RST   48
+#define PIN_MOSI  21
+#define PIN_SCLK  20
+
+// 屏幕参数
+#define TFT_WIDTH  320
+#define TFT_HEIGHT 480
+
+// ==================== SPI底层 ====================
+
+void spi_byte(uint8_t d) {
+    for (int i = 0; i < 8; i++) {
+        digitalWrite(PIN_SCLK, LOW);
+        if (d & 0x80) digitalWrite(PIN_MOSI, HIGH);
+        else          digitalWrite(PIN_MOSI, LOW);
+        d <<= 1;
+        digitalWrite(PIN_SCLK, HIGH);
+    }
+}
+
+void wr_cmd(uint8_t cmd) {
+    digitalWrite(PIN_DC, LOW);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(cmd);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+void wr_data(uint8_t d) {
+    digitalWrite(PIN_DC, HIGH);
+    digitalWrite(PIN_CS, LOW);
+    spi_byte(d);
+    digitalWrite(PIN_CS, HIGH);
+}
+
+// ==================== 厂家4线SPI初始化序列（一字不差照抄） ====================
+
+void lcd_init() {
+    Serial.println("[INIT] 开始初始化...");
+
+    // === 复位序列 ===
+    digitalWrite(PIN_RST, HIGH); delay(1);
+    digitalWrite(PIN_RST, LOW);  delay(10);
+    digitalWrite(PIN_RST, HIGH); delay(120);
+
+    Serial.println("[INIT] RST完成，发送初始化命令...");
+
+    // --- F7: Panel Interface Control ---
+    wr_cmd(0xF7);
+    wr_data(0xA9); wr_data(0x51); wr_data(0x2C); wr_data(0x82);
+
+    // --- EC: ? ---
+    wr_cmd(0xEC);
+    wr_data(0x00); wr_data(0x02); wr_data(0x03); wr_data(0x7A);
+
+    // --- C0: Power Control 1 ---
+    wr_cmd(0xC0);
+    wr_data(0x13); wr_data(0x13);
+
+    // --- C1: Power Control 2 (VGH/VGL) ---
+    wr_cmd(0xC1);
+    wr_data(0x41);
+
+    // --- C5: VCOM Control ---
+    wr_cmd(0xC5);
+    wr_data(0x00); wr_data(0x28); wr_data(0x80);
+
+    // --- B0: Interface Setting ---
+    wr_cmd(0xB0);
+    wr_data(0x00);
+
+    // --- B1: Frame Rate 70Hz ---
+    wr_cmd(0xB1);
+    wr_data(0xB0); wr_data(0x11);
+
+    // --- B4: Display Inversion Control ---
+    wr_cmd(0xB4);
+    wr_data(0x02);  // 2-dot inversion
+
+    // --- B6: Display Function Control ---
+    wr_cmd(0xB6);
+    wr_data(0x02);  // MCU interface
+    wr_data(0x22);
+
+    // --- B7: Gate Scan Timing ---
+    wr_cmd(0xB7);
+    wr_data(0xC6);
+
+    // --- BE: ? ---
+    wr_cmd(0xBE);
+    wr_data(0x00); wr_data(0x04);
+
+    // --- E9: Set Image Function ---
+    wr_cmd(0xE9);
+    wr_data(0x00);
+
+    // --- F4: Set Display Mode (必须在Gamma之前!) ---
+    wr_cmd(0xF4);
+    wr_data(0x00); wr_data(0x00); wr_data(0x0F);
+
+    // --- E0: Positive Gamma ---
+    wr_cmd(0xE0);
+    wr_data(0x00); wr_data(0x04); wr_data(0x0E); wr_data(0x08);
+    wr_data(0x17); wr_data(0x0A); wr_data(0x40); wr_data(0x79);
+    wr_data(0x4D); wr_data(0x07); wr_data(0x0E); wr_data(0x0A);
+    wr_data(0x1A); wr_data(0x1D); wr_data(0x0F);
+
+    // --- E1: Negative Gamma ---
+    wr_cmd(0xE1);
+    wr_data(0x00); wr_data(0x1B); wr_data(0x1F); wr_data(0x02);
+    wr_data(0x10); wr_data(0x05); wr_data(0x32); wr_data(0x34);
+    wr_data(0x43); wr_data(0x02); wr_data(0x0A); wr_data(0x09);
+    wr_data(0x33); wr_data(0x37); wr_data(0x0F);
+
+    // --- F4 again ---
+    wr_cmd(0xF4);
+    wr_data(0x00); wr_data(0x00); wr_data(0x0F);
+
+    // --- 36: Memory Access Control ---
+    wr_cmd(0x36);
+    wr_data(0x08);  // 0x08 = BGR order (厂家4SPI值)
+
+    // --- 3A: Interface Pixel Format ---
+    wr_cmd(0x3A);
+    wr_data(0x55);  // 0x55 = 16-bit color (0x66 = 18-bit)
+    // 注：厂家4SPI程序用0x66(18bit)，但为匹配fill_screen的16bit模式用0x55
+
+    // --- 21: Display Inversion ON ---
+    wr_cmd(0x21);
+
+    // --- 11: Sleep Out ---
+    Serial.println("[INIT] Sleep Out (0x11)...");
+    wr_cmd(0x11);
+    delay(120);
+    Serial.println("[INIT] Sleep Out完成");
+
+    // --- 29: Display ON ---
+    Serial.println("[INIT] Display ON (0x29)...");
+    wr_cmd(0x29);
+    delay(50);
+    Serial.println("[INIT] 初始化完成!");
+}
+
+// ==================== 填充屏幕 ====================
+
+void fill_screen(uint16_t color) {
+    // CASET: Column Address Set
+    wr_cmd(0x2A);
+    wr_data(0x00); wr_data(0x00);
+    wr_data((TFT_WIDTH - 1) >> 8); wr_data((TFT_WIDTH - 1) & 0xFF);
+
+    // RASET: Row Address Set
+    wr_cmd(0x2B);
+    wr_data(0x00); wr_data(0x00);
+    wr_data((TFT_HEIGHT - 1) >> 8); wr_data((TFT_HEIGHT - 1) & 0xFF);
+
+    // RAMWR: Memory Write
+    wr_cmd(0x2C);
+    digitalWrite(PIN_CS, LOW);
+    digitalWrite(PIN_DC, HIGH);
+    for (int i = 0; i < TFT_WIDTH * TFT_HEIGHT; i++) {
+        spi_byte(color >> 8);
+        spi_byte(color & 0xFF);
+    }
+    digitalWrite(PIN_CS, HIGH);
+}
+
+// ==================== 测试模式 ====================
+
+void color_test() {
+    Serial.println("[TEST] 红色...");
+    fill_screen(0xF800);  // Red
+    delay(3000);
+
+    Serial.println("[TEST] 绿色...");
+    fill_screen(0x07E0);  // Green
+    delay(3000);
+
+    Serial.println("[TEST] 蓝色...");
+    fill_screen(0x001F);  // Blue
+    delay(3000);
+
+    Serial.println("[TEST] 白色...");
+    fill_screen(0xFFFF);  // White
+    delay(3000);
+
+    Serial.println("[TEST] 黑色...");
+    fill_screen(0x0000);  // Black
+    delay(2000);
+}
+
+void color_bar_test() {
+    // 画六条竖色带
+    int bar_w = TFT_WIDTH / 6;
+    
+    for (int bar = 0; bar < 6; bar++) {
+        uint16_t colors[] = {0xF800, 0x07E0, 0x001F, 0xFFE0, 0xF81F, 0xFFFF};
+        
+        wr_cmd(0x2A);
+        wr_data(0x00); wr_data(bar * bar_w);
+        wr_data(0x01); wr_data((bar + 1) * bar_w - 1);
+        
+        wr_cmd(0x2B);
+        wr_data(0x00); wr_data(0x00);
+        wr_data(0x01); wr_data(0x3F);
+        
+        wr_cmd(0x2C);
+        digitalWrite(PIN_CS, LOW);
+        digitalWrite(PIN_DC, HIGH);
+        for (int i = 0; i < bar_w * TFT_HEIGHT; i++) {
+            spi_byte(colors[bar] >> 8);
+            spi_byte(colors[bar] & 0xFF);
+        }
+        digitalWrite(PIN_CS, HIGH);
+    }
+    Serial.println("[TEST] 六色彩条完成");
+}
+
+// ==================== 主函数 ====================
+
+void setup() {
+    Serial.begin(115200);
+    delay(2000);  // 等串口
+
+    Serial.println();
+    Serial.println("========================================");
+    Serial.println("灵犀 v0312O - 厂家4SPI正版初始化");
+    Serial.println("========================================");
+
+    // 初始化GPIO
+    pinMode(PIN_CS, OUTPUT);   digitalWrite(PIN_CS, HIGH);
+    pinMode(PIN_DC, OUTPUT);   digitalWrite(PIN_DC, HIGH);
+    pinMode(PIN_RST, OUTPUT);  digitalWrite(PIN_RST, HIGH);
+    pinMode(PIN_MOSI, OUTPUT); digitalWrite(PIN_MOSI, LOW);
+    pinMode(PIN_SCLK, OUTPUT); digitalWrite(PIN_SCLK, LOW);
+
+    Serial.printf("RST=GPIO%d CS=GPIO%d DC=GPIO%d\n", PIN_RST, PIN_CS, PIN_DC);
+    Serial.printf("MOSI=GPIO%d SCK=GPIO%d\n", PIN_MOSI, PIN_SCLK);
+    Serial.printf("分辨率: %dx%d\n", TFT_WIDTH, TFT_HEIGHT);
+    Serial.println();
+
+    // 初始化屏
+    lcd_init();
+
+    // 全红
+    Serial.println("→ 填充红色");
+    fill_screen(0xF800);
+    delay(3000);
+
+    // 六色条
+    color_bar_test();
+    delay(3000);
+
+    // 颜色循环
+    while (true) {
+        color_test();
+        delay(1000);
+    }
+}
+
+void loop() {
+    // 所有测试在setup中完成
+    delay(10000);
+}

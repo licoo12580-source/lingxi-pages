@@ -60,6 +60,20 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 <script>
 const versions = [
   {
+    ver: "v0312J",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["厂家序列"],
+    file: "v0312J.bin",
+    sha256: "b2e348483344cdc4d5c1f7ab65ca880721623537f43fae010dedfe6c3e8defe2",
+    size: "382KB",
+    driver: "待定",
+    desc: "照搬厂家完整初始化序列(伽马/电源/F7/EE)，红→绿→蓝→白→闪烁",
+    changelog: "📌 使用厂家exact初始化序列\\n🔧 完整0xE0/E1伽马(15字节×2)\\n🔧 完整0xC0/C1/C5电源配置\\n🔧 0xB1帧率、0xB4反转\\n🔧 0xF7面板控制(A9 51 2C 82)\\n🔧 0xEE(00 04)、0xE9(00)\\n🔧 0x21显示反转ON\\n🔧 Reset时序修正：HIGH→LOW(10ms)→HIGH(120ms)",
+    hw: "HW-678A N16R8, 4寸屏",
+    recommend: true
+  },
+  {
     ver: "v0312H",
     date: "2026-06-20",
     status: "latest",

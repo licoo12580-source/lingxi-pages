@@ -52,14 +52,27 @@ h1{font-size:22px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 
 <input class="search-bar" type="text" id="search" placeholder="搜索固件版本..." oninput="filterFirmware()">
 
-<div class="stats">共 22 个固件版本 · 最新的排最前面</div>
+<div class="stats">共 23 个固件版本 · 最新的排最前面</div>
 <div id="fwList">
+
+    <div class="fw-card">
+      <div class="fw-name">v0312P.bin</div>
+      <div class="fw-info">
+        <span>📦 283 KB</span>
+        <span class="fw-time">🕐 06-19 19:02</span>
+        <span>📄 有源码</span>
+      </div>
+      <div class="fw-actions">
+        <a class="btn dl" href="https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312P.bin" download>⬇ 下载</a>
+        <button class="btn source" onclick="viewSource('v0312P.bin', 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware/v0312P-source.txt')">📝 查看源码</button>
+      </div>
+    </div>
 
     <div class="fw-card">
       <div class="fw-name">v0312O.bin</div>
       <div class="fw-info">
         <span>📦 282 KB</span>
-        <span class="fw-time">🕐 06-19 18:46</span>
+        <span class="fw-time">🕐 06-19 18:59</span>
         <span>📄 有源码</span>
       </div>
       <div class="fw-actions">

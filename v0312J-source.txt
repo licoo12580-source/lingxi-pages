@@ -1,0 +1,193 @@
+// 灵犀 v0312J - 使用厂家初始化序列，精确照搬
+#include <Arduino.h>
+#include <SPI.h>
+#include <Adafruit_NeoPixel.h>
+
+Adafruit_NeoPixel pixels(1, 48, NEO_GRB + NEO_KHZ800);
+
+#define PIN_CS    45
+#define PIN_DC    47
+#define PIN_RST   4
+#define PIN_MOSI  21
+#define PIN_SCLK  20
+
+#define SPI_CLOCK 2000000
+
+static SPISettings spi_settings(SPI_CLOCK, MSBFIRST, SPI_MODE0);
+
+void dc_low()  { digitalWrite(PIN_DC, LOW); }
+void dc_high() { digitalWrite(PIN_DC, HIGH); }
+void cs_low()  { digitalWrite(PIN_CS, LOW); }
+void cs_high() { digitalWrite(PIN_CS, HIGH); }
+
+void wr_reg(uint8_t cmd) {
+    dc_low(); cs_low(); SPI.transfer(cmd); cs_high();
+}
+void wr_data(uint8_t d) {
+    dc_high(); cs_low(); SPI.transfer(d); cs_high();
+}
+
+// ===== 厂家初始化序列 (EXACT) =====
+void init_display() {
+    SPI.beginTransaction(spi_settings);
+
+    // Reset: HIGH(1ms) → LOW(10ms) → HIGH(120ms)
+    digitalWrite(PIN_RST, HIGH); delay(1);
+    digitalWrite(PIN_RST, LOW);  delay(10);
+    digitalWrite(PIN_RST, HIGH); delay(120);
+
+    // Gamma positive
+    wr_reg(0xE0);
+    wr_data(0x00); wr_data(0x09); wr_data(0x0C); wr_data(0x03);
+    wr_data(0x10); wr_data(0x06); wr_data(0x34); wr_data(0x68);
+    wr_data(0x49); wr_data(0x02); wr_data(0x0A); wr_data(0x07);
+    wr_data(0x2C); wr_data(0x31); wr_data(0x0F);
+
+    // Gamma negative
+    wr_reg(0xE1);
+    wr_data(0x00); wr_data(0x12); wr_data(0x15); wr_data(0x02);
+    wr_data(0x10); wr_data(0x06); wr_data(0x35); wr_data(0x35);
+    wr_data(0x4A); wr_data(0x05); wr_data(0x10); wr_data(0x0C);
+    wr_data(0x2F); wr_data(0x33); wr_data(0x0F);
+
+    // Power Control 1
+    wr_reg(0xC0);
+    wr_data(0x0F); wr_data(0x0F);
+
+    // Power Control 2
+    wr_reg(0xC1);
+    wr_data(0x44);
+
+    // VCOM Control
+    wr_reg(0xC5);
+    wr_data(0x00); wr_data(0x66); wr_data(0x80);
+
+    // MADCTL
+    wr_reg(0x36);
+    wr_data(0x48);
+
+    // Pixel format
+    wr_reg(0x3A);
+    wr_data(0x55);
+
+    // Frame rate
+    wr_reg(0xB1);
+    wr_data(0xA0); wr_data(0x11);
+
+    // Display inversion
+    wr_reg(0xB4);
+    wr_data(0x02);
+
+    // 0xEE
+    wr_reg(0xEE);
+    wr_data(0x00); wr_data(0x04);
+
+    // 0xE9
+    wr_reg(0xE9);
+    wr_data(0x00);
+
+    // 0xF7 - Panel Interface Control
+    wr_reg(0xF7);
+    wr_data(0xA9); wr_data(0x51); wr_data(0x2C); wr_data(0x82);
+
+    // Display inversion ON
+    wr_reg(0x21);
+
+    // Sleep out
+    wr_reg(0x11);
+    delay(120);
+
+    // Display on
+    wr_reg(0x29);
+    delay(50);
+
+    SPI.endTransaction();
+}
+
+void fill_screen(uint16_t color) {
+    SPI.beginTransaction(spi_settings);
+
+    // CASET: 0~479 (X)
+    wr_reg(0x2A);
+    wr_data(0x00); wr_data(0x00);
+    wr_data(0x01); wr_data(0xDF);
+
+    // RASET: 0~319 (Y)
+    wr_reg(0x2B);
+    wr_data(0x00); wr_data(0x00);
+    wr_data(0x01); wr_data(0x3F);
+
+    // RAMWR
+    wr_reg(0x2C);
+    dc_high(); cs_low();
+    for (int i = 0; i < 480 * 320; i++) {
+        SPI.write16(color);
+    }
+    cs_high();
+
+    SPI.endTransaction();
+}
+
+void setup() {
+    pixels.begin(); pixels.setBrightness(50);
+    pixels.setPixelColor(0, pixels.Color(100, 0, 0)); pixels.show();
+
+    Serial.begin(115200); delay(2000);
+    Serial.println("\n=== v0312J 厂家初始化序列测试 ===");
+
+    pinMode(PIN_CS, OUTPUT);   cs_high();
+    pinMode(PIN_DC, OUTPUT);   dc_high();
+    pinMode(PIN_RST, OUTPUT);  digitalWrite(PIN_RST, HIGH);
+    pinMode(PIN_MOSI, OUTPUT);
+    pinMode(PIN_SCLK, OUTPUT);
+
+    SPI.begin(PIN_SCLK, -1, PIN_MOSI, PIN_CS);
+
+    // === 初始化 + 红色 ===
+    Serial.print("初始化... ");
+    init_display();
+    Serial.println("OK");
+
+    Serial.print("填红... ");
+    fill_screen(0xF800);
+    Serial.println("OK");
+    delay(3000);
+
+    // === 绿色 ===
+    Serial.print("填绿... ");
+    fill_screen(0x07E0);
+    Serial.println("OK");
+    delay(3000);
+
+    // === 蓝色 ===
+    Serial.print("填蓝... ");
+    fill_screen(0x001F);
+    Serial.println("OK");
+    delay(3000);
+
+    // === 白色 ===
+    Serial.print("填白... ");
+    fill_screen(0xFFFF);
+    Serial.println("OK");
+    delay(3000);
+
+    // === 红绿蓝闪烁 ===
+    for (int i = 0; i < 5; i++) {
+        fill_screen(0xF800); delay(400);
+        fill_screen(0x07E0); delay(400);
+        fill_screen(0x001F); delay(400);
+    }
+
+    pixels.setPixelColor(0, pixels.Color(0, 100, 0)); pixels.show();
+    Serial.println("\n=== 测试完成 ===");
+}
+
+void loop() {
+    static unsigned long last = 0;
+    if (millis() - last > 5000) {
+        last = millis();
+        Serial.printf("[♥] mem=%uKB free=%u\n",
+            ESP.getFreeHeap() / 1024, ESP.getFreePsram() / 1024);
+    }
+    delay(100);
+}

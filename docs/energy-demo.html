@@ -3,79 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🦞 灵犀 · 节能演示 · 核心卖点</title>
+<title>⚡ 灵犀 · 节能演示</title>
 <style>
-:root{--bg:#0b1120;--card:#1e293b;--border:#334155;--fg:#e2e8f0;--fg2:#94a3b8;--fg3:#64748b;--accent:#3b82f6;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--font:system-ui,sans-serif}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:13px;min-height:100vh}
-.top{background:linear-gradient(135deg,#0f172a,#1e293b);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+/* ========== RESET ========== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#080d1a;color:#e2e8f0;min-height:100vh;line-height:1.5}
+::-webkit-scrollbar{width:5px;background:#080d1a}
+::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}
+
+/* ========== VARIABLES ========== */
+:root{
+  --bg:#080d1a; --card:#0f172a; --card2:#131c31;
+  --border:#1e293b; --border-light:#334155;
+  --text:#e2e8f0; --text2:#94a3b8; --text3:#475569;
+  --green:#22c55e; --green-bg:rgba(34,197,94,.1);
+  --blue:#3b82f6; --blue-bg:rgba(59,130,246,.1);
+  --orange:#f59e0b; --orange-bg:rgba(245,158,11,.1);
+  --purple:#8b5cf6; --red:#ef4444;
+  --radius:12px; --shadow:0 4px 20px rgba(0,0,0,.3);
+}
+
+/* ========== TOP ========== */
+.top{background:linear-gradient(135deg,#0f172a,#0a1a0f);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
 .top h1{font-size:16px;display:flex;align-items:center;gap:6px}
-.top .tag{background:#22c55e;color:#fff;font-size:9px;padding:2px 8px;border-radius:4px}
-.top .sub{color:var(--fg3);font-size:11px;flex:1;text-align:right}
-.container{max-width:1000px;margin:0 auto;padding:16px 20px}
+.top .tag{background:var(--green);color:#000;font-size:9px;padding:2px 10px;border-radius:12px;font-weight:600}
+.top .sub{color:var(--text3);font-size:11px;flex:1;text-align:right}
 
-/* 省电总览 */
-.hero{background:linear-gradient(135deg,#22c55e11,#22c55e22);border:1px solid #22c55e44;border-radius:16px;padding:24px;text-align:center;margin-bottom:16px}
-.hero .big{font-size:48px;font-weight:700;color:var(--green);line-height:1}
-.hero .big span{font-size:16px;font-weight:400;color:var(--fg3)}
-.hero .sub{font-size:13px;color:var(--fg2);margin-top:4px}
-.hero .meta{display:flex;justify-content:center;gap:24px;margin-top:10px;font-size:11px;color:var(--fg3)}
-.hero .meta .m{display:flex;align-items:center;gap:4px}
+/* ========== HERO ========== */
+.hero{background:linear-gradient(135deg,rgba(34,197,94,.05),rgba(34,197,94,.1));border:1px solid rgba(34,197,94,.2);border-radius:16px;padding:32px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(34,197,94,.04),transparent);pointer-events:none}
+.hero .big{font-size:52px;font-weight:700;color:var(--green);line-height:1}
+.hero .big span{font-size:16px;font-weight:400;color:var(--text3)}
+.hero .sub{font-size:14px;color:var(--text2);margin-top:6px}
+.hero .meta{display:flex;justify-content:center;gap:32px;margin-top:12px;font-size:11px;color:var(--text3)}
 
-/* 房间卡片 */
-.room-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px}
-.room-eco{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .2s}
-.room-eco:hover{border-color:#22c55e44}
-.room-eco .rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.room-eco .rh .rn{font-size:14px;font-weight:600}
-.room-eco .rh .rsaved{font-size:14px;font-weight:700;color:var(--green)}
-.room-eco .rtl{position:relative;height:80px;margin:8px 0;padding:0}
-.room-eco .rtl svg{width:100%;height:80px}
-.room-eco .events{display:flex;flex-direction:column;gap:4px;font-size:10px}
-.room-eco .ev{display:flex;align-items:center;gap:6px;padding:4px 6px;background:var(--bg);border-radius:4px;border-left:3px solid}
-.room-eco .ev.g{border-color:var(--green)}
-.room-eco .ev.b{border-color:var(--accent)}
-.room-eco .ev.o{border-color:var(--orange)}
-.room-eco .ev .et{color:var(--fg3);min-width:40px;font-family:monospace;font-size:9px}
-.room-eco .ev .el{flex:1;font-size:10px}
-.room-eco .ev .ev2{font-size:10px;font-weight:600}
-.room-eco .ev .ev2.g{color:var(--green)}
-.room-eco .ev .ev2.o{color:var(--orange)}
-.room-eco .ev .ev2.b{color:var(--accent)}
-.room-eco .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
-.room-eco .stats .st{padding:6px;background:var(--bg);border-radius:6px;text-align:center}
-.room-eco .stats .st .sv{font-size:13px;font-weight:600}
-.room-eco .stats .st .sl{font-size:8px;color:var(--fg3);margin-top:1px}
-.room-eco .stats .st .sv.g{color:var(--green)}
+/* ========== CONTAINER ========== */
+.container{max-width:1000px;margin:0 auto;padding:20px}
 
-/* 节能原理 */
-.how-it-works{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
-.how-it-works h3{font-size:13px;margin-bottom:10px;color:var(--fg2)}
-.how-step{display:flex;gap:12px;margin-bottom:8px;padding:8px;background:var(--bg);border-radius:8px}
-.how-step .num{width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+/* ========== STATS ROW ========== */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;position:relative}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.stat-card:nth-child(1)::before{background:var(--green)}
+.stat-card:nth-child(2)::before{background:var(--blue)}
+.stat-card:nth-child(3)::before{background:var(--orange)}
+.stat-card:nth-child(4)::before{background:var(--purple)}
+.stat-card .sv{font-size:22px;font-weight:700}
+.stat-card .sv.g{color:var(--green)}
+.stat-card .sv.b{color:var(--blue)}
+.stat-card .sv.o{color:var(--orange)}
+.stat-card .sv.p{color:var(--purple)}
+.stat-card .sl{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ========== SECTION ========== */
+.section{margin-bottom:20px}
+.section-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.section-header h3{font-size:13px;font-weight:600;color:var(--text2)}
+
+/* ========== ROOM GRID ========== */
+.room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.room-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all .25s}
+.room-card:hover{border-color:rgba(34,197,94,.2)}
+.room-card .rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.room-card .rh .rn{font-size:14px;font-weight:600}
+.room-card .rh .rsaved{font-size:16px;font-weight:700;color:var(--green)}
+
+/* ========== TIMELINE SVG ========== */
+.timeline-svg{width:100%;height:80px;margin:8px 0}
+
+/* ========== EVENTS ========== */
+.events{display:flex;flex-direction:column;gap:4px;font-size:10px}
+.ev{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--card2);border-radius:6px;border-left:3px solid}
+.ev.g{border-color:var(--green)}
+.ev.b{border-color:var(--blue)}
+.ev.o{border-color:var(--orange)}
+.ev .et{color:var(--text3);min-width:40px;font-family:monospace;font-size:9px}
+.ev .el{flex:1;font-size:10px}
+.ev .ev2{font-size:10px;font-weight:600}
+.ev .ev2.g{color:var(--green)}
+.ev .ev2.o{color:var(--orange)}
+
+.room-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.room-stats .st{padding:6px;background:var(--card2);border-radius:6px;text-align:center}
+.room-stats .st .sv{font-size:13px;font-weight:600}
+.room-stats .st .sl{font-size:8px;color:var(--text3);margin-top:1px}
+.room-stats .st .sv.g{color:var(--green)}
+
+/* ========== HOW IT WORKS ========== */
+.how{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.how h3{font-size:13px;margin-bottom:12px;color:var(--text2)}
+.how-step{display:flex;gap:12px;margin-bottom:8px;padding:10px;background:var(--card2);border-radius:8px}
+.how-step .num{width:26px;height:26px;border-radius:50%;background:var(--green);color:#000;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
 .how-step .c{font-size:11px}
 .how-step .c .hl{font-weight:600;color:var(--green)}
-.how-step .c .hd{color:var(--fg3);font-size:10px;margin-top:1px}
+.how-step .c .hd{color:var(--text3);font-size:10px;margin-top:1px}
 
-/* 节能数据卡片 */
-.eco-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:16px}
-.eco-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
-.eco-card .ec-icon{font-size:20px;margin-bottom:4px}
-.eco-card .ec-title{font-size:10px;color:var(--fg3);text-transform:uppercase;letter-spacing:1px}
-.eco-card .ec-value{font-size:22px;font-weight:700;margin:4px 0}
-.eco-card .ec-value.g{color:var(--green)}
-.eco-card .ec-value.o{color:var(--orange)}
-.eco-card .ec-desc{font-size:10px;color:var(--fg3)}
+/* ========== SELL POINTS ========== */
+.sells{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.sell{display:flex;align-items:flex-start;gap:8px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.sell .sp-icon{font-size:18px;flex-shrink:0}
+.sell .sp-t{font-size:11px}
+.sell .sp-t strong{color:var(--green)}
+.sell .sp-d{font-size:9px;color:var(--text3);margin-top:2px}
 
-/* 卖点列表 */
-.sell-points{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.sell-point{display:flex;align-items:flex-start;gap:8px;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px}
-.sell-point .sp-icon{font-size:16px}
-.sell-point .sp-t{font-size:11px}
-.sell-point .sp-t strong{color:var(--green)}
-.sell-point .sp-d{font-size:9px;color:var(--fg3);margin-top:2px}
+/* ========== ANIMATION ========== */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.room-card{animation:fadeInUp .4s ease both}
+.room-card:nth-child(1){animation-delay:0s}
+.room-card:nth-child(2){animation-delay:.06s}
+.room-card:nth-child(3){animation-delay:.12s}
 
-@media(max-width:600px){.room-cards{grid-template-columns:1fr}.sell-points{grid-template-columns:1fr}}
+/* ========== RESPONSIVE ========== */
+@media(max-width:768px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .room-grid{grid-template-columns:1fr}
+  .sells{grid-template-columns:1fr}
+  .container{padding:12px}
+  .hero{padding:20px}
+  .hero .big{font-size:36px}
+  .hero .meta{flex-wrap:wrap;gap:12px}
+}
 </style>
 </head>
 <body>
@@ -90,180 +138,118 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:13px
 <!-- 核心数据 -->
 <div class="hero">
   <div class="big" id="totalSaved">2,184 <span>kWh</span></div>
-  <div class="sub">今日省电 · 23家酒店 · 1,247台设备</div>
+  <div class="sub">今日省电 · 7家酒店 · 436台设备</div>
   <div class="meta">
-    <span class="m">💰 今日省钱: <strong style="color:var(--green)" id="totalMoney">¥3,822</strong></span>
-    <span class="m">🏪 平均每酒店: <strong style="color:var(--green)">95 kWh</strong></span>
-    <span class="m">📅 本月累计: <strong style="color:var(--green)" id="monthTotal">58,392 kWh</strong></span>
+    <span>💰 今日省钱: <strong style="color:var(--green)">¥3,822</strong></span>
+    <span>🏪 平均每酒店: <strong style="color:var(--green)">95 kWh</strong></span>
+    <span>📅 本月累计: <strong style="color:var(--green)">58,392 kWh</strong></span>
   </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card"><div class="sv g">+4°C</div><div class="sl">省电偏移</div></div>
+  <div class="stat-card"><div class="sv b">30min</div><div class="sl">入眠检测</div></div>
+  <div class="stat-card"><div class="sv o">+2°C</div><div class="sl">夜间调高</div></div>
+  <div class="stat-card"><div class="sv p">¥7.6万</div><div class="sl">年省电费</div></div>
+</div>
+
+<!-- 房间卡片 -->
+<div class="section">
+  <div class="section-header"><h3>🏨 房间节能故事 · 点击查看详情</h3></div>
+  <div class="room-grid" id="roomGrid"></div>
 </div>
 
 <!-- 节能原理 -->
-<div class="how-it-works">
-  <h3>⚡ 灵犀怎么帮你省电</h3>
+<div class="how">
+  <h3>🔬 灵犀怎么省电的</h3>
   <div class="how-step">
     <div class="num">1</div>
-    <div class="c"><div class="hl">客人设定温度</div><div class="hd">客人入住调空调到22°C，系统记录客人偏好</div></div>
+    <div class="c"><span class="hl">雷达+WiFi 感知</span>空间知道客人还在不在房里<div class="hd">毫米波雷达检测微动呼吸，WiFi信号判断手机位置</div></div>
   </div>
   <div class="how-step">
     <div class="num">2</div>
-    <div class="c"><div class="hl">客人出门 → 自动节能</div><div class="hd">雷达+红外检测到无人 → 15分钟后再确认 → 空调从22°C调到26°C（省电偏移 +4°C）</div></div>
+    <div class="c"><span class="hl">无人15分钟 → 节能模式</span>自动调温+4°C<div class="hd">客人出门后，空调不用开到22°C那么冷</div></div>
   </div>
   <div class="how-step">
     <div class="num">3</div>
-    <div class="c"><div class="hl">客人睡觉 → 舒适省电</div><div class="hd">检测到30分钟无活动（深睡）→ 夜间模式：温度调高2°C到24°C，不影响睡眠舒适度</div></div>
+    <div class="c"><span class="hl">深睡检测 → 再加+2°C</span>睡得越深，省得越多<div class="hd">深睡时人对温度不敏感，+2°C完全无感</div></div>
   </div>
   <div class="how-step">
     <div class="num">4</div>
-    <div class="c"><div class="hl">客人回来 → 自动恢复</div><div class="hd">雷达+红外检测到有人 → 恢复到客人设定的22°C，客人完全无感</div></div>
-  </div>
-  <div class="how-step">
-    <div class="num">5</div>
-    <div class="c"><div class="hl">退房 → 彻底关停</div><div class="hd">PMS标记退房 → 确认无人 → 关闭空调 → 直到下一位客人入住</div></div>
+    <div class="c"><span class="hl">客人回来 → 自动恢复</span>进门之前就开始预降温<div class="hd">蓝牙感知到手机靠近，提前10分钟恢复设定温度</div></div>
   </div>
 </div>
 
-<!-- 房间节能故事 -->
-<h3 style="font-size:12px;color:var(--fg2);margin-bottom:10px">🏨 每间房的省电故事（点击查看完整数据）</h3>
-<div class="room-cards" id="roomCards"></div>
-
-<!-- 节能数据卡片 -->
-<h3 style="font-size:12px;color:var(--fg2);margin-bottom:10px">📊 节能数据一览</h3>
-<div class="eco-cards">
-  <div class="eco-card">
-    <div class="ec-icon">🌡️</div>
-    <div class="ec-title">客人设定温度</div>
-    <div class="ec-value">22°C</div>
-    <div class="ec-desc">多数客人设定在22-24°C之间</div>
-  </div>
-  <div class="eco-card">
-    <div class="ec-icon">↕️</div>
-    <div class="ec-title">省电偏移</div>
-    <div class="ec-value g">+4°C</div>
-    <div class="ec-desc">无人时自动上调4°C，不浪费一度电</div>
-  </div>
-  <div class="eco-card">
-    <div class="ec-icon">⏱️</div>
-    <div class="ec-title">外出→节能时间</div>
-    <div class="ec-value o">15分钟</div>
-    <div class="ec-desc">确认无人后再切换，避免误判</div>
-  </div>
-  <div class="eco-card">
-    <div class="ec-icon">🌙</div>
-    <div class="ec-title">入眠检测时间</div>
-    <div class="ec-value">30分钟</div>
-    <div class="ec-desc">无活动后判断为深睡，自动调温</div>
-  </div>
-  <div class="eco-card">
-    <div class="ec-icon">❄️</div>
-    <div class="ec-title">夜间调高幅度</div>
-    <div class="ec-value g">+2°C</div>
-    <div class="ec-desc">深睡后微调，不影响舒适度</div>
-  </div>
-  <div class="eco-card">
-    <div class="ec-icon">💰</div>
-    <div class="ec-title">单房日均省电</div>
-    <div class="ec-value g">2.4 kWh</div>
-    <div class="ec-desc">≈ ¥4.2/天/间，年省¥1,533/间</div>
-  </div>
-  <div class="eco-card">
-    <div class="ec-icon">🏪</div>
-    <div class="ec-title">50间酒店年省</div>
-    <div class="ec-value g">¥76,650</div>
-    <div class="ec-desc">投入¥4,400买设备 → 2个月回本</div>
-  </div>
-  <div class="eco-card">
-    <div class="ec-icon">✔️</div>
-    <div class="ec-title">客人投诉率</div>
-    <div class="ec-value" style="color:var(--green)">0%</div>
-    <div class="ec-desc">智能恢复设定温度，客人完全无感</div>
-  </div>
-</div>
-
-<!-- 卖点总结 -->
-<h3 style="font-size:12px;color:var(--fg2);margin-bottom:10px">🎯 跟酒店老板说的卖点</h3>
-<div class="sell-points">
-  <div class="sell-point"><div class="sp-icon">🔑</div><div class="sp-t"><strong>客人出门，空调自动关</strong><div class="sp-d">雷达检测无人→15分钟后调高4°C→客人回来自动恢复原温度</div></div></div>
-  <div class="sell-point"><div class="sp-icon">🌙</div><div class="sp-t"><strong>客人睡觉，温度自动调</strong><div class="sp-d">检测深睡（30分钟无活动）→温度调高2°C→省电不影响睡眠</div></div></div>
-  <div class="sell-point"><div class="sp-icon">📊</div><div class="sp-t"><strong>每天告诉你省了多少</strong><div class="sp-d">后台自动生成省电报告：每间房每天省了多少，折合多少钱</div></div></div>
-  <div class="sell-point"><div class="sp-icon">🔄</div><div class="sp-t"><strong>客人完全无感</strong><div class="sp-d">恢复客人设定的温度，客人从来没发现空调被调过</div></div></div>
-  <div class="sell-point"><div class="sp-icon">📈</div><div class="sp-t"><strong>50间房一年省¥7.6万</strong><div class="sp-d">¥4,400设备投入 → 2个月回本 → 之后每年白赚7万多</div></div></div>
-  <div class="sell-point"><div class="sp-icon">🛡️</div><div class="sp-t"><strong>退房自动关空调</strong><div class="sp-d">PMS联动退房→确认无人→彻底关停，不浪费一度电</div></div></div>
+<!-- 卖点 -->
+<div class="sells">
+  <div class="sell"><span class="sp-icon">💡</span><div class="sp-t"><strong>客人完全无感</strong><div class="sp-d">温度缓慢变化，客人不会觉得忽冷忽热</div></div></div>
+  <div class="sell"><span class="sp-icon">⚡</span><div class="sp-t"><strong>50间房年省¥7.6万</strong><div class="sp-d">每间房每天省2.4kWh，一年就是¥1,512</div></div></div>
+  <div class="sell"><span class="sp-icon">🎯</span><div class="sp-t"><strong>2个月回本</strong><div class="sp-d">硬件投入¥4,400，两个月省的电费就赚回来</div></div></div>
+  <div class="sell"><span class="sp-icon">🤖</span><div class="sp-t"><strong>越用越聪明</strong><div class="sp-d">AI学习客人作息习惯，节能效率逐月上升</div></div></div>
 </div>
 
 </div>
 
 <script>
+// 房间数据
 var rooms = [
-  {no:301, guest:'陈先生', temp:22, ecoOffset:4, sleepTemp:24, leaveDetect:8.5, returnDetect:11.08, sleepDetect:23.25, totalSaved:2.4, money:4.2, ecoTime:'3h12m', sleepEco:'6h45m', events:[
-    {t:'07:15',l:'入住 · 设定22°C',v:'22°C',c:'b'},
-    {t:'08:30',l:'客人外出 灵犀检测无人',v:'⏳15min',c:'o'},
-    {t:'08:45',l:'自动节能 调至26°C',v:'+4°C',c:'g'},
-    {t:'11:05',l:'客人返回 恢复22°C',v:'22°C',c:'b'},
-    {t:'23:00',l:'检测到无活动 准备入眠',v:'⏳30min',c:'o'},
-    {t:'23:30',l:'深睡模式 调至24°C',v:'+2°C(夜间)',c:'g'},
-  ]},
-  {no:302, guest:'李先生', temp:24, ecoOffset:2, sleepTemp:25, leaveDetect:9.0, returnDetect:18.0, sleepDetect:22.5, totalSaved:3.8, money:6.65, ecoTime:'8h00m', sleepEco:'8h30m', events:[
-    {t:'06:00',l:'入住 · 设定24°C',v:'24°C',c:'b'},
-    {t:'09:00',l:'客人外出 灵犀检测无人',v:'⏳15min',c:'o'},
-    {t:'09:15',l:'自动节能 调至26°C',v:'+2°C',c:'g'},
-    {t:'18:00',l:'客人返回 恢复24°C',v:'24°C',c:'b'},
-    {t:'22:00',l:'检测到无活动 准备入眠',v:'⏳30min',c:'o'},
-    {t:'22:30',l:'深睡模式 调至25°C',v:'+1°C(夜间)',c:'g'},
-  ]},
-  {no:303, guest:'王女士一家', temp:20, ecoOffset:6, sleepTemp:23, leaveDetect:10.0, returnDetect:12.0, sleepDetect:21.5, totalSaved:1.2, money:2.1, ecoTime:'1h30m', sleepEco:'9h00m', events:[
-    {t:'09:30',l:'入住 · 设定20°C',v:'20°C',c:'b'},
-    {t:'10:00',l:'⚠️ 噪音告警 小孩尖叫声78dB',v:'关注',c:'o'},
-    {t:'10:15',l:'外出 灵犀检测无人',v:'⏳15min',c:'o'},
-    {t:'10:30',l:'自动节能 调至26°C',v:'+6°C',c:'g'},
-    {t:'12:00',l:'返回 恢复20°C',v:'20°C',c:'b'},
-    {t:'21:00',l:'检测到无活动',v:'⏳30min',c:'o'},
-    {t:'21:30',l:'深睡模式 调至23°C',v:'+3°C(夜间)',c:'g'},
-  ]},
-  {no:306, guest:'张先生', temp:18, ecoOffset:8, sleepTemp:22, leaveDetect:6.0, returnDetect:0, sleepDetect:23.5, totalSaved:6.8, money:11.9, ecoTime:'16h00m', sleepEco:'7h30m', events:[
-    {t:'04:30',l:'入住 · 设定18°C',v:'18°C',c:'b'},
-    {t:'06:00',l:'退房 PMS标记已退',v:'🔄',c:'o'},
-    {t:'06:15',l:'确认无人 彻底关闭空调',v:'—',c:'g'},
-    {t:'—',l:'全天节能中',v:'省16h',c:'g'},
-  ]},
+  {no:'301',people:2,temp:26,noise:62,humi:58,eco:'2.4',dur:'3h12m',
+   events:[
+     {time:'08:15',label:'客人出门',type:'b',val:'进入节能'},
+     {time:'08:16',label:'温度从22°调至26°C',type:'g',val:'+4°C'},
+     {time:'11:05',label:'客人回来',type:'b',val:'自动恢复'},
+     {time:'11:06',label:'恢复22°C',type:'g',val:'完成'},
+   ]},
+  {no:'302',people:1,temp:25,noise:38,humi:55,eco:'3.8',dur:'5h20m',
+   events:[
+     {time:'06:00',label:'入住·商务旅客',type:'b'},
+     {time:'08:45',label:'外出办公',type:'o',val:'节能中'},
+     {time:'当前',label:'节能已持续3h',type:'g',val:'省3.8kWh'},
+   ]},
+  {no:'303',people:2,temp:24,noise:45,humi:52,eco:'3.2',dur:'6h30m',
+   events:[
+     {time:'04:30',label:'凌晨入住·红眼航班',type:'b'},
+     {time:'06:00',label:'进入深睡',type:'g',val:'+2°C'},
+     {time:'07:30',label:'回温准备',type:'o',val:'恢复22°C'},
+   ]},
 ];
 
-function render() {
-  var c = document.getElementById('roomCards');
+function renderRooms() {
+  var grid = document.getElementById('roomGrid');
   rooms.forEach(function(r){
-    var h = '<div class="room-eco">';
-    h += '<div class="rh"><span class="rn">'+r.no+' 房 · '+r.guest+'</span><span class="rsaved">⚡ 省 '+r.totalSaved+'kWh (¥'+r.money+')</span></div>';
-    // Timeline chart (simplified SVG)
-    h += '<div class="rtl"><svg viewBox="0 0 280 60"><rect x="0" y="10" width="280" height="40" rx="6" fill="#1e293b"/>';
-    // Day hours bar
-    h += '<rect x="0" y="10" width="280" height="40" rx="6" fill="url(#g'+r.no+')"/>';
-    h += '<defs><linearGradient id="g'+r.no+'"><stop offset="0%" stop-color="#22c55e44"/><stop offset="30%" stop-color="#22c55e"/><stop offset="45%" stop-color="#22c55e44"/><stop offset="60%" stop-color="#22c55e"/><stop offset="80%" stop-color="#22c55e44"/><stop offset="100%" stop-color="#22c55e"/></linearGradient></defs>';
-    // Temperature markers
-    h += '<text x="10" y="35" font-size="8" fill="#e2e8f0">'+r.temp+'°C</text>';
-    h += '<text x="80" y="35" font-size="8" fill="#22c55e">'+(r.temp+r.ecoOffset)+'°C 省电</text>';
-    h += '<text x="170" y="35" font-size="8" fill="#e2e8f0">'+r.temp+'°C 恢复</text>';
-    h += '<text x="230" y="35" font-size="8" fill="#22c55e">'+r.sleepTemp+'°C 夜间</text>';
-    // Time markers
-    h += '<text x="5" y="55" font-size="6" fill="#64748b">06</text>';
-    h += '<text x="73" y="55" font-size="6" fill="#64748b">10</text>';
-    h += '<text x="143" y="55" font-size="6" fill="#64748b">14</text>';
-    h += '<text x="213" y="55" font-size="6" fill="#64748b">18</text>';
-    h += '<text x="263" y="55" font-size="6" fill="#64748b">22</text>';
-    h += '</svg></div>';
-    // Events
-    h += '<div class="events">';
+    var evHtml = '';
     r.events.forEach(function(e){
-      var tc = {g:'g',b:'b',o:'o'}[e.c]||'';
-      h += '<div class="ev '+tc+'"><span class="et">'+e.t+'</span><span class="el">'+e.l+'</span><span class="ev2 '+tc+'">'+e.v+'</span></div>';
+      evHtml += '<div class="ev '+e.type+'"><span class="et">'+e.time+'</span><span class="el">'+e.label+'</span>'+(e.val?'<span class="ev2 '+e.type+'">'+e.val+'</span>':'')+'</div>';
     });
-    h += '</div>';
-    // Stats
-    h += '<div class="stats"><div class="st"><div class="sv g">'+r.totalSaved+' kWh</div><div class="sl">今日省电</div></div><div class="st"><div class="sv">¥'+r.money+'</div><div class="sl">省钱</div></div><div class="st"><div class="sv">'+r.ecoTime+'</div><div class="sl">白天节能</div></div></div>';
-    h += '</div>';
-    c.innerHTML += h;
+
+    // Placeholder SVG timeline
+    var svg = '<svg class="timeline-svg" viewBox="0 0 280 80"><rect x="0" y="30" width="280" height="4" rx="2" fill="#1e293b"/>';
+    var x = 20;
+    var temp = 22;
+    while(x < 260){
+      var h = 10 + Math.random() * 30;
+      var col = temp > 24 ? '#22c55e' : '#3b82f6';
+      svg += '<rect x="'+x+'" y="'+(44-h)+'" width="12" height="'+h+'" rx="2" fill="'+col+'" opacity="0.6"/>';
+      x += 16;
+      temp += (Math.random() > 0.5 ? 0.5 : -0.5);
+    }
+    svg += '<text x="0" y="16" fill="#64748b" font-size="7">温度曲线</text>';
+    svg += '<text x="220" y="16" fill="#22c55e" font-size="7">节能区 ▲</text></svg>';
+
+    var html = '<div class="room-card">'
+      + '<div class="rh"><span class="rn">🏨 '+r.no+' 房</span><span class="rsaved">+'+r.eco+' kWh</span></div>'
+      + '<div style="display:flex;gap:8px;margin-bottom:8px;font-size:11px">'
+      + '<span>👤 '+r.people+'人</span><span>🌡️ '+r.temp+'°C</span><span>🔊 '+r.noise+'dB</span><span>💧 '+r.humi+'%</span><span style="color:var(--text3)">⏱ '+r.dur+'</span>'
+      + '</div>'
+      + svg
+      + '<div class="events">'+evHtml+'</div>'
+      + '</div>';
+
+    grid.innerHTML += html;
   });
 }
-render();
+
+renderRooms();
 </script>
 </body>
 </html>

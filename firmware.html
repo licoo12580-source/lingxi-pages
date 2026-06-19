@@ -60,6 +60,20 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 <script>
 const versions = [
   {
+    ver: "v0312H",
+    date: "2026-06-20",
+    status: "latest",
+    tags: ["硬件SPI", "最简初始化"],
+    file: "v0312H.bin",
+    sha256: "04a5c24a0b6e992ffd78bb65d9fbfb1b8117a396f115093bc49985cbcaeed72a",
+    size: "376KB",
+    driver: "ILI9488",
+    desc: "硬件SPI(1MHz)+最简初始化(跳过gamma/电源)+7种MADCTL值遍历测试",
+    changelog: "🔧 改用ESP32-S3硬件SPI(SPI.transfer)\n🔧 最简初始化：只留0x11→0x36→0x3A→0x29\n🔧 MADCTL遍历7个值(0x08~0xE8)，每值填色块\n📝 规格书确认驱动为ILI9488",
+    hw: "HW-678A N16R8, ILI9488 4寸",
+    recommend: true
+  },
+  {
     ver: "v0312G",
     date: "2026-06-20",
     status: "latest",

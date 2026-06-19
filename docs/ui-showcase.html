@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🦞 灵犀 · UI 设计展</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#080d1a;color:#e2e8f0;min-height:100vh}
+
+.header{text-align:center;padding:60px 20px 40px}
+.header h1{font-size:32px;font-weight:700;background:linear-gradient(135deg,#22c55e,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.header .sub{color:#475569;font-size:14px;margin-bottom:20px}
+.header .tags{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.header .tag{padding:4px 14px;border-radius:20px;font-size:11px;border:1px solid #1e293b;color:#94a3b8}
+
+.container{max-width:1100px;margin:0 auto;padding:0 20px 60px}
+
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fill,minmax(500px,1fr))}
+
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:16px;overflow:hidden;transition:all .3s}
+.card:hover{transform:translateY(-4px);border-color:#334155;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.card .preview{height:280px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.card .preview iframe{width:100%;height:100%;border:none;transform:scale(0.6);transform-origin:0 0;pointer-events:none}
+.card .meta{padding:20px}
+.card .meta .v{font-size:18px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .meta .v .num{background:#1e293b;padding:2px 8px;border-radius:6px;font-size:11px;color:#64748b}
+.card .meta p{font-size:12px;color:#94a3b8;line-height:1.6;margin-bottom:10px}
+.card .meta .style-tags{display:flex;gap:4px;flex-wrap:wrap}
+.card .meta .style-tags span{padding:2px 8px;border-radius:6px;font-size:9px}
+.s1{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
+.s2{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+.s3{background:#8b5cf622;color:#a78bfa;border:1px solid #8b5cf644}
+.s4{background:#00ff4111;color:#00ff41;border:1px solid #00ff4133}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;border:none;cursor:pointer;text-decoration:none;transition:all .2s;margin-top:8px}
+.btn.primary{background:#3b82f6;color:#fff}
+.btn.primary:hover{background:#2563eb}
+.btn.outline{background:transparent;border:1px solid #334155;color:#94a3b8}
+.btn.outline:hover{border-color:#3b82f6;color:#60a5fa}
+
+@media(max-width:768px){
+  .header{padding:40px 16px 24px;font-size:24px}
+  .grid{grid-template-columns:1fr}
+  .card .preview{height:200px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🦞 灵犀 · UI 设计展</h1>
+  <div class="sub">基于当前最流行的UI趋势，为酒店节能系统打造4种完整设计语言</div>
+  <div class="tags">
+    <span class="tag">shadcn/ui</span>
+    <span class="tag">Bento Grid</span>
+    <span class="tag">Glassmorphism</span>
+    <span class="tag">Terminal</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid">
+
+    <!-- Version 1: shadcn/ui -->
+    <div class="card">
+      <div class="preview" style="background:#0b1120;overflow:auto;padding:20px">
+        <div style="background:#0e1528;border:1px solid #1a2140;border-radius:12px;padding:16px;width:100%">
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <div style="flex:1;background:#0b1120;border-radius:8px;padding:14px;border-top:3px solid #3b82f6"><div style="color:#64748b;font-size:10px">总设备</div><div style="font-size:20px;font-weight:700;color:#e2e8f0">1,284</div></div>
+            <div style="flex:1;background:#0b1120;border-radius:8px;padding:14px;border-top:3px solid #22c55e"><div style="color:#64748b;font-size:10px">在线</div><div style="font-size:20px;font-weight:700;color:#22c55e">1,176</div></div>
+            <div style="flex:1;background:#0b1120;border-radius:8px;padding:14px;border-top:3px solid #06b6d4"><div style="color:#64748b;font-size:10px">今日省电</div><div style="font-size:20px;font-weight:700;color:#06b6d4">347 kWh</div></div>
+          </div>
+          <div style="display:flex;gap:12px">
+            <div style="flex:2;background:#0b1120;border-radius:8px;padding:12px">
+              <div style="color:#64748b;font-size:10px;margin-bottom:8px">区域分布</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:#94a3b8;width:40px">A栋</span><div style="flex:1;height:6px;background:#1a2140;border-radius:3px"><div style="height:100%;width:74%;background:#3b82f6;border-radius:3px"></div></div></div>
+                <div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:#94a3b8;width:40px">B栋</span><div style="flex:1;height:6px;background:#1a2140;border-radius:3px"><div style="height:100%;width:62%;background:#22c55e;border-radius:3px"></div></div></div>
+              </div>
+            </div>
+            <div style="flex:1;background:#0b1120;border-radius:8px;padding:12px">
+              <div style="color:#64748b;font-size:10px;margin-bottom:8px">省电Top3</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#f59e0b">🥇 A栋</span><span style="color:#22c55e;font-weight:600">128</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#94a3b8">🥈 宴会厅</span><span style="color:#22c55e;font-weight:600">94</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="v">shadcn/ui 专业版 <span class="num">438行</span></div>
+        <p>最小化专业设计，中性色系+蓝绿点缀。卡片顶线、进度条、表格，适合酒店经理日常使用。</p>
+        <div class="style-tags"><span class="s1">Minimal</span><span class="s1">shadcn</span><span class="s1">专业</span></div>
+        <a href="version-1-shadcn.html" class="btn primary">查看完整版 →</a>
+      </div>
+    </div>
+
+    <!-- Version 2: Bento Grid -->
+    <div class="card">
+      <div class="preview" style="background:#080d1a;overflow:hidden;position:relative">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 30% 30%,rgba(34,197,94,.04),transparent 70%),radial-gradient(circle at 70% 60%,rgba(139,92,246,.04),transparent 70%)"></div>
+        <div style="position:relative;z-index:1;padding:20px">
+          <div style="font-size:24px;font-weight:700;text-align:center;margin-bottom:12px;background:linear-gradient(135deg,#22c55e,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">为每一度电赋予智慧</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px">
+            <div style="background:rgba(15,23,42,.8);backdrop-filter:blur(10px);border-radius:20px;padding:16px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:#22c55e">32%</div><div style="font-size:8px;color:#64748b">能耗降低</div></div>
+                <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:#60a5fa">2,847t</div><div style="font-size:8px;color:#64748b">碳减排</div></div>
+              </div>
+            </div>
+            <div style="background:rgba(15,23,42,.8);backdrop-filter:blur(10px);border-radius:20px;padding:16px;display:flex;flex-direction:column;justify-content:center">
+              <div style="font-size:9px;color:#22c55e;font-weight:600">AI自适应</div>
+              <div style="height:3px;background:#1e293b;border-radius:2px;margin-top:4px"><div style="width:78%;height:100%;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:2px"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="v">Bento Grid 现代版 <span class="num">1,090行</span></div>
+        <p>Apple风格非对称网格，大圆角毛玻璃卡片，渐入动画+视差滚动。适合酒店老板观看演示。</p>
+        <div class="style-tags"><span class="s2">Bento</span><span class="s2">Apple</span><span class="s2">现代</span></div>
+        <a href="version-2-bento.html" class="btn primary">查看完整版 →</a>
+      </div>
+    </div>
+
+    <!-- Version 3: Glassmorphism -->
+    <div class="card">
+      <div class="preview" style="background:linear-gradient(135deg,#080d1a,#0a1628,#0f1f3a);overflow:hidden;padding:20px">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <div style="flex:1;background:rgba(15,23,42,.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:16px;padding:14px;border-bottom:2px solid rgba(56,182,255,.5);text-align:center">
+            <div style="font-size:9px;color:rgba(255,255,255,.5);margin-bottom:4px">省电(kWh)</div>
+            <div style="font-size:18px;font-weight:700;color:#38b6ff">128,460</div>
+          </div>
+          <div style="flex:1;background:rgba(15,23,42,.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:16px;padding:14px;border-bottom:2px solid rgba(34,197,94,.5);text-align:center">
+            <div style="font-size:9px;color:rgba(255,255,255,.5);margin-bottom:4px">在线客房</div>
+            <div style="font-size:18px;font-weight:700;color:#22c55e">342</div>
+          </div>
+          <div style="flex:1;background:rgba(15,23,42,.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:16px;padding:14px;border-bottom:2px solid rgba(139,92,246,.5);text-align:center">
+            <div style="font-size:9px;color:rgba(255,255,255,.5);margin-bottom:4px">管理酒店</div>
+            <div style="font-size:18px;font-weight:700;color:#a78bfa">12</div>
+          </div>
+        </div>
+        <div style="background:rgba(15,23,42,.35);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:16px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="padding:6px;border-radius:8px;background:rgba(255,255,255,.03)"><div style="font-size:9px;color:rgba(255,255,255,.6)">🌡️ 智能节能</div></div>
+          <div style="padding:6px;border-radius:8px;background:rgba(255,255,255,.03)"><div style="font-size:9px;color:rgba(255,255,255,.6)">🛡️ 智慧安防</div></div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="v">Glassmorphism 旗舰版 <span class="num">496行</span></div>
+        <p>玻璃拟态豪华风格，毛玻璃卡片+发光边框+渐变背景。适合高端酒店老板展示。</p>
+        <div class="style-tags"><span class="s3">Glass</span><span class="s3">Premium</span><span class="s3">豪华</span></div>
+        <a href="version-3-glass.html" class="btn primary">查看完整版 →</a>
+      </div>
+    </div>
+
+    <!-- Version 4: Terminal Cyber -->
+    <div class="card">
+      <div class="preview" style="background:#000;overflow:hidden;position:relative;padding:16px">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,.03) 2px,rgba(0,255,65,.03) 4px);pointer-events:none"></div>
+        <div style="position:relative;z-index:1;font-family:'Courier New',monospace">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+            <span style="width:10px;height:10px;border-radius:50%;background:#ff5f57"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#febc2e"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#28c840"></span>
+            <span style="font-size:9px;color:#666;margin-left:8px">lingxi@hotel-energy:~$</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px">
+            <div style="font-size:10px;color:#00ff41;line-height:1.4">
+              <div>$ ls -la devices/</div>
+              <div>> ESP-S3-001 ● 在线</div>
+              <div>> ESP-S3-002 ● 在线</div>
+              <div>> ESP-S3-003 ○ 待机</div>
+            </div>
+            <div style="font-size:10px;color:#00ff41">
+              <div style="display:flex;gap:12px;margin-bottom:4px">
+                <span>今日省电 <strong style="color:#fff">347</strong> kWh</span>
+                <span>累计 <strong style="color:#fff">128,460</strong> kWh</span>
+              </div>
+              <div style="display:flex;gap:4px">
+                <div style="flex:1;height:4px;background:#0a0a0a;border:1px solid #00ff4133"><div style="width:74%;height:100%;background:#00ff41"></div></div>
+              </div>
+              <div style="margin-top:4px;color:#666">$ uptime: <span id="cyber-uptime" style="color:#00ff41">0h 0m</span></div>
+            </div>
+          </div>
+          <div style="font-size:9px;color:#00ff41;margin-top:6px;border-top:1px solid #00ff4122;padding-top:4px">
+            <span>● 16 devices · 14 online · 0 alerts · last commit: v0312S</span>
+            <span style="animation:blink 1s step-end infinite"> █</span>
+          </div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="v">Terminal 赛博版 <span class="num">969行</span></div>
+        <p>赛博朋克终端风格，纯黑背景+霓虹绿主色，CRT扫描线+发光字+实时日志动态。</p>
+        <div class="style-tags"><span class="s4">Cyber</span><span class="s4">Terminal</span><span class="s4">科技</span></div>
+        <a href="version-4-cyber.html" class="btn primary">查看完整版 →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center;margin-top:40px;padding-top:30px;border-top:1px solid #1e293b">
+    <p style="color:#475569;font-size:12px;margin-bottom:12px">每个版本都是完整的自包含HTML文件，零外部依赖，可直接在浏览器打开</p>
+    <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;font-size:11px;color:#64748b">
+      <span>🎨 <strong style="color:#94a3b8">研究来源:</strong> shadcn/ui · Tabler · Apple HIG · AdminLTE</span>
+      <span>📐 <strong style="color:#94a3b8">共 2,993 行代码</strong></span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

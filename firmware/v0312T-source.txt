@@ -65,7 +65,7 @@ void lcd_init() {
                   wr_data(0x43); wr_data(0x02); wr_data(0x0A); wr_data(0x09);
                   wr_data(0x33); wr_data(0x37); wr_data(0x0F);
     wr_cmd(0xF4); wr_data(0x00); wr_data(0x00); wr_data(0x0F);
-    wr_cmd(0x36); wr_data(0x48);  // MY=1 翻转
+    wr_cmd(0x36); wr_data(0x08);  // MX=0, BGR=1 修正镜像
     wr_cmd(0x3A); wr_data(0x66);  // 18-bit
     wr_cmd(0x21);
     wr_cmd(0x11); delay(120);

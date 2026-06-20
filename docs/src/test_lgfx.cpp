@@ -1,9 +1,7 @@
 /**
- * 灵犀 · 空间感知 — 中文三页 + 触摸  v0621W
- * LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U + 中文20px字库
- * 颜色/方向配置与v0621N一致
- * TG1WDT喂狗 + I2C超时保护 + SPI2_HOST (PSRAM兼容)
- * 触摸失败→自动降级(dummy_read)
+ * 灵犀 · 空间感知 — 中文三页 + 无触摸  v0621X
+ * LovyanGFX + LVGL 9.5 + ILI9488 + 中文20px字库
+ * 去掉所有触摸/I2C代码，纯显示UI
  */
 #include <Arduino.h>
 #include "soc/rtc_cntl_reg.h"
@@ -11,11 +9,9 @@
 #include <lvgl.h>
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
-#include <FT6336U.h>
 #include "soc/timer_group_reg.h"
 #include "soc/timer_group_struct.h"
 
-// 喂TG1看门狗（bootloader开启的，不喂超过约1秒就重启）
 static void tg1_feed() {
     TIMERG1.wdtwprotect.val = 0x50D83AA1;
     TIMERG1.wdtfeed.val = 1;
@@ -60,9 +56,7 @@ public:
 };
 
 LGFX tft;
-FT6336U touch;
 
-// 中文20px字库声明
 extern lv_font_t font_cjk_20;
 
 static void factory_init() {
@@ -115,22 +109,6 @@ static void disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_ma
     lv_disp_flush_ready(disp);
 }
 
-// 默认触摸读取函数
-static void touch_read_real(lv_indev_t *indev, lv_indev_data_t *data) {
-    uint16_t x, y;
-    if (touch.getPoint(x, y)) {
-        data->point.x = x; data->point.y = y;
-        data->state = LV_INDEV_STATE_PR;
-    } else {
-        data->state = LV_INDEV_STATE_REL;
-    }
-}
-
-// 触摸不可用时的占位读取函数
-static void touch_read_dummy(lv_indev_t *indev, lv_indev_data_t *data) {
-    data->state = LV_INDEV_STATE_REL;
-}
-
 #define LV_BUF_SIZE (320 * 40)
 static lv_color_t buf1[LV_BUF_SIZE];
 static lv_color_t buf2[LV_BUF_SIZE];
@@ -143,6 +121,7 @@ static lv_color_t buf2[LV_BUF_SIZE];
 #define C_GRAY   lv_color_make(107, 122, 153)
 #define C_WHITE  lv_color_make(200, 208, 224)
 
+static unsigned long last_switch = 0;
 static int current_page = 0;
 static lv_obj_t *pages[3];
 static lv_obj_t *page_indicators[3];
@@ -170,11 +149,7 @@ static void switch_to_page(int page) {
     current_page = page;
 }
 
-static void on_nav_click(lv_event_t *e) {
-    int target = (int)(intptr_t)lv_event_get_user_data(e);
-    if (target == current_page) return;
-    switch_to_page(target);
-}
+// 自动翻页（loop中用millis控制，见loop()）
 
 static lv_obj_t *make_card(lv_obj_t *parent, int x, int y, int w, int h,
                            const char *label, const char *value,
@@ -211,7 +186,6 @@ static void create_page_energy(lv_obj_t *parent) {
     lv_obj_set_style_bg_opa(page, 255, 0);
     lv_obj_set_size(page, 320, 480);
 
-    // 状态栏
     lv_obj_t *sb = lv_label_create(page);
     lv_label_set_text(sb, "灵犀");
     lv_obj_set_style_text_color(sb, C_GRAY, 0);
@@ -224,14 +198,12 @@ static void create_page_energy(lv_obj_t *parent) {
     lv_obj_set_style_text_font(dot, &font_cjk_20, 0);
     lv_obj_set_pos(dot, 240, 8);
 
-    // 标题
     lv_obj_t *title = lv_label_create(page);
     lv_label_set_text(title, "节能");
     lv_obj_set_style_text_color(title, C_GREEN, 0);
     lv_obj_set_style_text_font(title, &font_cjk_20, 0);
     lv_obj_set_pos(title, 12, 36);
 
-    // 卡片
     make_card(page, 7, 72, 306, 58, "今日省电", "3.2kWh", C_GREEN, &lv_font_montserrat_30);
     make_card(page, 7, 138, 148, 70, "月省电", "96.8kWh", C_BLUE, &lv_font_montserrat_20);
     make_card(page, 165, 138, 148, 70, "设备在线", "3/5台", C_GREEN, &lv_font_montserrat_20);
@@ -309,10 +281,10 @@ static void create_page_settings(lv_obj_t *parent) {
     lv_obj_set_style_text_font(title, &font_cjk_20, 0);
     lv_obj_set_pos(title, 12, 36);
 
-    make_card(page, 7, 72, 306, 48, "版本号", "v0621W", C_WHITE, &lv_font_montserrat_16);
+    make_card(page, 7, 72, 306, 48, "版本号", "v0621X", C_WHITE, &lv_font_montserrat_16);
     make_card(page, 7, 128, 306, 48, "设备", "ESP32-S3", C_WHITE, &lv_font_montserrat_16);
     make_card(page, 7, 184, 306, 48, "屏幕", "ILI9488 320x480", C_WHITE, &lv_font_montserrat_16);
-    make_card(page, 7, 240, 306, 48, "触摸", "未连接", C_GRAY, &font_cjk_20);
+    make_card(page, 7, 240, 306, 48, "触摸", "未启用", C_GRAY, &font_cjk_20);
 
     pages[2] = page;
 }
@@ -341,7 +313,6 @@ static void create_bottom_bar(lv_obj_t *parent) {
         lv_obj_set_style_text_color(lbl, (i == 0) ? lv_color_white() : C_WHITE, 0);
         lv_obj_set_style_text_font(lbl, &font_cjk_20, 0);
         lv_obj_center(lbl);
-        lv_obj_add_event_cb(btn, on_nav_click, LV_EVENT_CLICKED, (void *)(intptr_t)i);
         nav_btns[i] = btn;
     }
 
@@ -371,7 +342,7 @@ static void create_bottom_bar(lv_obj_t *parent) {
     lv_obj_set_style_radius(line, 1, 0);
 
     lv_obj_t *footer = lv_label_create(parent);
-    lv_label_set_text(footer, "v0621W  灵犀  空间感知");
+    lv_label_set_text(footer, "v0621X  灵犀  空间感知  (自动翻页)");
     lv_obj_set_style_text_color(footer, C_GRAY, 0);
     lv_obj_set_style_text_font(footer, &font_cjk_20, 0);
     lv_obj_set_pos(footer, 12, 386);
@@ -385,7 +356,7 @@ void setup() {
     tg1_feed();
 
     Serial.begin(115200);
-    Serial.println("[Boot] Lingxi v0621W - 中文三页 + 触摸");
+    Serial.println("[Boot] Lingxi v0621X - 中文三页 无触摸");
     tg1_feed();
 
     tft.begin();
@@ -393,19 +364,10 @@ void setup() {
     tft.setBrightness(255);
     tg1_feed();
 
-    // 触摸初始化 — FT6336U内部按厂家时序处理RST(20ms LOW→300ms HIGH)
-    Wire.begin(FT6336U_SDA, FT6336U_SCL);
-    Wire.setTimeout(50);
-    bool touch_ok = touch.begin(-1, -1);
-    tg1_feed();
-
     lv_init();
     lv_display_t *disp = lv_display_create(320, 480);
     lv_display_set_buffers(disp, buf1, buf2, sizeof(lv_color_t) * LV_BUF_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(disp, disp_flush);
-    lv_indev_t *indev = lv_indev_create();
-    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(indev, touch_ok ? touch_read_real : touch_read_dummy);
 
     lv_obj_t *scr = lv_scr_act();
     lv_obj_remove_style_all(scr);
@@ -418,11 +380,19 @@ void setup() {
     create_bottom_bar(scr);
     tg1_feed();
 
-    Serial.println("[Boot] 就绪");
+    Serial.println("[Boot] 就绪 - 中文三页 5秒自动翻页");
 }
 
 void loop() {
     tg1_feed();
     lv_timer_handler();
+
+    // 每5秒自动翻页
+    if (millis() - last_switch > 5000) {
+        last_switch = millis();
+        int next = (current_page + 1) % 3;
+        switch_to_page(next);
+    }
+
     delay(5);
 }

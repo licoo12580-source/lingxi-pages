@@ -104,7 +104,8 @@ static void disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_ma
     lv_disp_flush_ready(disp);
 }
 
-static void touch_read(lv_indev_t *indev, lv_indev_data_t *data) {
+// 默认触摸读取函数
+static void touch_read_real(lv_indev_t *indev, lv_indev_data_t *data) {
     uint16_t x, y;
     if (touch.getPoint(x, y)) {
         data->point.x = x; data->point.y = y;
@@ -112,6 +113,11 @@ static void touch_read(lv_indev_t *indev, lv_indev_data_t *data) {
     } else {
         data->state = LV_INDEV_STATE_REL;
     }
+}
+
+// 触摸不可用时的占位读取函数
+static void touch_read_dummy(lv_indev_t *indev, lv_indev_data_t *data) {
+    data->state = LV_INDEV_STATE_REL;
 }
 
 #define LV_BUF_SIZE (320 * 40)
@@ -384,10 +390,11 @@ void setup() {
     delay(10);
 
     Wire.setTimeout(50);
-    if (touch.begin(FT6336U_SDA, FT6336U_SCL)) {
+    bool touch_ok = touch.begin(FT6336U_SDA, FT6336U_SCL);
+    if (touch_ok) {
         Serial.println("[OK] 触摸就绪");
     } else {
-        Serial.println("[WARN] 触摸未检测到，继续运行");
+        Serial.println("[WARN] 触摸未检测到，禁用触摸");
     }
 
     lv_init();
@@ -396,7 +403,7 @@ void setup() {
     lv_display_set_flush_cb(disp, disp_flush);
     lv_indev_t *indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(indev, touch_read);
+    lv_indev_set_read_cb(indev, touch_ok ? touch_read_real : touch_read_dummy);
 
     lv_obj_t *scr = lv_scr_act();
     lv_obj_remove_style_all(scr);

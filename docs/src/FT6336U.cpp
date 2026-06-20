@@ -1,9 +1,10 @@
-// FT6336U.cpp — 电容触摸屏驱动实现
+// FT6336U.cpp — 电容触摸屏驱动实现（厂家参考时序修正版）
 #include "FT6336U.h"
 
 FT6336U::FT6336U() {}
 
 bool FT6336U::begin(int sda, int scl) {
+  // 初始化I2C — 传-1,-1表示外部已初始化
   if (sda >= 0 && scl >= 0) {
     Wire.begin(sda, scl);
   } else if (sda < 0 || scl < 0) {
@@ -11,11 +12,18 @@ bool FT6336U::begin(int sda, int scl) {
   } else {
     Wire.begin(FT6336U_SDA, FT6336U_SCL);
   }
-  Wire.setTimeout(50);  // 设超时，防止I2C挂死
-  pinMode(FT6336U_INT, INPUT_PULLUP);
-  reset();
-  delay(50);
+  Wire.setTimeout(50);
 
+  // 厂家时序：RST拉低20ms → 拉高 → 等300ms → 可读写
+  pinMode(FT6336U_RST, OUTPUT);
+  digitalWrite(FT6336U_RST, LOW);
+  delay(20);
+  digitalWrite(FT6336U_RST, HIGH);
+  delay(300);
+
+  pinMode(FT6336U_INT, INPUT_PULLUP);
+
+  // 读取VENDOR_ID和CHIP_ID验证
   uint8_t vendor = readReg(REG_VENDOR_ID);
   uint8_t chip = readReg(REG_CHIP_ID);
 
@@ -34,12 +42,13 @@ bool FT6336U::begin(int sda, int scl) {
   return true;
 }
 
+// 厂家不额外调用reset，begin()内部已完成
 void FT6336U::reset() {
   pinMode(FT6336U_RST, OUTPUT);
   digitalWrite(FT6336U_RST, LOW);
-  delay(5);
-  digitalWrite(FT6336U_RST, HIGH);
   delay(20);
+  digitalWrite(FT6336U_RST, HIGH);
+  delay(300);
 }
 
 uint8_t FT6336U::readReg(uint8_t reg) {

@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== v0622 系列 (诊断测试) ====
+  {ver:"v0622A-mini", date:"2026-06-21", type:"diagnostic", tags:["最简","裸LCD","颜色轮换"], files:{full:"v0622A-mini.bin"}, size:"407KB",
+    desc:"⚡ 最简亮屏测试：只开LCD+颜色轮换(红绿蓝白黑灵犀色)，无LVGL/触摸/字库/PSRAM",
+    changes:"✅ 纯LovyanGFX驱动LCD\\n✅ PSRAM禁用\\n✅ 无LVGL/无触摸/无字库\\n✅ 2秒切换红→绿→蓝→白→黑→灵犀背景色\\n✅ SPI2_HOST+正确的MADCTL/invert/rgb_order",
+    source:"test_minimal.cpp"},
   // ==== v0621 系列 (LovyanGFX + LVGL) ====
   {ver:"v0621Z", date:"2026-06-21", type:"testing", tags:["中文UI","软件I2C","WDT禁用"], files:{full:"v0621Z-lingxi-ui-full.bin"}, size:"744KB",
     desc:"🔥 软件I2C bitbang触摸 + TGIWDT彻底禁用 + 中文三页",

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灵犀 Lingxi · 屏幕UI预览 v0621H</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; flex-direction: column; gap: 20px; padding: 20px; }
+.screen {
+  width: 360px; height: 540px;
+  background: #0b0e17;
+  border-radius: 16px;
+  padding: 12px 7px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+}
+/* 状态栏 */
+.status-bar { display: flex; justify-content: space-between; padding: 0 5px; margin-bottom: 4px; }
+.status-bar span { font-size: 10px; color: #6b7a99; }
+.status-bar .right { color: #4caf50; }
+/* 标题 */
+.title { font-size: 26px; font-weight: 700; color: #2196f3; margin-bottom: 16px; letter-spacing: 4px; padding: 0 5px; }
+/* 大卡片 */
+.card-lg {
+  background: #131725; border-radius: 8px; padding: 12px 10px;
+  margin-bottom: 8px; height: 58px;
+}
+.card-lg .label { font-size: 10px; color: #6b7a99; margin-bottom: 2px; }
+.card-lg .value { font-size: 30px; font-weight: 700; color: #4caf50; }
+
+/* 小卡片行 */
+.card-row { display: flex; gap: 10px; margin-bottom: 8px; }
+.card-sm {
+  background: #131725; border-radius: 8px; padding: 10px;
+  flex: 1; height: 70px;
+}
+.card-sm .label { font-size: 10px; color: #6b7a99; margin-bottom: 6px; }
+.card-sm .value { font-size: 20px; font-weight: 700; }
+.card-sm .value.blue { color: #2196f3; }
+.card-sm .value.green { color: #4caf50; }
+.card-sm .value.orange { color: #ff9800; }
+
+/* 导航 */
+.nav { display: flex; gap: 8px; margin-top: 6px; padding: 0 1px; }
+.nav-btn {
+  flex: 1; height: 32px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+}
+.nav-btn.active { background: #2196f3; color: #fff; border: none; }
+.nav-btn.inactive { background: transparent; color: #c8d0e0; border: 1px solid #6b7a99; }
+
+/* 底条 */
+.bottom-divider { height: 2px; background: #131725; border-radius: 1px; margin: 6px 0 4px; }
+.footer { font-size: 10px; color: #6b7a99; }
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="status-bar">
+    <span>LINGXI</span>
+    <span class="right">&#10003; ONLINE</span>
+  </div>
+  <div class="title">LINGXI</div>
+
+  <!-- 今日省电 大卡片 -->
+  <div class="card-lg">
+    <div class="label">SAVED TODAY</div>
+    <div class="value">3.2 kWh</div>
+  </div>
+
+  <!-- 双行小卡片 -->
+  <div class="card-row">
+    <div class="card-sm">
+      <div class="label">MONTHLY</div>
+      <div class="value blue">96.8 kWh</div>
+    </div>
+    <div class="card-sm">
+      <div class="label">DEVICES</div>
+      <div class="value green">3 / 5</div>
+    </div>
+  </div>
+
+  <div class="card-row">
+    <div class="card-sm">
+      <div class="label">ECO MODE</div>
+      <div class="value orange">2 rooms</div>
+    </div>
+    <div class="card-sm">
+      <div class="label">TEMP</div>
+      <div class="value orange">26 °C</div>
+    </div>
+  </div>
+
+  <!-- 导航 -->
+  <div class="nav">
+    <div class="nav-btn active">ENERGY</div>
+    <div class="nav-btn inactive">DEVICES</div>
+    <div class="nav-btn inactive">SETTINGS</div>
+  </div>
+
+  <!-- 底部 -->
+  <div class="bottom-divider"></div>
+  <div class="footer">v0621H &nbsp;|&nbsp; SPACESENSE &nbsp;|&nbsp; ECO</div>
+</div>
+
+<p style="color:#6b7a99;font-size:12px;text-align:center;">
+  实际屏幕全英文显示（内置montserrat字体无法显示中文）
+</p>
+</body>
+</html>

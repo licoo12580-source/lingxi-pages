@@ -115,6 +115,10 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 <script>
 const FW = [
   // ==== v0621 系列 (LovyanGFX + LVGL) ====
+  {ver:"v0621W", date:"2026-06-21", type:"testing", tags:["中文UI","触摸","厂家时序"], files:{full:"v0621W-lingxi-ui-full.bin",inc:"v0621W-lingxi-ui.bin"}, size:"756KB / 691KB",
+    desc:"🔥 厂家时序修正:触摸RST 20ms LOW→300ms HIGH + TG1喂狗 + 中文三页",
+    changes:"✅ 触摸RST:20ms LOW+300ms HIGH(厂家参考)\n✅ RST处理移至FT6336U内部(stable)\n✅ 去掉test_lgfx.cpp中的重复RST\n✅ TG1WDT喂狗\n✅ SPI2_HOST+PSRAM\n✅ I2C超时50ms\n✅ 触摸失败→自动降级",
+    source:"test_lgfx.cpp FT6336U.cpp v0621W"},
   {ver:"v0621V", date:"2026-06-21 04:49", type:"testing", tags:["中文UI","触摸","WDT喂狗"], files:{full:"v0621V-lingxi-ui-full.bin",inc:"v0621U-lingxi-ui.bin"}, size:"756KB / 691KB",
     desc:"🔥 TG1WDT喂狗修复 + I2C超时保护(较新)",
     changes:"✅ 主动喂狗函数 tg1_feed() (6个喂狗点)\n✅ loop()中每轮喂狗\n✅ Wire.begin()提前到touch.begin()之前\n✅ Wire.setTimeout(50)在FT6336U内部设\n✅ begin(-1,-1)不复位I2C\n✅ 触摸RST延时缩短(10+300→5+20ms)\n✅ begin()内delay缩短(200→50ms)\n✅ 失败不重试(省500ms)\n⚠️ TG1WDT仍需手动喂狗(813ms重启)",

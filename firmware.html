@@ -115,6 +115,10 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 <script>
 const FW = [
   // ==== v0621 系列 (LovyanGFX + LVGL) ====
+  {ver:"v0621Z", date:"2026-06-21", type:"testing", tags:["中文UI","软件I2C","零Wire依赖"], files:{full:"v0621Z-lingxi-ui-full.bin"}, size:"744KB",
+    desc:"🔥 完整中文三页UI + 软件I2C bitbang触摸(无Wire依赖,不panic)",
+    changes:"✅ 彻底放弃硬件I2C(Wire)→改用软件I2C bitbang\\n✅ 纯GPIO操作(无esp32-hal-i2c,不会TG1WDT panic)\\n✅ GPIO内部上拉+开漏输出(无需外部上拉)\\n✅ 厂家RST时序:20ms LOW+300ms HIGH\\n✅ 完整STOP协议(非repeated start)\\n✅ 50ms超时保护\\n✅ 触摸可用→触摸翻页 不可用→5秒自动翻页\\n✅ 完整中文三页(节能/感知/系统)\\n✅ TG1WDT喂狗+SPI2_HOST+PSRAM",
+    source:"test_lgfx.cpp FT6336U.cpp v0621Z"},
   {ver:"v0621Y", date:"2026-06-21", type:"testing", tags:["中文UI","触摸","厂家协议"], files:{full:"v0621Y-lingxi-ui-full.bin",inc:"v0621Y-lingxi-ui.bin"}, size:"748KB / 684KB",
     desc:"🔥 完整中文三页UI + 厂家协议触摸驱动(全STOP读写+RST时序)",
     changes:"✅ FT6336U驱动完全重写(参考FocalTech datasheet)\n✅ I2C读写改用完整STOP(非repeated start)\n✅ Wire.setPins()+Wire.begin()分离\n✅ RST 20ms LOW+300ms HIGH(厂家时序)\n✅ 不做ID校验(仅日志,兼容不同批次芯片)\n✅ 中文完整字库(NotoSansSC 20px)\n✅ TG1WDT喂狗+SPI2_HOST+PSRAM\n✅ 触摸可用→触摸翻页 触摸不可用→5秒自动翻页",

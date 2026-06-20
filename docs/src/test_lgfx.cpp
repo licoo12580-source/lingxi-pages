@@ -1,7 +1,7 @@
 /**
- * 灵犀 · 空间感知 — 中文三页 + 触摸  v0621Y
- * LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U(厂家协议) + 中文20px字库
- * 完整UI + 新触摸驱动
+ * 灵犀 · 空间感知 — 中文三页 + 触摸  v0621Z
+ * LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U(软件I2C bitbang) + 中文20px字库
+ * 完整UI + 软件I2C驱动(无Wire依赖,内部上拉,50ms超时)
  */
 #include <Arduino.h>
 #include "soc/rtc_cntl_reg.h"
@@ -298,7 +298,7 @@ static void create_page_settings(lv_obj_t *parent) {
     lv_obj_set_style_text_font(title, &font_cjk_20, 0);
     lv_obj_set_pos(title, 12, 36);
 
-    make_card(page, 7, 72, 306, 48, "版本号", "v0621Y", C_WHITE, &lv_font_montserrat_16);
+    make_card(page, 7, 72, 306, 48, "版本号", "v0621Z", C_WHITE, &lv_font_montserrat_16);
     make_card(page, 7, 128, 306, 48, "设备", "ESP32-S3", C_WHITE, &lv_font_montserrat_16);
     make_card(page, 7, 184, 306, 48, "屏幕", "ILI9488 320x480", C_WHITE, &lv_font_montserrat_16);
     // 触摸状态动态更新（在setup中根据touch_ok设置）
@@ -361,7 +361,7 @@ static void create_bottom_bar(lv_obj_t *parent) {
     lv_obj_set_style_radius(line, 1, 0);
 
     lv_obj_t *footer = lv_label_create(parent);
-    lv_label_set_text(footer, "v0621Y  灵犀  空间感知");
+    lv_label_set_text(footer, "v0621Z  灵犀  空间感知");
     lv_obj_set_style_text_color(footer, C_GRAY, 0);
     lv_obj_set_style_text_font(footer, &font_cjk_20, 0);
     lv_obj_set_pos(footer, 12, 386);
@@ -377,7 +377,7 @@ void setup() {
     tg1_feed();
 
     Serial.begin(115200);
-    Serial.println("[Boot] Lingxi v0621Y - 中文三页 + 触摸(厂家协议)");
+    Serial.println("[Boot] Lingxi v0621Z - 中文三页 + 触摸(软件I2C bitbang)");
     tg1_feed();
 
     // LCD

@@ -6,12 +6,15 @@ FT6336U::FT6336U() {}
 bool FT6336U::begin(int sda, int scl) {
   if (sda >= 0 && scl >= 0) {
     Wire.begin(sda, scl);
+  } else if (sda < 0 || scl < 0) {
+    // -1 表示外部已初始化Wire，不复位
   } else {
     Wire.begin(FT6336U_SDA, FT6336U_SCL);
   }
+  Wire.setTimeout(50);  // 设超时，防止I2C挂死
   pinMode(FT6336U_INT, INPUT_PULLUP);
   reset();
-  delay(200);
+  delay(50);
 
   uint8_t vendor = readReg(REG_VENDOR_ID);
   uint8_t chip = readReg(REG_CHIP_ID);
@@ -19,16 +22,8 @@ bool FT6336U::begin(int sda, int scl) {
   Serial.printf("[Touch] Vendor=0x%02X Chip=0x%02X\n", vendor, chip);
 
   if (vendor != 0x11 || chip != 0x64) {
-    Serial.println("[Touch] ID mismatch, trying alternative init...");
-    // 有些模块需要额外延时
-    delay(500);
-    vendor = readReg(REG_VENDOR_ID);
-    chip = readReg(REG_CHIP_ID);
-    Serial.printf("[Touch] Retry: Vendor=0x%02X Chip=0x%02X\n", vendor, chip);
-    if (vendor != 0x11 || chip != 0x64) {
-      Serial.println("[Touch] FAILED - touch not available");
-      return false;
-    }
+    Serial.println("[Touch] FAILED - touch not available");
+    return false;
   }
 
   // 中断模式: 触发模式 (INT拉低表示有触摸)
@@ -42,9 +37,9 @@ bool FT6336U::begin(int sda, int scl) {
 void FT6336U::reset() {
   pinMode(FT6336U_RST, OUTPUT);
   digitalWrite(FT6336U_RST, LOW);
-  delay(10);
+  delay(5);
   digitalWrite(FT6336U_RST, HIGH);
-  delay(300);
+  delay(20);
 }
 
 uint8_t FT6336U::readReg(uint8_t reg) {

@@ -1,7 +1,8 @@
 /**
- * 灵犀 · 空间感知 — 中文三页 + 触摸  v0621Q
+ * 灵犀 · 空间感知 — 中文三页 + 触摸  v0621V
  * LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U + 中文20px字库
  * 颜色/方向配置与v0621N一致
+ * TG1WDT喂狗 + I2C超时保护 + SPI2_HOST (PSRAM兼容)
  */
 #include <Arduino.h>
 #include "soc/rtc_cntl_reg.h"
@@ -10,6 +11,15 @@
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
 #include <FT6336U.h>
+#include "soc/timer_group_reg.h"
+#include "soc/timer_group_struct.h"
+
+// 喂TG1看门狗（bootloader开启的，不喂超过约1秒就重启）
+static void tg1_feed() {
+    TIMERG1.wdtwprotect.val = 0x50D83AA1;
+    TIMERG1.wdtfeed.val = 1;
+    TIMERG1.wdtwprotect.val = 0;
+}
 
 #define LCD_CS   45
 #define LCD_DC   47
@@ -25,7 +35,7 @@ class LGFX : public lgfx::LGFX_Device {
 public:
     LGFX(void) {
         { auto cfg = _bus.config();
-          cfg.spi_host = SPI3_HOST; cfg.spi_mode = 0;
+          cfg.spi_host = SPI2_HOST; cfg.spi_mode = 0;
           cfg.freq_write = 40000000; cfg.freq_read = 16000000;
           cfg.spi_3wire = false; cfg.use_lock = true; cfg.dma_channel = 1;
           cfg.pin_sclk = LCD_SCLK; cfg.pin_mosi = LCD_MOSI;
@@ -200,7 +210,6 @@ static void create_page_energy(lv_obj_t *parent) {
     lv_obj_set_style_bg_opa(page, 255, 0);
     lv_obj_set_size(page, 320, 480);
 
-    // 状态栏
     lv_obj_t *sb = lv_label_create(page);
     lv_label_set_text(sb, "灵犀");
     lv_obj_set_style_text_color(sb, C_GRAY, 0);
@@ -213,14 +222,12 @@ static void create_page_energy(lv_obj_t *parent) {
     lv_obj_set_style_text_font(dot, &font_cjk_20, 0);
     lv_obj_set_pos(dot, 240, 8);
 
-    // 标题
     lv_obj_t *title = lv_label_create(page);
     lv_label_set_text(title, "节能");
     lv_obj_set_style_text_color(title, C_GREEN, 0);
     lv_obj_set_style_text_font(title, &font_cjk_20, 0);
     lv_obj_set_pos(title, 12, 36);
 
-    // 卡片
     make_card(page, 7, 72, 306, 58, "今日省电", "3.2kWh", C_GREEN, &lv_font_montserrat_30);
     make_card(page, 7, 138, 148, 70, "月省电", "96.8kWh", C_BLUE, &lv_font_montserrat_20);
     make_card(page, 165, 138, 148, 70, "设备在线", "3/5台", C_GREEN, &lv_font_montserrat_20);
@@ -298,7 +305,7 @@ static void create_page_settings(lv_obj_t *parent) {
     lv_obj_set_style_text_font(title, &font_cjk_20, 0);
     lv_obj_set_pos(title, 12, 36);
 
-    make_card(page, 7, 72, 306, 48, "版本号", "v0621Q", C_WHITE, &lv_font_montserrat_16);
+    make_card(page, 7, 72, 306, 48, "版本号", "v0621V", C_WHITE, &lv_font_montserrat_16);
     make_card(page, 7, 128, 306, 48, "设备", "ESP32-S3", C_WHITE, &lv_font_montserrat_16);
     make_card(page, 7, 184, 306, 48, "屏幕", "ILI9488 320x480", C_WHITE, &lv_font_montserrat_16);
     make_card(page, 7, 240, 306, 48, "触摸", "已就绪", C_GREEN, &font_cjk_20);
@@ -360,7 +367,7 @@ static void create_bottom_bar(lv_obj_t *parent) {
     lv_obj_set_style_radius(line, 1, 0);
 
     lv_obj_t *footer = lv_label_create(parent);
-    lv_label_set_text(footer, "v0621S  灵犀  空间感知");
+    lv_label_set_text(footer, "v0621V  灵犀  空间感知");
     lv_obj_set_style_text_color(footer, C_GRAY, 0);
     lv_obj_set_style_text_font(footer, &font_cjk_20, 0);
     lv_obj_set_pos(footer, 12, 386);
@@ -368,34 +375,34 @@ static void create_bottom_bar(lv_obj_t *parent) {
 
 void setup() {
     WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
-    // 禁用中断看门狗和任务看门狗
+    // 禁用所有看门狗
     disableCore0WDT();
     disableCore1WDT();
     disableLoopWDT();
+    tg1_feed();  // 喂狗：刚刚启动
 
     Serial.begin(115200);
-    delay(300);
-    Serial.println("[Boot] Lingxi v0621S - 中文三页 + 触摸");
+    Serial.println("[Boot] Lingxi v0621V - 中文三页 + 触摸");
+    tg1_feed();  // 喂狗：准备初始化LCD
 
+    // LCD初始化
     tft.begin();
     factory_init();
     tft.setBrightness(255);
+    tg1_feed();  // 喂狗：LCD初始化完成
 
-    // 触摸初始化（由库内部调Wire.begin，调之前设超时）
-    // 先短暂拉低RST确保触摸芯片复位
+    // 触摸初始化 - 先重置触摸芯片
     pinMode(FT6336U_RST, OUTPUT);
     digitalWrite(FT6336U_RST, LOW);
     delay(5);
     digitalWrite(FT6336U_RST, HIGH);
     delay(10);
 
+    // 先初始化I2C并设超时，再让touch库复用
+    Wire.begin(FT6336U_SDA, FT6336U_SCL);
     Wire.setTimeout(50);
-    bool touch_ok = touch.begin(FT6336U_SDA, FT6336U_SCL);
-    if (touch_ok) {
-        Serial.println("[OK] 触摸就绪");
-    } else {
-        Serial.println("[WARN] 触摸未检测到，禁用触摸");
-    }
+    bool touch_ok = touch.begin(-1, -1);
+    tg1_feed();  // 喂狗：触摸初始化完成
 
     lv_init();
     lv_display_t *disp = lv_display_create(320, 480);
@@ -414,11 +421,14 @@ void setup() {
     create_page_sense(scr);
     create_page_settings(scr);
     create_bottom_bar(scr);
+    tg1_feed();  // 喂狗：UI构建完成
 
     Serial.println("[Boot] 就绪");
+    tg1_feed();  // 喂狗：setup结束
 }
 
 void loop() {
+    tg1_feed();
     lv_timer_handler();
     delay(5);
 }

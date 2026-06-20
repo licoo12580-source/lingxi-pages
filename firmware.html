@@ -232,8 +232,12 @@ const FW = [
   // ==== 测试版 (v0621V-mini) ====
   {ver:"v0621V-mini", date:"2026-06-21 04:53", type:"test", tags:["只亮屏","无触摸"], files:{full:"v0621V-mini.bin"}, size:"417KB",
     desc:"🧪 最小测试:只亮屏显示文字,不碰I2C/触摸/LVGL",
-    changes:"✅ 去掉所有触摸/I2C代码\n✅ 只用LovyanGFX画文字\n✅ 判断硬件是否正常",
-    source:"test_lgfx.cpp mini"}
+    changes:"✅ 去掉所有触摸/I2C代码\n✅ 只用LovyanGFX画文字\n✅ 判断硬件是否正常\n✅ 用户验证:LCD OK",
+    source:"test_lgfx.cpp mini"},
+  {ver:"v0621V-touchtest", date:"2026-06-21", type:"test", tags:["触控诊断","喂狗"], files:{full:"v0621V-touchtest.bin"}, size:"416KB",
+    desc:"🧪 触控诊断:mini基础上加上触摸I2C初始化,看是否触控导致重启",
+    changes:"✅ 先亮屏显示LCD OK\n✅ 再初始化FT6336U触摸\n✅ I2C超时50ms+喂狗\n✅ 成功→绿色OK 失败→红色提示\n✅ 无论结果都继续运行",
+    source:"test_lgfx.cpp touchtest"}
 ];
 
 function render(verList) {

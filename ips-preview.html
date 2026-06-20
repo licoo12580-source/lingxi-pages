@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>灵犀 IPS 屏 UI 预览</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;font-family:system-ui,sans-serif;padding:20px;color:#e2e8f0}
+h1{font-size:18px;margin-bottom:6px;color:#22c55e}
+.sub{color:#64748b;font-size:13px;margin-bottom:20px}
+.display{width:340px;height:510px;background:linear-gradient(135deg,#070b18,#0a1224);border:2px solid #1e2e42;border-radius:16px;position:relative;overflow:hidden;margin:0 auto}
+.tab-bar{display:flex;gap:4px;padding:8px 10px;background:rgba(12,18,32,0.9);border-bottom:1px solid #1e2e42}
+.tab{font-size:10px;padding:4px 8px;border-radius:4px;cursor:pointer;color:#64748b;background:transparent;border:none}
+.tab.active{background:#1e293b;color:#22c55e}
+.tab.done{background:#1e293b;color:#3b82f6}
+.preview-area{position:relative;width:320px;height:460px;margin:8px auto 0}
+.screen{position:absolute;inset:0;padding:8px}
+.screen.hidden{display:none}
+
+/* 页面1 - 节能 */
+.p1-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.p1-title h2{font-size:12px;color:#22c55e}
+.p1-title span{font-size:10px;color:#64748b}
+.p1-divider{height:1px;background:#1e2e42;margin-bottom:6px}
+.p1-arc{position:relative;width:120px;height:100px;float:left}
+.p1-arc svg{width:120px;height:100px}
+.p1-arc-text{position:absolute;top:30px;left:35px;text-align:center}
+.p1-arc-text .num{font-size:22px;font-weight:700;color:#e2e8f0}
+.p1-arc-text .unit{font-size:9px;color:#94a3b8}
+.p1-arc-text .label{font-size:10px;color:#64748b;margin-top:-2px}
+.p1-cards{float:right;width:165px;display:flex;flex-direction:column;gap:5px}
+.p1-card{background:#102038;border-radius:6px;padding:6px 8px;height:34px}
+.p1-card .l{font-size:9px;color:#64748b}
+.p1-card .v{font-size:14px;font-weight:600}
+.p1-cards .v.g{color:#22c55e}
+.p1-cards .v.b{color:#3b82f6}
+.p1-cards .v.p{color:#a78bfa}
+.p1-divider2{clear:both;height:1px;background:#1e2e42;margin:4px 0}
+.p1-grid{display:flex;gap:4px}
+.p1-item{background:#102038;border-radius:5px;padding:5px;flex:1;border-top:2px solid}
+.p1-item .l{font-size:8px;color:#64748b}
+.p1-item .v{font-size:11px;font-weight:600}
+.p1-item .u{font-size:8px;color:#94a3b8}
+.p1-status{margin-top:5px;background:#06281a;border-radius:6px;padding:5px 8px;border-left:2px solid #22c55e;display:flex;justify-content:space-between}
+.p1-status .l{font-size:9px;color:#22c55e}
+.p1-status .v{font-size:8px;color:#94a3b8}
+.p1-footer{text-align:center;font-size:8px;color:#64748b;margin-top:4px}
+
+/* 页面2 - 环境 */
+.p2-title{display:flex;justify-content:space-between;margin-bottom:4px}
+.p2-title h2{font-size:12px;color:#3b82f6}
+.p2-title span{font-size:10px;color:#06b7d0}
+.p2-temp{background:#102038;border-radius:8px;padding:7px;margin-bottom:5px;border-left:2px solid #3b82f6}
+.p2-temp .row{display:flex;justify-content:space-between;align-items:center}
+.p2-temp .big{font-size:18px;font-weight:700}
+.p2-temp .set{font-size:11px;color:#64748b}
+.p2-bar-bg{height:4px;background:#1e2e42;border-radius:2px;margin-top:5px;overflow:hidden}
+.p2-bar-fill{height:4px;background:#3b82f6;border-radius:2px;width:82%}
+.p2-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.p2-sensor{background:#182c48;border-radius:6px;padding:6px}
+.p2-sensor .l{font-size:9px;color:#64748b}
+.p2-sensor .v{font-size:12px;font-weight:600}
+.p2-sensor .bar{height:3px;background:#1e2e42;border-radius:2px;margin-top:4px;overflow:hidden}
+.p2-sensor .fill{height:3px;border-radius:2px}
+.p2-percept{margin-top:5px;background:#102038;border-radius:6px;padding:5px 8px;border-left:2px solid #06b7d0}
+.p2-percept .l{font-size:9px;color:#06b7d0}
+.p2-percept .v{font-size:8px;color:#94a3b8}
+
+/* 页面3 - 安防 */
+.p3-door{background:#102038;border-radius:8px;padding:7px;margin-bottom:5px;border-left:2px solid #22c55e}
+.p3-door .row{display:flex;justify-content:space-between}
+.p3-door .l{font-size:10px}
+.p3-door .s{font-size:10px;color:#22c55e}
+.p3-door .sub{font-size:8px;color:#64748b}
+.p3-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.p3-sensor{background:#182c48;border-radius:6px;padding:6px;height:52px}
+.p3-sensor .l{font-size:9px;color:#64748b;margin-bottom:4px}
+.p3-sensor .dot{width:4px;height:4px;border-radius:50%;display:inline-block;margin-right:3px;vertical-align:middle}
+.p3-sensor .s{font-size:9px;vertical-align:middle}
+
+/* 导航点 */
+.dots{display:flex;justify-content:center;gap:3px;margin-top:3px}
+.dot{width:4px;height:4px;border-radius:50%;background:#1e2e42}
+.dot.active{background:#22c55e}
+
+/* 版本切换 */
+.ver-tabs{display:flex;justify-content:center;gap:6px;margin:12px 0 8px}
+.ver-tab{padding:3px 10px;border-radius:4px;font-size:11px;border:1px solid #1e2e42;cursor:pointer;background:transparent;color:#94a3b8}
+.ver-tab.active{background:#102038;border-color:#22c55e;color:#22c55e}
+
+.layout{max-width:400px;margin:0 auto}
+
+.nav-tip{text-align:center;font-size:8px;color:#64748b;margin-top:4px}
+
+/* v0620B - 仪表盘 */
+.b-top{display:flex;justify-content:space-between;align-items:center;background:#0c1220;padding:4px 8px;margin:-8px -8px 5px;border-bottom:1px solid #1e2e42}
+.b-top .lt{font-size:10px;color:#22c55e}
+.b-top .rt{font-size:8px;color:#94a3b8}
+.b-cols{display:flex;gap:4px;margin-bottom:4px}
+.b-col{flex:1;background:#121a2e;border-radius:5px;padding:4px 6px}
+.b-col .l{font-size:8px;color:#64748b}
+.b-col .v{font-size:13px;font-weight:600}
+.b-col .bar{height:3px;background:#1e2e42;border-radius:2px;margin-top:3px;overflow:hidden}
+.b-chart{background:#0c1220;border-radius:5px;padding:5px;margin-bottom:4px}
+.b-chart .cl{font-size:8px;color:#64748b;margin-bottom:3px}
+.b-bars{display:flex;gap:3px;height:28px;align-items:flex-end}
+.b-bar{flex:1;border-radius:1px;min-height:3px}
+.b-sec{background:#121a2e;border-radius:5px;padding:4px 6px;margin-bottom:4px;border-left:2px solid #22c55e;display:flex;justify-content:space-between}
+.b-sec .l{font-size:9px}
+.b-sec .s{font-size:9px;color:#22c55e}
+.b-sensors{display:flex;gap:4px;margin-bottom:4px}
+.b-sen{flex:1;background:#121a2e;border-radius:5px;padding:4px;text-align:center}
+.b-sen .l{font-size:8px;color:#64748b}
+.b-sen .dot{width:3px;height:3px;border-radius:50%;display:inline-block;margin-right:2px}
+.b-sen .s{font-size:8px}
+.b-env{background:#121a2e;border-radius:5px;padding:4px 6px;margin-bottom:4px;border-left:2px solid #06b7d0;font-size:8px;color:#64748b;display:flex;gap:10px}
+.b-status{background:#06281a;padding:4px 8px;margin:0 -8px -8px;display:flex;justify-content:space-between;font-size:8px}
+.b-status .l{color:#22c55e}
+.b-status .v{color:#94a3b8}
+.b-btns{display:flex;gap:4px;margin-top:4px}
+.b-btn{flex:1;background:#18243c;border-radius:4px;padding:4px;text-align:center;font-size:8px}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<h1>🖥 IPS 屏 UI 预览</h1>
+<div class="sub">触摸切换版本 · 模拟320x480显示效果</div>
+
+<div class="ver-tabs">
+<span class="ver-tab active" onclick="switchVer('a')">v0620A 触摸交互</span>
+<span class="ver-tab" onclick="switchVer('b')">v0620B 仪表盘</span>
+</div>
+
+<!-- v0620A -->
+<div id="ver-a">
+<div class="display">
+<div class="tab-bar">
+<button class="tab active" onclick="showPage(0)">节能</button>
+<button class="tab" onclick="showPage(1)">环境</button>
+<button class="tab" onclick="showPage(2)">安防</button>
+<button class="tab" onclick="showPage(3)">能耗</button>
+<button class="tab" onclick="showPage(4)">系统</button>
+</div>
+
+<div class="preview-area">
+
+<!-- 页面1 -->
+<div class="screen" id="p0">
+<div class="p1-title"><h2>今日节能</h2><span>1208房</span></div>
+<div class="p1-divider"></div>
+<div class="p1-arc">
+<svg viewBox="0 0 120 100"><path d="M 20 80 A 40 40 0 1 1 100 80" fill="none" stroke="#1e2e42" stroke-width="5"/><path d="M 20 80 A 40 40 0 1 1 98 72" fill="none" stroke="#22c55e" stroke-width="5"/></svg>
+<div class="p1-arc-text"><div class="num">2.4</div><div class="unit">kWh</div><div class="label">今日已省</div></div>
+</div>
+<div class="p1-cards">
+<div class="p1-card"><div class="l">设定温度</div><div class="v b">26 度</div></div>
+<div class="p1-card"><div class="l">深睡模式</div><div class="v p">5h 12m</div></div>
+</div>
+<div style="clear:both"></div>
+<div class="p1-divider2"></div>
+<div class="p1-grid">
+<div class="p1-item" style="border-top-color:#22c55e"><div class="l">省电金额</div><div class="v" style="color:#22c55e">4.2</div><div class="u">元</div></div>
+<div class="p1-item" style="border-top-color:#a78bfa"><div class="l">深睡时长</div><div class="v" style="color:#a78bfa">6h</div><div class="u"></div></div>
+<div class="p1-item" style="border-top-color:#3b82f6"><div class="l">房门状态</div><div class="v" style="color:#3b82f6">已关</div><div class="u"></div></div>
+<div class="p1-item" style="border-top-color:#fb923c"><div class="l">CO2</div><div class="v" style="color:#fb923c">420</div><div class="u">ppm</div></div>
+</div>
+<div class="p1-status">
+<div><div class="l">● 有人在房</div><div class="v">节能运行 已省4.2元</div></div>
+</div>
+<div class="nav-tip">← 触摸切换 →</div>
+<div class="dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
+<!-- 页面2 -->
+<div class="screen hidden" id="p1">
+<div class="p2-title"><h2>环境感知</h2><span>舒适</span></div>
+<div class="p1-divider"></div>
+<div class="p2-temp">
+<div class="row"><span><span class="big">24.5</span> 度</span><span class="set">设定 26 度</span></div>
+<div class="p2-bar-bg"><div class="p2-bar-fill"></div></div>
+</div>
+<div class="p2-grid">
+<div class="p2-sensor"><div class="l">湿度</div><div class="v" style="color:#22c55e">45%</div><div class="bar"><div class="fill" style="width:45%;background:#22c55e"></div></div></div>
+<div class="p2-sensor"><div class="l">噪音</div><div class="v" style="color:#fb923c">38dB</div><div class="bar"><div class="fill" style="width:38%;background:#fb923c"></div></div></div>
+<div class="p2-sensor"><div class="l">CO2</div><div class="v" style="color:#3b82f6">420ppm</div><div class="bar"><div class="fill" style="width:42%;background:#3b82f6"></div></div></div>
+<div class="p2-sensor"><div class="l">空气</div><div class="v" style="color:#a78bfa">正常</div><div class="bar"><div class="fill" style="width:75%;background:#a78bfa"></div></div></div>
+</div>
+<div class="p2-percept"><div class="l">空间感知</div><div class="v">有人在房 持续14:30 舒适</div></div>
+<div class="nav-tip">← 触摸切换 →</div>
+<div class="dots"><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
+<!-- 页面3 -->
+<div class="screen hidden" id="p2">
+<div class="p1-title"><h2 style="color:#fc5555">安防监控</h2><span style="color:#22c55e">全正常</span></div>
+<div class="p1-divider"></div>
+<div class="p3-door">
+<div class="row"><div class="l">房门状态</div><div class="s">● 已关门</div></div>
+<div class="sub">今日开12次</div>
+</div>
+<div class="p3-grid">
+<div class="p3-sensor"><div class="l">人体检测</div><span class="dot" style="background:#22c55e"></span><span class="s" style="color:#22c55e">正常</span></div>
+<div class="p3-sensor"><div class="l">门磁</div><span class="dot" style="background:#3b82f6"></span><span class="s" style="color:#3b82f6">正常</span></div>
+<div class="p3-sensor"><div class="l">紧急按钮</div><span class="dot" style="background:#a78bfa"></span><span class="s" style="color:#a78bfa">正常</span></div>
+<div class="p3-sensor"><div class="l">烟雾</div><span class="dot" style="background:#fb923c"></span><span class="s" style="color:#fb923c">正常</span></div>
+</div>
+<div class="p2-percept"><div class="l" style="color:#22c55e">系统状态</div><div class="v">连续运行3d2h 全部正常</div></div>
+<div class="nav-tip">← 触摸切换 →</div>
+<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
+<!-- 页面4 -->
+<div class="screen hidden" id="p3">
+<div class="p1-title"><h2 style="color:#fb923c">能耗统计</h2><span style="color:#64748b">本周</span></div>
+<div class="p1-divider"></div>
+<div style="display:flex;gap:4px;height:100px;align-items:flex-end;padding:0 8px;margin-bottom:5px">
+<div style="flex:1;background:#fb923c;height:42px;border-radius:2px 2px 0 0;position:relative"><span style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:#64748b">一</span></div>
+<div style="flex:1;background:#fb923c;height:52px;border-radius:2px 2px 0 0"><span style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:#64748b">二</span></div>
+<div style="flex:1;background:#fb923c;height:63px;border-radius:2px 2px 0 0"><span style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:#64748b">三</span></div>
+<div style="flex:1;background:#fb923c;height:57px;border-radius:2px 2px 0 0"><span style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:#64748b">四</span></div>
+<div style="flex:1;background:#fb923c;height:67px;border-radius:2px 2px 0 0"><span style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:#64748b">五</span></div>
+<div style="flex:1;background:#fb923c;height:78px;border-radius:2px 2px 0 0"><span style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:#64748b">六</span></div>
+<div style="flex:1;background:#fb923c;height:72px;border-radius:2px 2px 0 0"><span style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:#64748b">日</span></div>
+</div>
+<div class="p1-divider2"></div>
+<div class="p1-card" style="float:left;width:130px"><div class="l">本周合计</div><div style="display:flex;align-items:baseline;gap:3px"><span style="font-size:14px;font-weight:600;color:#fb923c">288</span><span style="font-size:9px;color:#94a3b8">kWh</span></div></div>
+<div class="p1-card" style="float:right;width:130px"><div class="l">相对于上周</div><div style="font-size:14px;font-weight:600;color:#22c55e">-12.5%</div></div>
+<div style="clear:both"></div>
+<div class="p1-status" style="margin-top:5px"><div><div class="l">节能运行中</div></div></div>
+<div class="nav-tip">← 触摸切换 →</div>
+<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div></div>
+</div>
+
+<!-- 页面5 -->
+<div class="screen hidden" id="p4">
+<div class="p1-title"><h2 style="color:#a78bfa">系统信息</h2></div>
+<div class="p1-divider"></div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<div class="p1-card"><div style="display:flex;justify-content:space-between"><span class="l" style="font-size:10px">固件版本</span><span style="font-size:10px;color:#e2e8f0">v0620A</span></div></div>
+<div class="p1-card"><div style="display:flex;justify-content:space-between"><span class="l" style="font-size:10px">设备编号</span><span style="font-size:10px;color:#e2e8f0">LX-1208-001</span></div></div>
+<div class="p1-card"><div style="display:flex;justify-content:space-between"><span class="l" style="font-size:10px">网络状态</span><span style="font-size:10px;color:#22c55e">4G 在线</span></div></div>
+<div class="p1-card"><div style="display:flex;justify-content:space-between"><span class="l" style="font-size:10px">信号强度</span><span style="font-size:10px;color:#e2e8f0">RSRP -82dBm</span></div></div>
+<div class="p1-card"><div style="display:flex;justify-content:space-between"><span class="l" style="font-size:10px">运行时间</span><span style="font-size:10px;color:#e2e8f0">3天2小时</span></div></div>
+<div class="p1-card"><div style="display:flex;justify-content:space-between"><span class="l" style="font-size:10px">当前时间</span><span style="font-size:10px;color:#e2e8f0">10:30</span></div></div>
+</div>
+<div style="text-align:center;margin-top:8px"><div style="font-size:10px;color:#a78bfa">灵犀空间感知</div><div style="font-size:8px;color:#64748b">空间知道你在做什么</div></div>
+<div class="dots" style="margin-top:8px"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- v0620B -->
+<div id="ver-b" style="display:none">
+<div class="display">
+<div class="b-top"><span class="lt">灵犀 空间感知</span><span class="rt">1208房 10:30</span></div>
+<div class="screen" style="position:static;padding:4px 8px">
+<div class="b-cols">
+<div class="b-col"><div class="l">温度</div><div class="v" style="color:#3b82f6">24.5°</div><div class="bar"><div style="width:82%;height:3px;background:#3b82f6;border-radius:2px"></div></div></div>
+<div class="b-col"><div class="l">湿度</div><div class="v" style="color:#22c55e">45%</div><div class="bar"><div style="width:45%;height:3px;background:#22c55e;border-radius:2px"></div></div></div>
+<div class="b-col"><div class="l">今日省电</div><div class="v" style="color:#fb923c">2.4</div><div class="bar"><div style="width:72%;height:3px;background:#fb923c;border-radius:2px"></div></div></div>
+</div>
+<div class="b-chart">
+<div class="cl">能耗趋势(本周)</div>
+<div class="b-bars">
+<div class="b-bar" style="background:#fb923c;height:42%"></div>
+<div class="b-bar" style="background:#fb923c;height:52%"></div>
+<div class="b-bar" style="background:#fb923c;height:63%"></div>
+<div class="b-bar" style="background:#fb923c;height:57%"></div>
+<div class="b-bar" style="background:#fb923c;height:67%"></div>
+<div class="b-bar" style="background:#fb923c;height:78%"></div>
+<div class="b-bar" style="background:#fb923c;height:72%"></div>
+</div>
+</div>
+<div class="b-sec"><span class="l">房门状态</span><span><span class="s">● 已关</span><span style="color:#64748b;font-size:8px;margin-left:6px">今日开12次</span></span></div>
+<div class="b-sensors">
+<div class="b-sen"><div class="l">人体</div><span class="dot" style="background:#22c55e"></span><span class="s" style="color:#22c55e">正常</span></div>
+<div class="b-sen"><div class="l">门磁</div><span class="dot" style="background:#3b82f6"></span><span class="s" style="color:#3b82f6">正常</span></div>
+<div class="b-sen"><div class="l">烟雾</div><span class="dot" style="background:#fb923c"></span><span class="s" style="color:#fb923c">正常</span></div>
+<div class="b-sen"><div class="l">紧急</div><span class="dot" style="background:#a78bfa"></span><span class="s" style="color:#a78bfa">正常</span></div>
+</div>
+<div class="b-env"><span>CO2 420ppm</span><span>噪音 38dB</span><span>空气 正常</span></div>
+<div class="b-status"><span class="l">● 空间感知 有人在房</span><span class="v">连续3d2h 正常</span></div>
+<div class="b-btns">
+<div class="b-btn" style="color:#22c55e">节能详</div>
+<div class="b-btn" style="color:#3b82f6">空调</div>
+<div class="b-btn" style="color:#a78bfa">设置</div>
+<div class="b-btn" style="color:#fb923c">系统</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="text-align:center;margin-top:12px;font-size:12px;color:#64748b">
+预览模拟屏幕效果，实际显示以烧录为准
+</div>
+
+</div>
+<script>
+let curPage = 0;
+function showPage(n) {
+document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+document.getElementById('p'+n).classList.remove('hidden');
+document.querySelectorAll('.tab').forEach((t,i) => t.className = i===n ? 'tab active' : 'tab');
+document.querySelectorAll('.dot').forEach((d,i) => d.className = i===n ? 'dot active' : 'dot');
+curPage = n;
+}
+function switchVer(v) {
+document.querySelectorAll('.ver-tab').forEach(t => t.classList.remove('active'));
+event.target.classList.add('active');
+document.getElementById('ver-a').style.display = v==='a' ? '' : 'none';
+document.getElementById('ver-b').style.display = v==='b' ? '' : 'none';
+}
+</script>
+</body>
+</html>

@@ -79,12 +79,10 @@ unsigned long last_change = 0;
 void loop() {
     if (millis() - last_change > 2000) {
         last_change = millis();
-        if (color_idx < 6) {
-            tft.fillScreen(colors[color_idx]);
-            Serial.printf("[Color] #%d: R=%d G=%d B=%d\n",
-                color_idx, colors[color_idx].R8(), colors[color_idx].G8(), colors[color_idx].B8());
-            color_idx++;
-        }
+        tft.fillScreen(colors[color_idx]);
+        Serial.printf("[Color] #%d: R=%d G=%d B=%d\n",
+            color_idx, colors[color_idx].R8(), colors[color_idx].G8(), colors[color_idx].B8());
+        color_idx = (color_idx + 1) % 6;  // 持续循环
     }
     delay(10);
 }

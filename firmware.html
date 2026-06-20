@@ -91,6 +91,22 @@ h1{font-size:20px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
 <script>
 const versions = [
   {
+    ver: "v0621L",
+    date: "2026-06-21",
+    status: "latest",
+    tags: ["灵犀UI", "推荐", "厂家初始化"],
+    file: "v0621L-lingxi-ui.bin",
+    size: "706KB",
+    driver: "ILI9488 (LovyanGFX+LVGL)",
+    desc: "🔥 厂家初始化序列(MADCTL=0x48+像素格式0x55=16位) + 电源/伽马校正 + 灵犀节能仪表盘",
+    changelog: "✅ 厂家完整初始化序列(电源/伽马/MADCTL/像素格式)\
+✅ 像素格式0x55=16位(匹配LVGL_COLOR_DEPTH=16)\
+✅ MADCTL=0x48(BGR+MX mirror)\
+✅ 灵犀UI：节能仪表盘四卡片+三页导航",
+    hw: "HW-678A N16R8, ILI9488 4寸",
+    recommend: true
+  },
+  {
     ver: "v0621J",
     date: "2026-06-21",
     status: "latest",

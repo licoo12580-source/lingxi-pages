@@ -115,6 +115,10 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 <script>
 const FW = [
   // ==== v0621 系列 (LovyanGFX + LVGL) ====
+  {ver:"v0621Y", date:"2026-06-21", type:"testing", tags:["中文UI","触摸","厂家协议"], files:{full:"v0621Y-lingxi-ui-full.bin",inc:"v0621Y-lingxi-ui.bin"}, size:"748KB / 684KB",
+    desc:"🔥 完整中文三页UI + 厂家协议触摸驱动(全STOP读写+RST时序)",
+    changes:"✅ FT6336U驱动完全重写(参考FocalTech datasheet)\n✅ I2C读写改用完整STOP(非repeated start)\n✅ Wire.setPins()+Wire.begin()分离\n✅ RST 20ms LOW+300ms HIGH(厂家时序)\n✅ 不做ID校验(仅日志,兼容不同批次芯片)\n✅ 中文完整字库(NotoSansSC 20px)\n✅ TG1WDT喂狗+SPI2_HOST+PSRAM\n✅ 触摸可用→触摸翻页 触摸不可用→5秒自动翻页",
+    source:"test_lgfx.cpp v0621Y"},
   {ver:"v0621X", date:"2026-06-21", type:"testing", tags:["中文UI","无触摸","自动翻页"], files:{full:"v0621X-lingxi-ui-full.bin",inc:"v0621X-lingxi-ui.bin"}, size:"733KB / 670KB",
     desc:"🔥 完整中文三页UI(无触摸)+5秒自动翻页,纯显示验证版",
     changes:"✅ 去掉所有触摸/I2C代码\n✅ 完整LVGL中文三页:节能/感知/系统\n✅ 5秒自动翻页(0→1→2→0)\n✅ 底栏导航按钮(不可点击,纯显示)\n✅ TG1WDT喂狗+SPI2_HOST+PSRAM\n✅ 厂家初始化序列+颜色正确",

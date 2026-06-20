@@ -370,6 +370,11 @@ static void create_bottom_bar(lv_obj_t *parent) {
 bool g_touch_ok = false;
 
 void setup() {
+    // 优先杀掉TG1WDT（在Arduino框架初始化前可能已被配置为短超时）
+    TIMERG1.wdtwprotect.val = 0x50D83AA1;
+    TIMERG1.wdt_config0.val = 0;  // 完全禁用
+    TIMERG1.wdtwprotect.val = 0;
+
     WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
     disableCore0WDT();
     disableCore1WDT();

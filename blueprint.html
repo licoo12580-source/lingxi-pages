@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灵犀 · 酒店空间感知平台 · 蓝图</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;line-height:1.7}
+.page{max-width:780px;margin:0 auto;padding:48px 24px 80px}
+
+.hero{text-align:center;margin-bottom:56px}
+.hero .logo{font-size:48px;margin-bottom:12px}
+.hero h1{font-size:32px;font-weight:800;background:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero .tagline{font-size:16px;color:#94a3b8;margin-bottom:4px}
+.hero .subtitle{font-size:13px;color:#64748b}
+.hero .divider{width:60px;height:3px;margin:20px auto;background:linear-gradient(90deg,#60a5fa,#a78bfa);border-radius:2px}
+
+.section{margin:48px 0 20px}
+.section h2{font-size:18px;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:10px}
+.section h2 .num{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#60a5fa,#a78bfa);color:#0b1120;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section h2 .line{flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
+
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin:12px 0}
+.card h3{font-size:14px;font-weight:600;color:#f1f5f9;margin-bottom:8px}
+.card p,.card li{font-size:13px;color:#94a3b8;line-height:1.8}
+.card ul{padding-left:18px;list-style:none}
+.card ul li::before{content:'▸ ';color:#60a5fa}
+.card.highlight{border-color:#60a5fa44;background:linear-gradient(135deg,#1e293b,#0f172a)}
+.card.highlight2{border-color:#a78bfa44}
+.card.highlight3{border-color:#22c55e44}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+.stat-box{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;text-align:center}
+.stat-box .num{font-size:22px;font-weight:800;color:#60a5fa}
+.stat-box .label{font-size:11px;color:#64748b;margin-top:2px}
+
+.tag{padding:2px 8px;border-radius:4px;font-size:11px;display:inline-block;margin:1px 2px}
+.tag.green{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+.tag.blue{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
+.tag.purple{background:#a78bfa22;color:#a78bfa;border:1px solid #a78bfa44}
+.tag.orange{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+.tag.gray{background:#47556922;color:#94a3b8;border:1px solid #47556944}
+
+.quote{padding:16px 20px;margin:16px 0;background:#1e293b;border-left:3px solid #60a5fa;border-radius:0 8px 8px 0;font-size:13px;color:#94a3b8;font-style:italic}
+
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+th{text-align:left;padding:8px 10px;background:#1e293b;color:#64748b;font-weight:600;border-bottom:2px solid #334155}
+td{padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:top;line-height:1.6;color:#94a3b8}
+tr:hover td{background:#1e293b66}
+td strong{color:#e2e8f0}
+
+.footer{text-align:center;margin-top:64px;padding-top:24px;border-top:1px solid #1e293b;font-size:11px;color:#475569}
+
+@media(max-width:640px){
+  .page{padding:32px 16px 60px}
+  .hero h1{font-size:24px}
+  .grid2,.grid3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hero">
+  <div class="logo">🦞</div>
+  <h1>灵犀 · 酒店空间感知平台</h1>
+  <p class="tagline">让每一间客房「看得见」</p>
+  <p class="subtitle">回响酒店管理有限公司 · 2026-06</p>
+  <div class="divider"></div>
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">1</span> 我们做什么 <span class="line"></span></h2></div>
+
+<p style="font-size:14px;color:#e2e8f0;margin-bottom:12px;font-weight:500">一个装进酒店客房的硬件终端 + 云端平台，让酒店「感知」房间状态，自动做节能与安防。</p>
+
+<div class="grid2">
+  <div class="card highlight">
+    <h3>⚡ 节能</h3>
+    <p>人走自动关空调/关灯，入住自动开。1间房1年省<strong style="color:#22c55e">¥800~1,500</strong>电费。<br><br>
+    50间房的小酒店，一年白省<strong style="color:#22c55e">¥4~7.5万</strong>。</p>
+  </div>
+  <div class="card highlight2">
+    <h3>🛡️ 安防</h3>
+    <p>雷达感知房间里「有几个人」「待了多久」。异常静默、陌生人闯入、衣帽间有人停留过久——<strong style="color:#f472b6">实时告警</strong>。<br><br>
+    酒店老板手机收到推送，看一眼就知道。</p>
+  </div>
+</div>
+
+<div class="quote">
+  根能力是「空间感知」—— 随时知道房间里有没有人、有几个人、在做什么区域。节能和安防是感知之上的两个应用。
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">2</span> 产品形态 <span class="line"></span></h2></div>
+
+<div class="card">
+  <h3>一个巴掌大的终端，装在天花板上</h3>
+  <div class="grid2" style="margin-top:10px">
+    <div>
+      <p><strong style="color:#f1f5f9">硬件组成：</strong></p>
+      <ul>
+        <li>ESP32-S3 主控（双核240MHz / 16MB Flash）</li>
+        <li>LD2450 毫米波雷达（24GHz / 追3人 / 送坐标）</li>
+        <li>ML307C 4G通信模块（¥9 / MQTT / AT指令）</li>
+        <li>红外收发 ×4（空调 / 电视 / 灯光控制）</li>
+        <li>SHT30 温湿度传感器（可选）</li>
+      </ul>
+    </div>
+    <div>
+      <p><strong style="color:#f1f5f9">产品特性：</strong></p>
+      <ul>
+        <li>4G联网，插电即用，不依赖酒店WiFi</li>
+        <li>OTA远程升级固件</li>
+        <li>定位精度 ±0.5m，0.1~6m 覆盖范围</li>
+        <li>无人15分钟→自动关空调（可配置）</li>
+        <li>有人入住→自动恢复温度</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="grid3">
+  <div class="stat-box">
+    <div class="num">¥80~94</div>
+    <div class="label">单台BOM成本</div>
+  </div>
+  <div class="stat-box">
+    <div class="num">¥399~699</div>
+    <div class="label">售价/间</div>
+  </div>
+  <div class="stat-box">
+    <div class="num">10~15</div>
+    <div class="label">SaaS月费/间/月</div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">3</span> 商业模式 <span class="line"></span></h2></div>
+
+<div class="card">
+  <h3>四层收费，酒店老板按需选</h3>
+  <table>
+    <thead><tr><th>产品包</th><th>内容</th><th>定价</th></tr></thead>
+    <tbody>
+      <tr><td><strong style="color:#60a5fa">终端设备</strong></td><td>含硬件 + 首年预装</td><td>¥399~699/间</td></tr>
+      <tr><td><strong style="color:#22c55e">节能云服务</strong></td><td>策略配置 + 省电报表 + 远程控制</td><td>¥10~15/间/月</td></tr>
+      <tr><td><strong style="color:#f472b6">安防扩展包</strong></td><td>异常告警 + 手机推送 + 事件回放</td><td>¥5~10/间/月（加购）</td></tr>
+      <tr><td><strong style="color:#a78bfa">纯分成模式</strong></td><td>免费装设备，省电费分成50/50</td><td>来谈</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card highlight3">
+  <h3>💰 算一笔账：50间房的酒店</h3>
+  <div class="grid2">
+    <div>
+      <p><strong style="color:#f1f5f9">投入：</strong></p>
+      <ul>
+        <li>设备：50 × ¥500 = ¥25,000</li>
+        <li>押金（可选信用模式）：¥5,000~8,000</li>
+        <li>月费：50 × ¥12 = ¥600/月</li>
+      </ul>
+    </div>
+    <div>
+      <p><strong style="color:#f1f5f9">回报：</strong></p>
+      <ul>
+        <li>省电：¥4~7.5万/年</li>
+        <li>安防：1次事故避免 = 几千到几万</li>
+        <li>回本周期：<strong style="color:#22c55e">4~8个月</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">4</span> 市场痛点 <span class="line"></span></h2></div>
+
+<div class="grid2">
+  <div class="card">
+    <h3>🏨 酒店的痛</h3>
+    <ul>
+      <li>客人退房不关空调，一间房一天白烧<strong>¥12~18</strong>电费</li>
+      <li>50间房 × 30%空置率 × 365天 = 一年<strong>烧掉¥6.5~10万</strong></li>
+      <li>客房安防靠人工巡检，死角多、成本高</li>
+      <li>员工私用房、衣帽间被盗、保洁时间无法追溯</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>✅ 灵犀的解法</h3>
+    <ul>
+      <li>无人感知→自动关空调/灯光 → 省电<strong>30~50%</strong></li>
+      <li>人去哪了→看得见房间状态 → 减少浪费</li>
+      <li>异常有人→实时推送手机 → 老板放心</li>
+      <li>一个人（序章+AI）就能管全部开发和部署</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">5</span> 技术栈 <span class="line"></span></h2></div>
+
+<div class="card">
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+    <span class="tag blue">ESP32-S3</span>
+    <span class="tag green">ESP-IDF</span>
+    <span class="tag purple">LD2450 雷达</span>
+    <span class="tag orange">ML307C 4G</span>
+    <span class="tag blue">MQTT</span>
+    <span class="tag purple">UART</span>
+    <span class="tag green">OTA</span>
+    <span class="tag orange">Python</span>
+    <span class="tag blue">FastAPI</span>
+    <span class="tag green">WebSocket</span>
+    <span class="tag purple">MySQL</span>
+    <span class="tag orange">GitHub Pages</span>
+  </div>
+  <p style="font-size:12px;color:#64748b">全栈：端侧 C++ (ESP-IDF) → 通信层 MQTT+AT → 后端 Python/FastAPI → 管理页面 HTML/JS → 展示页 GitHub Pages</p>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <h3>终端侧（ESP32-S3）</h3>
+    <ul>
+      <li>雷达驱动（UART）→ 坐标/人数/微动/轨迹</li>
+      <li>红外库（格力/美的/海尔等）→ 空调控制</li>
+      <li>4G模组（ML307C）→ MQTT上报+接收指令</li>
+      <li>OTA升级 + 安全启动（规划中）</li>
+      <li>NVS可配（MQTT服务器/策略等）</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>云端</h3>
+    <ul>
+      <li>MQTT Broker（EMQX）→ 设备消息队列</li>
+      <li>FastAPI → 设备管理/传感器入库/PMS对比</li>
+      <li>MySQL → 设备表/传感器流/节能报表</li>
+      <li>管理后台 → 房间管控/策略配置/省电看板</li>
+      <li>员工端 → 保洁签到/房间状态查看</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">6</span> 研发路线 <span class="line"></span></h2></div>
+
+<div class="card">
+  <table>
+    <thead><tr><th>阶段</th><th>时间</th><th>关键里程碑</th></tr></thead>
+    <tbody>
+      <tr><td><strong style="color:#60a5fa">Iter 1</strong></td><td>06-22~06-30</td><td>等待硬件到货 + 固件加固（TLS/NVS可配/模块拆分）</td></tr>
+      <tr><td><strong style="color:#60a5fa">Iter 2</strong></td><td>07-01~07-14</td><td>硬件实测 + OTA + IPS调优 + 全链路打通</td></tr>
+      <tr><td><strong style="color:#60a5fa">Iter 3</strong></td><td>07-15~07-28</td><td>节能V1闭环：空调码库+策略配置+省电报表</td></tr>
+      <tr><td><strong style="color:#60a5fa">Iter 4</strong></td><td>07-29~08-11</td><td>量产准备：KiCad终版→PCBA→安全启动→批量烧录</td></tr>
+      <tr><td><strong style="color:#a78bfa">商业1</strong></td><td>0~6月</td><td>5~10家酒店 → 省电数据验证 → 第一份年费合同</td></tr>
+      <tr><td><strong style="color:#a78bfa">商业2</strong></td><td>6~12月</td><td>100~200家酒店 → 阶梯推荐裂变</td></tr>
+      <tr><td><strong style="color:#a78bfa">商业3</strong></td><td>12~24月</td><td>500~1000家 + 城市合伙人 → 节能补贴</td></tr>
+      <tr><td><strong style="color:#a78bfa">商业4</strong></td><td>24~36月</td><td>>2000家 → 碳中和碳指标 → 广东省推广</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">7</span> 团队 <span class="line"></span></h2></div>
+
+<div class="grid2">
+  <div class="card">
+    <h3>👤 序章 · 创始人</h3>
+    <p>产品定义、商业模式、市场开拓。一个人+AI Agent 驱动整个项目。</p>
+  </div>
+  <div class="card">
+    <h3>🤖 AI Agent 团队</h3>
+    <p><strong>风止/小回</strong>（Leader）：拆任务、写方案、固件开发、管进度</p>
+    <p><strong>虾条</strong>（Worker）：后端代码、推GitHub（当前离线待恢复）</p>
+    <p><strong>Verifier</strong>（待补）：验收成果、沉淀经验</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">8</span> 核心优势 <span class="line"></span></h2></div>
+
+<div class="grid3">
+  <div class="card highlight">
+    <h3>🔑 价格屠夫</h3>
+    <p>BOM ¥80~94，售价399起。<br>竞品同类产品¥1,500~3,000/间。<br>灵犀是竞品<strong style="color:#22c55e">1/4~1/3的价格</strong>。</p>
+  </div>
+  <div class="card highlight2">
+    <h3>🔑 一鱼多吃</h3>
+    <p>一个硬件 = 节能 + 安防 + 运营数据。<br>酒店不用分别买两套系统。<br>安装一次，回报三份。</p>
+  </div>
+  <div class="card highlight3">
+    <h3>🔑 超轻团队</h3>
+    <p>序章（人）+ AI Agent × 3。<br>没有办公室、没有工资、没有股权。<br>月运营成本几乎为零。</p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<div class="section"><h2><span class="num">9</span> 联系我们 <span class="line"></span></h2></div>
+
+<div class="card" style="text-align:center">
+  <p style="color:#94a3b8;margin-bottom:12px">对项目感兴趣？想合作、试用、投资？</p>
+  <p style="color:#60a5fa;font-size:14px;margin-bottom:4px">📧 lingxi@lingxi.dev</p>
+  <p style="color:#64748b;font-size:12px">（邮箱暂未启用，联系请通过飞书群「回响技术交流」）</p>
+</div>
+
+<div class="footer">
+  <p>🦞 灵犀 · 酒店空间感知平台 · 回响酒店管理有限公司</p>
+  <p>灵感来源于北京/广州/深圳/武汉/成都多家酒店的真实运营痛点</p>
+  <p style="margin-top:4px;color:#475569">蓝图版本 1.0 · 2026-06-22</p>
+  <p style="margin-top:8px"><a href="project-overview.html" style="color:#60a5fa;text-decoration:none;font-size:12px">← 返回项目详情</a></p>
+</div>
+
+</div>
+</body>
+</html>

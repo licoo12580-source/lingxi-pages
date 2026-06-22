@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>灵犀 · 安装指南</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;line-height:1.7}
+.page{max-width:640px;margin:0 auto;padding:20px 16px 80px}
+
+.hero{text-align:center;padding:32px 0 20px}
+.hero .time{display:inline-block;padding:4px 12px;border-radius:20px;background:#22c55e18;color:#4ade80;font-size:12px;font-weight:600;border:1px solid #22c55e44;margin-bottom:10px}
+.hero h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .sub{color:#64748b;font-size:13px;margin-top:4px}
+
+.step-card{background:linear-gradient(135deg,#1a2332,#131b28);border:1px solid #2a3a4e;border-radius:14px;padding:20px;margin:14px 0;position:relative}
+.step-card .num{position:absolute;top:-10px;left:16px;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step-card h3{font-size:15px;font-weight:700;color:#f1f5f9;margin:4px 0 10px 0;padding-left:0}
+.step-card p,.step-card li{font-size:13px;color:#94a3b8;line-height:1.8}
+.step-card ul{padding-left:18px}
+.step-card .tag{display:inline-block;padding:2px 10px;border-radius:6px;font-size:11px;font-weight:500;margin:2px}
+.tag-green{background:#22c55e18;color:#4ade80;border:1px solid #22c55e44}
+.tag-blue{background:#3b82f618;color:#60a5fa;border:1px solid #3b82f644}
+.tag-red{background:#ef444418;color:#f87171;border:1px solid #ef444433}
+.tag-yellow{background:#f59e0b18;color:#fbbf24;border:1px solid #f59e0b44}
+.tag-gray{background:#47556922;color:#94a3b8;border:1px solid #47556944}
+
+.checklist{list-style:none;padding:0!important}
+.checklist li{padding:4px 0;color:#94a3b8;font-size:12px}
+.checklist li::before{content:'☐ ';color:#64748b;font-size:14px}
+
+.led-indicator{display:flex;gap:12px;margin:10px 0;flex-wrap:wrap}
+.led{display:flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8}
+.led-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.led-red{background:#ef4444;box-shadow:0 0 6px #ef444466}
+.led-blue{background:#3b82f6;box-shadow:0 0 6px #3b82f666}
+.led-green{background:#22c55e;box-shadow:0 0 6px #22c55e66}
+.led-dot.blink{animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.warning{background:#f59e0b18;border:1px solid #f59e0b44;border-radius:10px;padding:12px 16px;margin:10px 0;font-size:12px;color:#fbbf24;line-height:1.6}
+.error{background:#ef444418;border:1px solid #ef444433;border-radius:10px;padding:12px 16px;margin:10px 0;font-size:12px;color:#f87171;line-height:1.6}
+.success{background:#22c55e18;border:1px solid #22c55e44;border-radius:10px;padding:12px 16px;margin:10px 0;font-size:12px;color:#4ade80;line-height:1.6}
+
+.step-by-step{display:none;margin-top:10px;padding:12px;background:#0f172a;border-radius:8px;font-size:12px;color:#94a3b8;line-height:1.7}
+.step-by-step.show{display:block}
+
+.toggle-btn{display:inline-block;padding:6px 14px;border-radius:6px;background:#1e293b;border:1px solid #334155;color:#60a5fa;font-size:12px;cursor:pointer;margin:6px 0;transition:all .2s}
+.toggle-btn:hover{background:#263142}
+
+.boxes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.box{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px;text-align:center}
+.box .b-icon{font-size:20px;margin-bottom:4px}
+.box .b-label{font-size:10px;color:#64748b}
+.box.ok{border-color:#22c55e44}
+
+.footer{text-align:center;margin-top:40px;padding-top:16px;border-top:1px solid #1e293b;font-size:11px;color:#475569}
+
+@media(max-width:480px){
+  .boxes{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hero">
+  <div class="time">⏱ 目标：从拆箱到上线 ≤15分钟</div>
+  <h1>📦 灵犀安装指南</h1>
+  <div class="sub">适合：酒店前台 / 保洁 / 老板 · 不需要专业技能</div>
+</div>
+
+<!-- 步骤1 -->
+<div class="step-card" id="step1">
+  <div class="num">1</div>
+  <h3>📋 装前检查</h3>
+  <ul class="checklist">
+    <li>空调是分体式（壁挂/柜机），不是中央空调</li>
+    <li>空调遥控器能正常开关</li>
+    <li>房间有电源插座</li>
+    <li>已确认房间号</li>
+  </ul>
+  <div class="error" style="margin-top:8px">❌ 中央空调暂不支持，等V1.5网关方案</div>
+</div>
+
+<!-- 步骤2 -->
+<div class="step-card" id="step2">
+  <div class="num">2</div>
+  <h3>📦 拆箱 · 检查配件</h3>
+  <div class="boxes">
+    <div class="box ok"><div class="b-icon">📡</div><div class="b-label">灵犀主机 ×1</div></div>
+    <div class="box ok"><div class="b-icon">🔌</div><div class="b-label">电源适配器 ×1</div></div>
+    <div class="box ok"><div class="b-icon">🔋</div><div class="b-label">USB-C线 ×1</div></div>
+    <div class="box ok"><div class="b-icon">🏷️</div><div class="b-label">快速入门卡 ×1</div></div>
+  </div>
+  <div class="warning">⚠️ 保留包装盒。如需寄回翻新/维修，用原包装</div>
+</div>
+
+<!-- 步骤3 -->
+<div class="step-card" id="step3">
+  <div class="num">3</div>
+  <h3>⚡ 通电</h3>
+  <p>1. 插USB-C线到设备</p>
+  <p>2. 插电源适配器到插座</p>
+  <p>3. ⏳ 等待指示灯变化：</p>
+  <div class="led-indicator">
+    <div class="led"><span class="led-dot led-red blink"></span>红灯闪烁 → 启动中</div>
+    <div class="led"><span class="led-dot led-blue blink"></span>蓝灯慢闪 → 联网中</div>
+    <div class="led"><span class="led-dot led-green"></span>绿灯常亮 → ✅ 在线</div>
+  </div>
+  <div class="success">🟢 绿灯常亮 = 联网成功！</div>
+  <div class="error">🔴 红灯快闪 = 联网失败（见底部排查）</div>
+</div>
+
+<!-- 步骤4 -->
+<div class="step-card" id="step4">
+  <div class="num">4</div>
+  <h3>🔗 确认在线</h3>
+  <p>打开手机扫设备上的二维码 → 显示"设备在线"即可</p>
+  <p style="margin-top:6px;font-size:12px;color:#64748b">或让序章在后台上确认</p>
+  <div class="success">✅ 在线 → 进入下一步</div>
+</div>
+
+<!-- 步骤5 -->
+<div class="step-card" id="step5">
+  <div class="num">5</div>
+  <h3>🏷️ 绑定房间</h3>
+  <p>告诉序章：</p>
+  <ul>
+    <li>设备ID（设备标签上）</li>
+    <li>房间号（如：301）</li>
+    <li>空调品牌（格力/美的等）</li>
+  </ul>
+  <p style="margin-top:8px">序章在后台绑定后，会测试空调开关</p>
+  <div class="success">✅ 空调能开能关 → 绑定完成</div>
+  <div class="warning">⚠️ 不能控制 → 试品牌自动搜索</div>
+</div>
+
+<!-- 步骤6 -->
+<div class="step-card" id="step6">
+  <div class="num">6</div>
+  <h3>✅ 验收</h3>
+  <ul class="checklist">
+    <li>绿灯常亮（在线）</li>
+    <li>空调可远程开关</li>
+    <li>雷达能检测有人/无人</li>
+    <li>温度读数正常</li>
+  </ul>
+  <div class="success" style="margin-top:8px">🎉 装完！15分钟搞定一间</div>
+</div>
+
+<!-- 位置建议 -->
+<div class="step-card">
+  <h3>📐 安装位置建议</h3>
+  <ul>
+    <li>✅ 高度1.5-2米（视线高度）</li>
+    <li>✅ 面向房间中央</li>
+    <li>✅ 靠近电源插座</li>
+    <li>❌ 不要放空调正下方</li>
+    <li>❌ 不要放金属柜内（4G信号屏蔽）</li>
+    <li>❌ 不要放窗边（阳光直射）</li>
+  </ul>
+</div>
+
+<!-- 批量安装 -->
+<div class="step-card">
+  <h3>🏢 一层楼批量装（10间）</h3>
+  <div style="font-size:12px;color:#94a3b8;line-height:1.8">
+    08:00 全部10台拆箱插电<br>
+    08:15 10台全绿灯 → 确认在线<br>
+    08:20 开始绑定（3分钟/间）<br>
+    08:50 10间全绑定<br>
+    08:55 每间验收（1分钟/间）<br>
+    09:05 ✅ 全部完
+  </div>
+  <div class="success" style="margin-top:8px">约6.5分钟/间 · 批量更高效</div>
+</div>
+
+<!-- 故障排查 -->
+<div class="step-card">
+  <h3>🔧 故障排查</h3>
+  <button class="toggle-btn" onclick="toggleTroubleshoot()">展开/收起排查步骤</button>
+  <div id="troubleshoot" class="step-by-step">
+    <p><strong>红灯快闪（联网失败）：</strong></p>
+    <p>① 检查天线是否拧紧<br>
+    ② 确认位置有4G信号（手机测）<br>
+    ③ 重启设备（拔电源重插）<br>
+    ④ 换离窗户近的位置<br>
+    ⑤ 仍不行→联系序章换卡</p>
+    
+    <p style="margin-top:10px"><strong>空调不能控制（红外失败）：</strong></p>
+    <p>① 红外窗对准空调方向<br>
+    ② 确认品牌选对了<br>
+    ③ 试品牌自动搜索<br>
+    ④ 仍不行→用原装遥控器学习</p>
+    
+    <p style="margin-top:10px"><strong>雷达不准确：</strong></p>
+    <p>① 确认高度≥1.5米<br>
+    ② 前方无障碍物<br>
+    ③ 启动后等2分钟自校准<br>
+    ④ 检测范围约5×5米</p>
+  </div>
+</div>
+
+<div class="footer">
+  <p>🦞 灵犀 · 空间感知操作系统 · v1.0</p>
+  <p>有问题找序章或小回</p>
+</div>
+
+</div>
+
+<script>
+function toggleTroubleshoot() {
+  document.getElementById('troubleshoot').classList.toggle('show');
+}
+</script>
+</body>
+</html>

@@ -3,298 +3,353 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>灵犀 · 项目详情</title>
+<title>灵犀 · 项目详情 · 公开版</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b1120;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
-.page{max-width:900px;margin:0 auto;padding:24px 20px 60px}
-.back{margin-bottom:20px}
-.back a{color:#60a5fa;text-decoration:none;font-size:13px}
-.back a:hover{color:#93c5fd}
+body{background:#0a0e1a;color:#e2e8f0;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;line-height:1.6}
 
-h1{font-size:26px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-.sub{color:#64748b;font-size:13px;margin-bottom:24px}
+/* Nav */
+.nav{position:sticky;top:0;z-index:100;background:#0a0e1ae0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #1e293b}
+.nav-inner{max-width:1000px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-left{display:flex;align-items:center;gap:12px}
+.nav-logo{font-size:18px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-tag{font-size:10px;color:#64748b;background:#1e293b;padding:2px 8px;border-radius:4px;border:1px solid #334155}
+.nav-links{display:flex;gap:20px}
+.nav-links a{color:#94a3b8;text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:#60a5fa}
 
-.hero-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#60a5fa22,#a78bfa22);border:1px solid #60a5fa44;border-radius:8px;color:#60a5fa;text-decoration:none;font-weight:500;font-size:13px;margin-top:12px}
-.hero-btn span{font-size:10px;color:#64748b;font-weight:400}
+.page{max-width:1000px;margin:0 auto;padding:0 24px 80px}
 
-.section{margin:32px 0 14px}
-.section h2{font-size:16px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:8px}
-.section h2 .line{flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
+/* Hero */
+.hero{text-align:center;padding:80px 0 56px}
+.hero .badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid #334155;color:#94a3b8;margin-bottom:16px}
+.hero h1{font-size:42px;font-weight:800;background:linear-gradient(135deg,#f1f5f9,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.15}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .sub{margin-top:16px;font-size:16px;color:#64748b;max-width:540px;margin-left:auto;margin-right:auto}
+.hero .cta{display:flex;gap:12px;justify-content:center;margin-top:32px;flex-wrap:wrap}
+.hero .cta a{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;transition:all .25s}
+.hero .cta .primary{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;box-shadow:0 4px 20px #3b82f640}
+.hero .cta .primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px #3b82f660}
+.hero .cta .secondary{background:#1e293b;color:#e2e8f0;border:1px solid #334155}
+.hero .cta .secondary:hover{background:#263142;border-color:#60a5fa66}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:6px}
-.card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px}
-.card.col2{grid-column:1/-1}
-.card h3{font-size:13px;font-weight:600;color:#f1f5f9;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.card .stat{font-size:11px;color:#94a3b8;line-height:1.6}
-.card .stat strong{color:#e2e8f0}
-.card .tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;margin:1px}
-.card .tag.green{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
-.card .tag.blue{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
-.card .tag.purple{background:#a78bfa22;color:#a78bfa;border:1px solid #a78bfa44}
-.card .tag.orange{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
-.card .tag.gray{background:#47556922;color:#94a3b8;border:1px solid #47556944}
+/* Section */
+.section{margin:48px 0 20px}
+.section .label{font-size:11px;font-weight:600;color:#60a5fa;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.section h2{font-size:24px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
+.section .subtitle{font-size:14px;color:#64748b;max-width:600px}
 
-.timeline{position:relative;padding-left:24px}
-.tl-item{position:relative;padding:0 0 20px 16px;border-left:2px solid #334155}
-.tl-item:last-child{border-left-color:transparent;padding-bottom:0}
-.tl-item::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:#475569}
-.tl-item.done::before{background:#22c55e;box-shadow:0 0 6px #22c55e66}
-.tl-item.now::before{background:#3b82f6;box-shadow:0 0 8px #3b82f688;width:10px;height:10px;left:-6px}
-.tl-item .tl-date{font-size:10px;color:#64748b;margin-bottom:2px}
-.tl-item .tl-title{font-size:13px;font-weight:600;color:#f1f5f9;margin-bottom:2px}
-.tl-item .tl-desc{font-size:11px;color:#94a3b8;line-height:1.5}
+/* Card grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:16px}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:1fr 1fr 1fr}
 
-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
-th{text-align:left;padding:8px 10px;background:#1e293b;color:#94a3b8;font-weight:600;border-bottom:2px solid #334155}
-td{padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:top;line-height:1.5}
-tr:hover td{background:#1e293b66}
+.card{background:linear-gradient(135deg,#1a2332,#131b28);border:1px solid #2a3a4e;border-radius:14px;padding:24px;transition:all .3s}
+.card:hover{border-color:#60a5fa44;transform:translateY(-2px);box-shadow:0 8px 32px #3b82f610}
+.card.wide{grid-column:1/-1}
+.card .icon{font-size:28px;margin-bottom:12px}
+.card h3{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:8px}
+.card p{font-size:13px;color:#94a3b8;line-height:1.7}
+.card .highlight{color:#60a5fa;font-weight:600}
+.card .stat{font-size:11px;color:#64748b;margin-top:6px;line-height:1.6}
+.card .price{font-size:32px;font-weight:800;color:#f1f5f9}
+.card .price span{font-size:14px;font-weight:400;color:#64748b}
+.card .tag{display:inline-block;padding:2px 10px;border-radius:6px;font-size:11px;font-weight:500;margin:1px 2px}
+.tag-green{background:#22c55e18;color:#4ade80;border:1px solid #22c55e44}
+.tag-blue{background:#3b82f618;color:#60a5fa;border:1px solid #3b82f644}
+.tag-purple{background:#a78bfa18;color:#a78bfa;border:1px solid #a78bfa44}
+.tag-orange{background:#f59e0b18;color:#fbbf24;border:1px solid #f59e0b44}
 
-.plan-card{background:#1e293b;border:1px solid #60a5fa44;border-radius:10px;padding:16px;margin:10px 0}
-.plan-card h3{font-size:14px;font-weight:600;color:#f1f5f9;margin-bottom:6px}
-.plan-card .price{font-size:20px;font-weight:800;color:#60a5fa}
-.plan-card .price span{font-size:12px;font-weight:400;color:#64748b}
-.plan-card p{font-size:12px;color:#94a3b8;line-height:1.6;margin-top:4px}
-.plan-card .tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;margin:2px}
-.plan-card .tag.green{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
-.plan-card .tag.blue{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
-.plan-card .tag.orange{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+/* Scene table */
+.scene-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.scene-table th{text-align:left;padding:10px 14px;background:#1a2332;color:#64748b;font-weight:600;border-bottom:2px solid #2a3a4e;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.scene-table td{padding:10px 14px;border-bottom:1px solid #1e293b;vertical-align:top;line-height:1.6;color:#cbd5e1}
+.scene-table tr:hover td{background:#1a233266}
+.scene-table .s-tag{display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.s-tag.eco{background:#22c55e18;color:#4ade80;border:1px solid #22c55e33}
+.s-tag.safe{background:#f472b618;color:#f472b6;border:1px solid #f472b633}
 
-.blk{background:#1e293b;border:1px solid #ef444444;border-radius:8px;padding:12px;margin-bottom:8px}
-.blk .blk-title{font-size:12px;font-weight:600;color:#fca5a5;display:flex;align-items:center;gap:6px}
-.blk .blk-desc{font-size:11px;color:#94a3b8;margin-top:2px;line-height:1.5}
-.blk .blk-status{font-size:10px;display:inline-block;padding:1px 6px;border-radius:4px;margin-top:4px}
-.blk .blk-status.warn{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
-.blk .blk-status.done{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
-.blk .blk-owner{font-size:10px;color:#64748b;margin-top:2px}
+/* Pricing cards */
+.pricing{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px}
+.pricing-card{background:linear-gradient(135deg,#1a2332,#131b28);border:1px solid #2a3a4e;border-radius:14px;padding:28px 24px;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.pricing-card.featured{border-color:#60a5fa66;background:linear-gradient(135deg,#1a2332,#0d1522)}
+.pricing-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#3b82f6,#a78bfa)}
+.pricing-card:hover{transform:translateY(-3px);border-color:#60a5fa55}
+.pricing-card .p-icon{font-size:32px;margin-bottom:8px}
+.pricing-card .p-name{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
+.pricing-card .p-sub{font-size:12px;color:#64748b;margin-bottom:16px}
+.pricing-card .p-price{font-size:36px;font-weight:800;color:#f1f5f9}
+.pricing-card .p-price span{font-size:14px;font-weight:400;color:#64748b}
+.pricing-card .p-desc{font-size:12px;color:#94a3b8;line-height:1.6;margin-top:12px;text-align:left}
+.pricing-card .p-tags{margin-top:14px;display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
 
-.ver{font-family:monospace;font-weight:600;color:#22c55e;font-size:11px}
-.ver.old{color:#94a3b8}
+/* ROI calculator */
+.roi-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.roi-card{background:#1a2332;border:1px solid #2a3a4e;border-radius:12px;padding:20px;text-align:center}
+.roi-card .r-label{font-size:12px;color:#64748b;margin-bottom:4px}
+.roi-card .r-value{font-size:28px;font-weight:800;color:#60a5fa}
+.roi-card .r-desc{font-size:11px;color:#64748b;margin-top:4px}
+.roi-card.green .r-value{color:#4ade80}
+.roi-card.purple .r-value{color:#a78bfa}
 
-.footer{text-align:center;margin-top:48px;padding-top:20px;border-top:1px solid #1e293b;font-size:11px;color:#475569}
-@media(max-width:640px){
-  .page{padding:16px 12px 40px}
-  h1{font-size:20px}
-  .grid{grid-template-columns:1fr}
-  .tl-item{padding-bottom:16px}
+/* Steps */
+.steps{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:16px}
+.step{text-align:center;padding:20px 12px;background:#1a2332;border:1px solid #2a3a4e;border-radius:12px}
+.step .s-num{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.step h4{font-size:13px;font-weight:600;color:#f1f5f9;margin-bottom:4px}
+.step p{font-size:11px;color:#64748b;line-height:1.5}
+
+/* Footer */
+.footer{text-align:center;margin-top:64px;padding:32px 0 24px;border-top:1px solid #1e293b}
+.footer .f-links{display:flex;gap:16px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
+.footer .f-links a{color:#64748b;text-decoration:none;font-size:12px;transition:color .2s}
+.footer .f-links a:hover{color:#60a5fa}
+.footer p{font-size:11px;color:#475569}
+
+/* Responsive */
+@media(max-width:768px){
+  .hero h1{font-size:28px}
+  .hero{padding:48px 0 32px}
+  .pricing{grid-template-columns:1fr}
+  .roi-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+@media(max-width:480px){
+  .steps{grid-template-columns:1fr}
+  .hero .cta a{width:100%;justify-content:center}
 }
 </style>
 </head>
 <body>
+
+<!-- Nav -->
+<div class="nav">
+<div class="nav-inner">
+  <div class="nav-left">
+    <span class="nav-logo">🦞 灵犀</span>
+    <span class="nav-tag">v1.0 · 公开版</span>
+  </div>
+  <div class="nav-links">
+    <a href="#pricing">定价</a>
+    <a href="#scenes">场景</a>
+    <a href="#roi">收益</a>
+    <a href="#install">安装</a>
+    <a href="#roadmap">路线</a>
+  </div>
+</div>
+</div>
+
 <div class="page">
 
-<div class="back"><a href="/lingxi-pages/">← 返回演示中心</a></div>
-
-<h1>🦞 灵犀 · 项目详情</h1>
-<p class="sub">回响酒店管理有限公司 · 酒店空间感知运营服务公司</p>
-<a href="blueprint.html" class="hero-btn">📋 查看项目蓝图 <span>→ 对外沟通用</span></a>
+<!-- Hero -->
+<div class="hero">
+  <div class="badge">🏨 酒店空间感知系统</div>
+  <h1>知道房间有谁<br>才能为<em>谁</em>服务</h1>
+  <p class="sub">雷达感知 × 4G联网 × AI节能 — 插电即用，当天省钱</p>
+  <div class="cta">
+    <a href="#pricing" class="primary">查看方案 📋</a>
+    <a href="blueprint.html" class="secondary">项目蓝图 →</a>
+  </div>
+</div>
 
 <!-- 定位 -->
-<div class="section"><h2>🎯 定位 <span class="line"></span></h2></div>
-<div class="card col2" style="background:linear-gradient(135deg,#1e293b,#0f172a);border-color:#22c55e44">
-  <div style="font-size:13px;line-height:1.7">
-    <p><strong style="color:#f1f5f9">酒店空间感知运营服务公司</strong></p>
-    <p style="color:#94a3b8;margin-top:4px">硬件是入口，服务是现金流，数据是护城河。</p>
-    <p style="color:#94a3b8;margin-top:4px">根本能力：<strong style="color:#60a5fa">空间感知</strong>（知道房间有没有人、有几个人、在哪片区域）</p>
-    <p style="color:#94a3b8">节能和安防是感知之上长出来的两个应用。</p>
+<div class="section"><div class="label">🎯 定位</div><h2>酒店空间感知运营服务</h2><p class="subtitle">硬件是入口，服务是现金流，数据是护城河。</p></div>
+<div class="card wide" style="background:linear-gradient(135deg,#1a2332,#0f172a);border-color:#22c55e44">
+  <p><strong style="color:#f1f5f9">根本能力：</strong><span class="highlight">空间感知</span> — 知道房间有没有人、有几个人、在哪片区域</p>
+  <p style="margin-top:8px;color:#94a3b8">节能和安防是感知之上长出来的两个应用。不需要知道你是谁，永远知道你来过。</p>
+</div>
+
+<!-- 定价 -->
+<div class="section" id="pricing"><div class="label">💼 定价方案</div><h2>三种合作模式</h2><p class="subtitle">选适合你的方式，零门槛启动</p></div>
+
+<div class="pricing">
+  <div class="pricing-card">
+    <div class="p-icon">🔵</div>
+    <div class="p-name">买断</div>
+    <div class="p-sub">设备归你，零纠纷</div>
+    <div class="p-price">¥299 <span>/间</span></div>
+    <div class="p-desc">
+      • 服务费 ¥8–10/间/月<br>
+      • 无节能分成<br>
+      • 送3–6个月软件试用<br>
+      • 基础维护+AI支持
+    </div>
+    <div class="p-tags"><span class="tag tag-green">推荐</span><span class="tag tag-blue">简单透明</span></div>
+  </div>
+  <div class="pricing-card featured">
+    <div class="p-icon">🟣</div>
+    <div class="p-name">租赁</div>
+    <div class="p-sub">零设备费，灵活退出</div>
+    <div class="p-price">¥150 <span>/间</span></div>
+    <div class="p-desc">
+      • 押金 ¥150/间（含设备及配件）<br>
+      • 月费 ¥10–15/间<br>
+      • 节能分成 15–25%<br>
+      • 5年合同，到期设备送客户
+    </div>
+    <div class="p-tags"><span class="tag tag-purple">零门槛</span><span class="tag tag-orange">灵活退出</span></div>
+  </div>
+  <div class="pricing-card">
+    <div class="p-icon">🟡</div>
+    <div class="p-name">短期验证</div>
+    <div class="p-sub">先试再签，数据说话</div>
+    <div class="p-price">¥1,000 <span>/5台</span></div>
+    <div class="p-desc">
+      • 押金 ¥1,000 = 5台设备试用<br>
+      • 装独立电表做A/B对比<br>
+      • 跑1周–1个月看真数据<br>
+      • 有效签合同，无效退押金
+    </div>
+    <div class="p-tags"><span class="tag tag-green">零风险试水</span><span class="tag tag-blue">实测对比</span></div>
   </div>
 </div>
 
-<!-- 商业模式 -->
-<div class="section"><h2>💼 商业模式 <span class="line"></span></h2></div>
+<div class="card wide" style="margin-top:8px;border-color:#f59e0b44">
+  <p style="font-size:13px;color:#94a3b8"><strong style="color:#f1f5f9">推荐奖励：</strong> 推荐1家 → 免1年月费 · 推荐3家 → 免节能分成 · 合伙人 → 永久抽下家提成</p>
+</div>
 
-<div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-  <div class="plan-card">
-    <h3>🔵 售卖模式</h3>
-    <p class="price">¥299 <span>/间</span></p>
-    <p>服务费：¥8~10/间/月</p>
-    <p>节能分成：<strong style="color:#22c55e">无</strong></p>
-    <p style="margin-top:6px;color:#64748b;font-size:11px">买断，零纠纷，2.5个月回本</p>
-    <div style="margin-top:6px">
-      <span class="tag green">推荐</span>
-      <span class="tag blue">简单透明</span>
-    </div>
+<!-- ROI 计算器 -->
+<div class="section" id="roi"><div class="label">💰 收益测算</div><h2>装100间房，能省多少钱？</h2><p class="subtitle">基于一年实测数据的保守估计</p></div>
+
+<div class="roi-grid">
+  <div class="roi-card">
+    <div class="r-label">年省电费（100间）</div>
+    <div class="r-value">¥6–12万</div>
+    <div class="r-desc">按电价0.6–1.0元、节能率20–30%计算</div>
   </div>
-  <div class="plan-card" style="border-color:#a78bfa44">
-    <h3>🟣 租赁模式</h3>
-    <p class="price">¥0 <span>/间</span></p>
-    <p>押金：¥120~150/间</p>
-    <p>服务费+分成：<strong style="color:#a78bfa">有</strong></p>
-    <p style="margin-top:6px;color:#64748b;font-size:11px">零门槛，押金池管理，退出可回收</p>
-    <div style="margin-top:6px">
-      <span class="tag purple">零门槛</span>
-      <span class="tag orange">适合不愿意出钱的酒店</span>
-    </div>
+  <div class="roi-card green">
+    <div class="r-label">年省电费（500间）</div>
+    <div class="r-value">¥30–60万</div>
+    <div class="r-desc">500间稳定在线后，节能数据持续迭代</div>
+  </div>
+  <div class="roi-card purple">
+    <div class="r-label">设备回本周期（买断）</div>
+    <div class="r-value">≈2.5月</div>
+    <div class="r-desc">¥299 ÷ 月省¥120/间/月 = 2.5个月</div>
+  </div>
+  <div class="roi-card">
+    <div class="r-label">租赁回本周期</div>
+    <div class="r-value">≈4–6月</div>
+    <div class="r-desc">押金¥150 ÷ 月省¥120/间/月 = 4–6个月省回报押金</div>
   </div>
 </div>
 
-<div class="card col2" style="border-color:#f59e0b44">
-  <h3>🟡 短期验证工具</h3>
-  <p class="stat">押金¥300~500 → 两间房对比跑1周~1个月 → 有省电效果签合同，没效果退押金撤设备</p>
-  <p class="stat" style="margin-top:4px">用真实数据说话，不用PPT说服人。</p>
-</div>
-
-<!-- 定价对比 -->
-<div class="section"><h2>💵 算账 <span class="line"></span></h2></div>
-<table>
-<thead><tr><th>项目</th><th>售卖模式</th><th>租赁模式</th><th>短期验证</th></tr></thead>
-<tbody>
-<tr><td><strong>设备费</strong></td><td>¥299/间</td><td>¥0</td><td>¥0</td></tr>
-<tr><td><strong>押金</strong></td><td>—</td><td>¥120~150/间</td><td>¥300~500</td></tr>
-<tr><td><strong>月费</strong></td><td>¥8~10/间</td><td>高于售卖</td><td>试用期免费</td></tr>
-<tr><td><strong>分成</strong></td><td>无</td><td>15~25%</td><td>试用后确定</td></tr>
-<tr><td><strong>适合客户</strong></td><td>有信心的酒店</td><td>想零门槛的酒店</td><td>犹豫的酒店</td></tr>
-</tbody>
-</table>
-
-<!-- 硬件架构 -->
-<div class="section"><h2>🏗️ 硬件架构 <span class="line"></span></h2></div>
-<div class="grid">
-  <div class="card col2" style="background:linear-gradient(135deg,#1e293b,#0f172a);border-color:#22c55e44">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
-      <div><span style="color:#64748b;font-size:10px">主控</span><br><strong>ESP32-S3 N16R8</strong><br><span style="color:#94a3b8;font-size:10px">双核240MHz · 16MB Flash · 8MB PSRAM</span></div>
-      <div><span style="color:#64748b;font-size:10px">4G通信</span><br><strong>ML307C</strong><br><span style="color:#94a3b8;font-size:10px">¥10 · 零配置 · 插电即用</span></div>
-      <div><span style="color:#64748b;font-size:10px">雷达</span><br><strong>LD2450</strong><br><span style="color:#94a3b8;font-size:10px">24GHz · 追3人 · 坐标+人数</span></div>
-      <div><span style="color:#64748b;font-size:10px">BOM成本</span><br><strong>¥85/台</strong><br><span style="color:#94a3b8;font-size:10px">不含电池（选配+¥5）</span></div>
-    </div>
-    <div style="margin-top:10px;padding-top:8px;border-top:1px solid #1e293b;display:flex;gap:6px;flex-wrap:wrap;font-size:10px">
-      <span class="tag green">WiFi探针（IE指纹）</span>
-      <span class="tag green">BLE全时扫描</span>
-      <span class="tag green">红外收发×4</span>
-      <span class="tag green">预留电池接口</span>
-      <span class="tag blue">物联网卡¥4/年</span>
-    </div>
-  </div>
-</div>
-
-<!-- 覆盖策略 -->
-<div class="section"><h2>📍 覆盖策略 <span class="line"></span></h2></div>
-<div class="grid">
-  <div class="card">
-    <h3>🚪 大门</h3>
-    <p class="stat">雷达+WiFi探针 | 1台<br>到店/离店检测，人流计数<br>到店→通知房间预冷</p>
-  </div>
-  <div class="card">
-    <h3>🛗 每层电梯口</h3>
-    <p class="stat">雷达+WiFi探针 | 1台/层<br>覆盖电梯+楼梯口/消防通道<br>上下楼方向判定</p>
-  </div>
-  <div class="card">
-    <h3>🛏️ 每间客房</h3>
-    <p class="stat">标准设备1台/间<br>节能+安防+WiFi探针+BLE</p>
-  </div>
+<div class="card wide" style="border-color:#60a5fa44">
+  <p style="font-size:13px;color:#94a3b8"><strong style="color:#f1f5f9">酒店视角：</strong> 年省电费 <strong class="highlight">远超</strong> 年服务费+分成支出。省下的钱 > 付给灵犀的钱，净赚。</p>
+  <p style="font-size:12px;color:#64748b;margin-top:4px">了解更多 → <a href="blueprint.html" style="color:#60a5fa">查看完整收益模型</a></p>
 </div>
 
 <!-- 场景矩阵 -->
-<div class="section"><h2>🎬 场景矩阵 <span class="line"></span></h2></div>
-<div class="card col2">
-  <table>
-  <thead><tr><th>场景</th><th>触发</th><th>动作</th></tr></thead>
+<div class="section" id="scenes"><div class="label">🎬 场景矩阵</div><h2>9大节能与安防场景</h2><p class="subtitle">一个设备，覆盖客房到公区</p></div>
+
+<div class="card wide">
+  <table class="scene-table">
+  <thead><tr><th>场景</th><th>触发条件</th><th>执行动作</th></tr></thead>
   <tbody>
-  <tr><td><strong style="color:#22c55e">节能</strong></td><td>雷达无人15分钟</td><td>关空调/调高到26°C，省30~40%</td></tr>
-  <tr><td><strong style="color:#22c55e">夜间睡眠</strong></td><td>23:00~06:00</td><td>自动升2~3°C，省15~20%</td></tr>
-  <tr><td><strong style="color:#22c55e">即时节能</strong></td><td>WiFi信号+雷达消失（下楼）</td><td>即时调温不等15分钟</td></tr>
-  <tr><td><strong style="color:#22c55e">提前预冷</strong></td><td>大门→电梯口→楼层信号恢复</td><td>提前恢复温度，进门即舒适</td></tr>
-  <tr><td><strong style="color:#22c55e">人流计数</strong></td><td>大门+电梯口雷达累计</td><td>入住率/高峰时段/消防通道使用</td></tr>
-  <tr><td><strong style="color:#f472b6">安防</strong></td><td>雷达有人+无匹配信号</td><td>未知人员告警</td></tr>
-  <tr><td><strong style="color:#f472b6">楼梯异常</strong></td><td>深夜楼梯口未匹配信号</td><td>安防告警</td></tr>
-  <tr><td><strong style="color:#f472b6">断电告警</strong></td><td>主电断+电池待机+雷达有人</td><td>4G推送告警</td></tr>
-  <tr><td><strong style="color:#f472b6">员工滞留</strong></td><td>识别员工+超30分钟+非保洁</td><td>推送经理</td></tr>
+  <tr><td><span class="s-tag eco">节能</span> 无人关空调</td><td>雷达无人15分钟</td><td>关空调/调高至26°C，省30–40%</td></tr>
+  <tr><td><span class="s-tag eco">节能</span> 夜间睡眠</td><td>23:00–06:00</td><td>自动升温2–3°C，省15–20%</td></tr>
+  <tr><td><span class="s-tag eco">节能</span> 即时节能</td><td>WiFi+雷达同时消失（下楼）</td><td>即时调温，不等15分钟</td></tr>
+  <tr><td><span class="s-tag eco">节能</span> 提前预冷</td><td>大门→电梯→楼层信号恢复</td><td>提前恢复温度，进门即舒适</td></tr>
+  <tr><td><span class="s-tag eco">节能</span> 人流计数</td><td>大门+电梯口雷达累计</td><td>入住率/高峰时段/公区使用分析</td></tr>
+  <tr><td><span class="s-tag safe">安防</span> 异常告警</td><td>雷达有人+无匹配设备信号</td><td>未知人员告警推送</td></tr>
+  <tr><td><span class="s-tag safe">安防</span> 楼梯异常</td><td>深夜楼梯口未匹配信号</td><td>安防告警</td></tr>
+  <tr><td><span class="s-tag safe">安防</span> 断电告警</td><td>主电断+电池待机+雷达有人</td><td>4G推送告警</td></tr>
+  <tr><td><span class="s-tag safe">安防</span> 员工滞留</td><td>识别员工+超30分钟+非保洁</td><td>推送经理</td></tr>
   </tbody>
   </table>
+  <p style="font-size:12px;color:#64748b;margin-top:12px;padding-top:10px;border-top:1px solid #1e293b">
+    💡 每个酒店可独立配置场景包：会议室模式 · 宴会厅预约预冷 · 健身房除湿联动 · 公区走廊人感节能
+  </p>
+</div>
+
+<!-- 安装流程 -->
+<div class="section" id="install"><div class="label">⚡ 安装流程</div><h2>插电即用，无需布线</h2><p class="subtitle">4G自激活，10分钟搞定一间</p></div>
+
+<div class="steps">
+  <div class="step"><div class="s-num">1</div><h4>通电</h4><p>接入电源，设备自动开机</p></div>
+  <div class="step"><div class="s-num">2</div><h4>激活</h4><p>4G自动联网，后台识别设备ID</p></div>
+  <div class="step"><div class="s-num">3</div><h4>配房号</h4><p>前台扫码配置对应房间号</p></div>
+  <div class="step"><div class="s-num">4</div><h4>生效</h4><p>雷达开始检测，节能模式启动</p></div>
+</div>
+
+<div class="card wide" style="border-color:#22c55e44;margin-top:4px">
+  <p style="font-size:13px;color:#94a3b8">❌ <strong style="color:#f1f5f9">不需要</strong> 专业安装队 · 不需要改线路 · 不需要额外布线 · 不需要技术人员上门</p>
+  <p style="font-size:12px;color:#64748b;margin-top:4px">酒店自己完成，插电即用 — 一个前台半天能装完一层楼</p>
+</div>
+
+<!-- 硬件架构 -->
+<div class="section"><div class="label">🏗️ 硬件</div><h2>V1 技术架构</h2><p class="subtitle">已验证方案，可量产</p></div>
+
+<div class="grid grid-4">
+  <div class="card" style="text-align:center"><div class="icon">🧠</div><h3>ESP32-S3</h3><p>双核240MHz · 16MB Flash · 8MB PSRAM</p></div>
+  <div class="card" style="text-align:center"><div class="icon">📡</div><h3>4G通信</h3><p>ML307C · ¥10 · 零配置 · 插电即用</p></div>
+  <div class="card" style="text-align:center"><div class="icon">📡</div><h3>LD2450雷达</h3><p>24GHz · 追3人 · 坐标+人数检测</p></div>
+  <div class="card" style="text-align:center"><div class="icon">📊</div><h3>WiFi+BLE</h3><p>探针指纹辅助 · BLE全时扫描</p></div>
 </div>
 
 <!-- 产品路线 -->
-<div class="section"><h2>📜 产品路线 <span class="line"></span></h2></div>
-<div class="timeline">
-  <div class="tl-item now">
-    <div class="tl-date">现在 ~ 2026-12</div>
-    <div class="tl-title">V1 · 空间感知基础版</div>
-    <div class="tl-desc">4G+雷达+WiFi探针+BLE + 房间/电梯口/大门全场景覆盖 + 节能+安防+人流计数</div>
-  </div>
-  <div class="tl-item">
-    <div class="tl-date">2026-12 ~ 2027-03</div>
-    <div class="tl-title">V1.5 · 增强版</div>
-    <div class="tl-desc">加装选配电池（断电告警缓冲） · 大堂探针算法优化</div>
-  </div>
-  <div class="tl-item">
-    <div class="tl-date">2027-03 ~ 2027-09</div>
-    <div class="tl-title">V2 · 识别与场景扩展</div>
-    <div class="tl-desc">BLE融合 + 回客识别 + 声纹 + 适老化 + 会议室设备 + 大客户版合同</div>
-  </div>
-  <div class="tl-item">
-    <div class="tl-date">2027-09+</div>
-    <div class="tl-title">V3 · 平台化</div>
-    <div class="tl-desc">PMS对接 + 会员融合 + 数据平台 + 跨酒店数据产品</div>
+<div class="section" id="roadmap"><div class="label">📜 产品路线</div><h2>从V1到平台化</h2></div>
+
+<div class="card wide">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
+    <div style="background:#1e293b;border-radius:10px;padding:16px;border-top:3px solid #3b82f6">
+      <div style="font-size:10px;color:#64748b">现在 → 2026-12</div>
+      <div style="font-size:14px;font-weight:700;color:#f1f5f9;margin:4px 0">V1</div>
+      <div style="font-size:11px;color:#94a3b8;line-height:1.5">空间感知基础版<br>4G+雷达+WiFi+BLE<br>节能+安防+人流</div>
+    </div>
+    <div style="background:#1e293b;border-radius:10px;padding:16px;border-top:3px solid #60a5fa">
+      <div style="font-size:10px;color:#64748b">2026-12 → 2027-03</div>
+      <div style="font-size:14px;font-weight:700;color:#f1f5f9;margin:4px 0">V1.5</div>
+      <div style="font-size:11px;color:#94a3b8;line-height:1.5">增强版<br>选配电池 · 大堂算法优化<br>断电告警缓冲</div>
+    </div>
+    <div style="background:#1e293b;border-radius:10px;padding:16px;border-top:3px solid #a78bfa">
+      <div style="font-size:10px;color:#64748b">2027-03 → 2027-09</div>
+      <div style="font-size:14px;font-weight:700;color:#f1f5f9;margin:4px 0">V2</div>
+      <div style="font-size:11px;color:#94a3b8;line-height:1.5">识别与扩展<br>回客识别 · 适老化<br>会议/宴会厅场景包</div>
+    </div>
+    <div style="background:#1e293b;border-radius:10px;padding:16px;border-top:3px solid #22c55e">
+      <div style="font-size:10px;color:#64748b">2027-09+</div>
+      <div style="font-size:14px;font-weight:700;color:#f1f5f9;margin:4px 0">V3</div>
+      <div style="font-size:11px;color:#94a3b8;line-height:1.5">平台化<br>PMS对接 · 会员融合<br>跨酒店数据产品</div>
+    </div>
   </div>
 </div>
 
-<!-- 评分 -->
-<div class="section"><h2>📊 综合评分 <span class="line"></span></h2></div>
-<table>
-<thead><tr><th>维度</th><th>评分</th><th>说明</th></tr></thead>
-<tbody>
-<tr><td><strong>产品方向</strong></td><td>9.0/10</td><td>完整对齐</td></tr>
-<tr><td><strong>技术路线</strong></td><td>8.9/10</td><td>已验证方案，可落地</td></tr>
-<tr><td><strong>商业模型</strong></td><td>8.8/10</td><td>两套定价+验证工具</td></tr>
-<tr><td><strong>执行节奏</strong></td><td>9.2/10</td><td>V1→V1.5→V2→V3，非常合理</td></tr>
-<tr><td><strong>综合</strong></td><td><strong style="color:#22c55e">8.9/10</strong></td><td>已具备PMF验证条件</td></tr>
-</tbody>
-</table>
+<!-- 北极星 -->
+<div class="section"><div class="label">🎯 北极星指标</div><h2>第一年唯一目标</h2></div>
 
-<!-- 北极星指标 -->
-<div class="section"><h2>🎯 北极星指标 <span class="line"></span></h2></div>
-<table>
-<thead><tr><th>指标</th><th>目标</th></tr></thead>
-<tbody>
-<tr><td>在线率</td><td>≥99%</td></tr>
-<tr><td>OTA成功率</td><td>≥95%</td></tr>
-<tr><td>节能率</td><td>≥25%</td></tr>
-<tr><td>续费率</td><td>≥90%</td></tr>
-<tr><td>误报率</td><td>≤5%</td></tr>
-</tbody>
-</table>
-
-<!-- 12个月目标 -->
-<div class="section"><h2>🎯 未来12个月 <span class="line"></span></h2></div>
-<div class="card col2" style="border-color:#22c55e44">
-  <h3>只干一件事</h3>
-  <p class="stat" style="font-size:14px;font-weight:600;color:#22c55e">500间稳定在线</p>
-  <p class="stat" style="margin-top:4px">达到四个指标：在线率≥99% | 节能率≥25% | 续费率≥90% | 误报率≤5%</p>
-  <p class="stat" style="margin-top:4px">→ 从「项目阶段」跨入「公司阶段」</p>
+<div class="grid">
+  <div class="card" style="text-align:center"><div class="icon">📊</div><div style="font-size:28px;font-weight:800;color:#60a5fa">500</div><p style="font-size:12px;color:#64748b">间稳定在线一年</p></div>
+  <div class="card" style="text-align:center"><div class="icon">📶</div><div style="font-size:28px;font-weight:800;color:#4ade80">≥99%</div><p style="font-size:12px;color:#64748b">在线率</p></div>
+  <div class="card" style="text-align:center"><div class="icon">⚡</div><div style="font-size:28px;font-weight:800;color:#fbbf24">≥25%</div><p style="font-size:12px;color:#64748b">节能率</p></div>
+  <div class="card" style="text-align:center"><div class="icon">🔄</div><div style="font-size:28px;font-weight:800;color:#a78bfa">≥90%</div><p style="font-size:12px;color:#64748b">续费率</p></div>
+  <div class="card" style="text-align:center"><div class="icon">⚠️</div><div style="font-size:28px;font-weight:800;color:#f87171">≤5%</div><p style="font-size:12px;color:#64748b">误报率</p></div>
+  <div class="card" style="text-align:center"><div class="icon">📦</div><div style="font-size:28px;font-weight:800;color:#38bdf8">≥95%</div><p style="font-size:12px;color:#64748b">OTA成功率</p></div>
 </div>
 
 <!-- 数据护城河 -->
-<div class="section"><h2>🛡️ 数据护城河 <span class="line"></span></h2></div>
-<div class="card col2">
-  <p class="stat">不需要知道你是谁 → 永远知道你来过</p>
-  <p class="stat" style="margin-top:6px">500间→5万条数据 | 1,000间→20万条 | 5,000间→200万条 | 10,000间→800万条</p>
-  <p class="stat" style="margin-top:4px;color:#64748b">同行抄不了硬件、抄不了定价，但抄不了时间堆出来的行为数据。</p>
-</div>
+<div class="section"><div class="label">🛡️ 数据护城河</div><h2>时间是最好的壁垒</h2></div>
 
-<!-- 团队 -->
-<div class="section"><h2>👥 团队 <span class="line"></span></h2></div>
-<table>
-<thead><tr><th>角色</th><th>谁</th><th>状态</th><th>职责</th></tr></thead>
-<tbody>
-<tr><td><strong>创始人</strong></td><td>序章</td><td><span class="tag green">在线</span></td><td>产品定义、决策、市场</td></tr>
-<tr><td><strong>Leader</strong></td><td>风止/小回</td><td><span class="tag green">在线</span></td><td>架构、固件、方案、管进度</td></tr>
-<tr><td><strong>Worker</strong></td><td>虾条 🦞</td><td><span class="tag red">离线</span></td><td>后端代码</td></tr>
-</tbody>
-</table>
-
-<!-- 年收入预测 -->
-<div class="section"><h2>💰 年收入预测（1万间） <span class="line"></span></h2></div>
-<div class="card col2">
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
-    <div><div style="font-size:22px;font-weight:800;color:#60a5fa">¥719万</div><div style="font-size:11px;color:#64748b">第一年</div></div>
-    <div><div style="font-size:22px;font-weight:800;color:#60a5fa">¥420万</div><div style="font-size:11px;color:#64748b">第二年起</div></div>
-    <div><div style="font-size:22px;font-weight:800;color:#60a5fa">¥2,400万</div><div style="font-size:11px;color:#64748b">五年累计</div></div>
+<div class="card wide">
+  <p style="font-size:13px;color:#94a3b8">同行抄不了硬件、抄不了定价，但抄不了时间堆出来的行为数据。</p>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;text-align:center">
+    <div style="background:#1e293b;border-radius:8px;padding:12px"><div style="font-size:20px;font-weight:800;color:#60a5fa">500间</div><div style="font-size:10px;color:#64748b">→ 5万条</div></div>
+    <div style="background:#1e293b;border-radius:8px;padding:12px"><div style="font-size:20px;font-weight:800;color:#60a5fa">1,000间</div><div style="font-size:10px;color:#64748b">→ 20万条</div></div>
+    <div style="background:#1e293b;border-radius:8px;padding:12px"><div style="font-size:20px;font-weight:800;color:#60a5fa">5,000间</div><div style="font-size:10px;color:#64748b">→ 200万条</div></div>
+    <div style="background:#1e293b;border-radius:8px;padding:12px"><div style="font-size:20px;font-weight:800;color:#60a5fa">10,000间</div><div style="font-size:10px;color:#64748b">→ 800万条</div></div>
   </div>
 </div>
 
+<!-- Footer -->
 <div class="footer">
+  <div class="f-links">
+    <a href="blueprint.html">📋 项目蓝图</a>
+    <a href="index.html">🏠 回到首页</a>
+  </div>
   <p>🦞 灵犀 · 酒店空间感知平台 · 回响酒店管理有限公司</p>
-  <p style="margin-top:4px;color:#475569">最后更新 2026-06-22 · 版本V1定稿</p>
+  <p>v1.0 · 最后更新 2026-06-23</p>
 </div>
 
 </div>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灵犀 · 项目详情</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+.page{max-width:900px;margin:0 auto;padding:24px 20px 60px}
+.back{margin-bottom:20px}
+.back a{color:#60a5fa;text-decoration:none;font-size:13px}
+.back a:hover{color:#93c5fd}
+
+h1{font-size:26px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.sub{color:#64748b;font-size:13px;margin-bottom:24px}
+
+.section{margin:32px 0 14px}
+.section h2{font-size:16px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:8px}
+.section h2 .line{flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:6px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px}
+.card.col2{grid-column:1/-1}
+.card h3{font-size:13px;font-weight:600;color:#f1f5f9;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.card .stat{font-size:11px;color:#94a3b8;line-height:1.6}
+.card .stat strong{color:#e2e8f0}
+
+.timeline{position:relative;padding-left:24px}
+.tl-item{position:relative;padding:0 0 20px 16px;border-left:2px solid #334155}
+.tl-item:last-child{border-left-color:transparent;padding-bottom:0}
+.tl-item::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:#475569}
+.tl-item.done::before{background:#22c55e;box-shadow:0 0 6px #22c55e66}
+.tl-item.now::before{background:#3b82f6;box-shadow:0 0 8px #3b82f688;width:10px;height:10px;left:-6px}
+.tl-item.blocked::before{background:#ef4444;box-shadow:0 0 6px #ef444466}
+.tl-item .tl-date{font-size:10px;color:#64748b;margin-bottom:2px}
+.tl-item .tl-title{font-size:13px;font-weight:600;color:#f1f5f9;margin-bottom:2px}
+.tl-item .tl-desc{font-size:11px;color:#94a3b8;line-height:1.5}
+.tl-item .tl-dels{font-size:10px;color:#64748b;margin-top:4px;padding-left:0;list-style:none}
+.tl-item .tl-dels li::before{content:'✓ ';color:#22c55e}
+.tl-item.blocked .tl-dels li::before{color:#ef4444;content:'✗ '}
+
+.blk{background:#1e293b;border:1px solid #ef444444;border-radius:8px;padding:12px;margin-bottom:8px}
+.blk .blk-title{font-size:12px;font-weight:600;color:#fca5a5;display:flex;align-items:center;gap:6px}
+.blk .blk-desc{font-size:11px;color:#94a3b8;margin-top:2px;line-height:1.5}
+.blk .blk-status{font-size:10px;display:inline-block;padding:1px 6px;border-radius:4px;margin-top:4px}
+.blk .blk-status.warn{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+.blk .blk-status.done{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+.blk .blk-owner{font-size:10px;color:#64748b;margin-top:2px}
+
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+th{text-align:left;padding:8px 10px;background:#1e293b;color:#94a3b8;font-weight:600;border-bottom:2px solid #334155}
+td{padding:6px 10px;border-bottom:1px solid #1e293b;vertical-align:top;line-height:1.5}
+tr:hover td{background:#1e293b66}
+.ver{font-family:monospace;font-weight:600;color:#22c55e;font-size:11px}
+.ver.old{color:#94a3b8}
+.tag{padding:1px 6px;border-radius:4px;font-size:10px;display:inline-block;margin:1px}
+.tag.green{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+.tag.red{background:#ef444422;color:#fca5a5;border:1px solid #ef444444}
+.tag.orange{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+.tag.blue{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
+.tag.gray{background:#47556922;color:#94a3b8;border:1px solid #47556944}
+
+.footer{text-align:center;margin-top:48px;padding-top:20px;border-top:1px solid #1e293b;font-size:11px;color:#475569}
+@media(max-width:640px){
+  .page{padding:16px 12px 40px}
+  h1{font-size:20px}
+  .grid{grid-template-columns:1fr}
+  .tl-item{padding-bottom:16px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="back"><a href="/lingxi-pages/">← 返回演示中心</a></div>
+
+<h1>🦞 灵犀 · 项目详情</h1>
+<p class="sub">回响酒店管理有限公司 · 酒店房间空间感知节能系统</p>
+
+<div class="section"><h2>🏗️ 当前架构 <span class="line"></span></h2></div>
+<div class="grid">
+  <div class="card col2" style="background:linear-gradient(135deg,#1e293b,#0f172a);border-color:#22c55e44">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+      <div><span style="color:#64748b;font-size:10px">主控</span><br><strong>ESP32-S3 N16R8</strong><br><span style="color:#94a3b8;font-size:10px">双核240MHz · WiFi/BLE5.0 · 16MB Flash</span></div>
+      <div><span style="color:#64748b;font-size:10px">4G通信</span><br><strong>ML307C（信金物联）</strong><br><span style="color:#94a3b8;font-size:10px">¥9 · AT指令 · MQTT双栈</span></div>
+      <div><span style="color:#64748b;font-size:10px">雷达</span><br><strong>LD2450（海凌科）</strong><br><span style="color:#94a3b8;font-size:10px">24GHz · 追3人 · 坐标+人数</span></div>
+      <div><span style="color:#64748b;font-size:10px">BOM成本</span><br><strong>¥86~94/台</strong><br><span style="color:#94a3b8;font-size:10px">含首年物联网卡，批量¥80以下</span></div>
+    </div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid #1e293b;display:flex;gap:6px;flex-wrap:wrap;font-size:10px">
+      <span class="tag green">SHT30温湿度</span>
+      <span class="tag green">MSM261麦克风</span>
+      <span class="tag green">红外收发×3+1</span>
+      <span class="tag green">OLED/IPS彩屏</span>
+      <span class="tag green">后端MQTT+API</span>
+    </div>
+  </div>
+</div>
+
+<div class="section"><h2>📜 完成阶段 <span class="line"></span></h2></div>
+<div class="timeline">
+
+  <div class="tl-item done">
+    <div class="tl-date">2026-06-02 ~ 06-03</div>
+    <div class="tl-title">Phase 0: 产品定义与概念验证</div>
+    <div class="tl-desc">双SKU设计（蚊香液版+USB版），初始BOM v1，节能策略初步</div>
+    <ul class="tl-dels">
+      <li>产品定义书 v0.1</li>
+      <li>节能策略：无人15分钟→关空调</li>
+    </ul>
+  </div>
+
+  <div class="tl-item done">
+    <div class="tl-date">2026-06-06 ~ 06-10</div>
+    <div class="tl-title">Phase 0.5: 架构升级</div>
+    <div class="tl-desc">Air780E单芯片 → ESP32-S3 + ML307C 双芯片，加IPS彩屏/麦克风/WiFi CSI</div>
+    <ul class="tl-dels">
+      <li>BOM v2 ESP32-S3+ML307C定型</li>
+      <li>硬件能力大幅扩展</li>
+    </ul>
+  </div>
+
+  <div class="tl-item done">
+    <div class="tl-date">2026-06-13 ~ 06-17</div>
+    <div class="tl-title">Phase 0.6: 固件开发</div>
+    <div class="tl-desc">Lua固件（Air780E）+ C++固件（ESP32-S3）双线开发，5个版本迭代</div>
+    <ul class="tl-dels">
+      <li>v2.38 OTA修复 / v7.5 MQTT Lua / v0307~v0307B ML307C驱动</li>
+      <li>串口转发服务 / 监控页面</li>
+    </ul>
+  </div>
+
+  <div class="tl-item done">
+    <div class="tl-date">2026-06-03 ~ 06-17</div>
+    <div class="tl-title">Phase 0.7: 云端/后端全栈搭建</div>
+    <div class="tl-desc">MQTT+API+前后端+设备管理+PMS对接全部完成</div>
+    <ul class="tl-dels">
+      <li>MQTT Server · 设备管理CRUD · 传感器入库 · PMS对比</li>
+      <li>节能日报/月报/年报 · 管理后台 · 员工端</li>
+      <li>全量测试28项通过</li>
+    </ul>
+  </div>
+
+  <div class="tl-item done">
+    <div class="tl-date">2026-06-03</div>
+    <div class="tl-title">Phase 0.8: 商业模式设计</div>
+    <div class="tl-desc">定价策略、销售模型、拉人头机制、市场测算</div>
+    <ul class="tl-dels">
+      <li>定价¥88/台，批量¥46.5成本</li>
+      <li>阶梯推荐（推荐5家免单）· 试用流程（押¥300装7天）</li>
+    </ul>
+  </div>
+
+  <div class="tl-item done">
+    <div class="tl-date">2026-06-22</div>
+    <div class="tl-title">Phase 1: 协作框架落地</div>
+    <div class="tl-desc">Leader-Worker-Verifier三级分工框架，虾条离线下风止独立运行</div>
+    <ul class="tl-dels">
+      <li>collaboration-framework.md · task-board.md · STATUS.md</li>
+      <li>FW-001 网关自检完成</li>
+    </ul>
+  </div>
+
+  <div class="tl-item now">
+    <div class="tl-date">现在 ~ 2026-06-30</div>
+    <div class="tl-title">⚠️ Iteration 1: 等硬件到货 + 固件加固</div>
+    <div class="tl-desc">硬件（LD2450+面包板）已采购未到货。同时做固件加固：MQTT NVS可配、TLS、模块拆分</div>
+    <ul class="tl-dels">
+      <li style="color:#64748b">红外码库补充（格力/美的/海尔）</li>
+      <li style="color:#64748b">MQTT IP改NVS可配</li>
+      <li style="color:#64748b">MQTT加TLS支持</li>
+      <li style="color:#64748b">main.cpp模块拆分</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="section"><h2>🔮 未来规划 <span class="line"></span></h2></div>
+<div class="timeline">
+  <div class="tl-item" style="border-color:#3b82f644">
+    <div class="tl-date">2026-07-01 ~ 07-14</div>
+    <div class="tl-title" style="color:#60a5fa">Iteration 2: 硬件实测 + 全链路打通</div>
+    <div class="tl-desc">实物烧录 → OTA实测 → IPS点亮调优 → 算法全链路 → 语音采集 → 7天稳定性</div>
+  </div>
+  <div class="tl-item" style="border-color:#3b82f644">
+    <div class="tl-date">2026-07-15 ~ 07-28</div>
+    <div class="tl-title" style="color:#60a5fa">Iteration 3: 节能V1闭环</div>
+    <div class="tl-desc">空调IR完整码库 → 云端节能策略配置 → 省电报表 → 第一家酒店实测 → 省电对比数据</div>
+  </div>
+  <div class="tl-item" style="border-color:#3b82f644">
+    <div class="tl-date">2026-07-29 ~ 08-11</div>
+    <div class="tl-title" style="color:#60a5fa">Iteration 4: 量产准备</div>
+    <div class="tl-desc">KiCad原理图/PCB终版 → PCBA打样 → 安全启动+Flash加密 → 批量烧录脚本</div>
+  </div>
+  <div class="tl-item" style="border-color:#a78bfa44">
+    <div class="tl-date">0-6个月</div>
+    <div class="tl-title" style="color:#a78bfa">商业 Step 1: 验证期</div>
+    <div class="tl-desc">5-10家酒店 → 装3-5间 → 跑7天省电数据 → 第一份省电报告 → 第一个年费合同</div>
+  </div>
+  <div class="tl-item" style="border-color:#a78bfa44">
+    <div class="tl-date">6-12个月</div>
+    <div class="tl-title" style="color:#a78bfa">商业 Step 2: 裂变期</div>
+    <div class="tl-desc">100-200家酒店 → ¥3,000预付 → 阶梯推荐裂变</div>
+  </div>
+  <div class="tl-item" style="border-color:#a78bfa44">
+    <div class="tl-date">12-24个月</div>
+    <div class="tl-title" style="color:#a78bfa">商业 Step 3: 加速期</div>
+    <div class="tl-desc">500-1000家酒店 → 招城市合伙人（广州→深圳→东莞→佛山） → 申请节能补贴</div>
+  </div>
+  <div class="tl-item" style="border-color:#a78bfa44">
+    <div class="tl-date">24-36个月</div>
+    <div class="tl-title" style="color:#a78bfa">商业 Step 4: 政府期</div>
+    <div class="tl-desc">>2000家酒店 → 政府级节能项目 → 碳中和碳指标 → 广东省发文推广</div>
+  </div>
+</div>
+
+<div class="section"><h2>🚧 卡点与阻塞 <span class="line"></span></h2></div>
+<div class="blk">
+  <div class="blk-title">🔴 硬件未到货</div>
+  <div class="blk-desc">LD2450雷达 + 面包板等物料已采购但未到货，预计3-7天。当前所有固件开发无法实物验证。</div>
+  <span class="blk-status warn">进行中</span>
+  <span class="blk-owner">影响：Iteration 1 推进</span>
+</div>
+<div class="blk">
+  <div class="blk-title">🔴 虾条（Worker）离线</div>
+  <div class="blk-desc">虾条 Hermes 网关长期宕机，无法接收群消息。固件开发和任务执行无人接手。</div>
+  <span class="blk-status warn">待恢复</span>
+  <span class="blk-owner">影响：所有需要Worker执行的任务</span>
+</div>
+<div class="blk">
+  <div class="blk-title">🟡 缺 Verifier 角色</div>
+  <div class="blk-desc">当前只有Leader（风止），没有Verifier验收成果和沉淀经验到skill。影响质量闭环。</div>
+  <span class="blk-status warn">Phase 3补</span>
+  <span class="blk-owner">影响：质量验收</span>
+</div>
+<div class="blk">
+  <div class="blk-title">🟡 DeepSeek API Broken pipe</div>
+  <div class="blk-desc">Cron任务（日报、心跳自检、小时总结）因DeepSeek API流中断持续失败。已部分切为no_agent脚本。</div>
+  <span class="blk-status warn">已部分缓解</span>
+</div>
+<div class="blk">
+  <div class="blk-title">🟡 安全加固未完成</div>
+  <div class="blk-desc">TLS支持、安全启动、Flash加密等待实现。量产前必须完成。</div>
+  <span class="blk-status warn">Iteration 1-4逐步</span>
+</div>
+
+<div class="section"><h2>📦 版本历史 <span class="line"></span></h2></div>
+<table>
+<thead><tr><th>版本</th><th>日期</th><th>说明</th><th>类型</th></tr></thead>
+<tbody>
+<tr><td class="ver">v0309B</td><td>最新</td><td>全功能测试版：双雷达+MQTT+融合引擎+节能控制</td><td><span class="tag green">固件</span></td></tr>
+<tr><td class="ver">v0309A</td><td>—</td><td>全功能测试版：双雷达+MQTT+融合引擎</td><td><span class="tag green">固件</span></td></tr>
+<tr><td class="ver old">v0308E</td><td>—</td><td>IPS交互界面初代机 + 算法引擎</td><td><span class="tag green">固件</span></td></tr>
+<tr><td class="ver old">v0307E</td><td>—</td><td>OTA自动回滚版：修复esp_ota_get_state_partition参数</td><td><span class="tag green">固件</span></td></tr>
+<tr><td class="ver old">v0307B</td><td>—</td><td>波特率修复 921600→115200</td><td><span class="tag green">固件</span></td></tr>
+<tr><td class="ver old">v0307A</td><td>—</td><td>OLED布局修复+动态流量计算</td><td><span class="tag green">固件</span></td></tr>
+<tr><td class="ver old">v0307</td><td>—</td><td>ML307C MQTT驱动最终版</td><td><span class="tag green">固件</span></td></tr>
+<tr><td>后端全栈</td><td>06-03~17</td><td>MQTT+API+前后端+PMS+OTA管理，28项测试通过</td><td><span class="tag blue">后端</span></td></tr>
+<tr><td>框架落地</td><td>06-22</td><td>Leader-Worker-Verifier协作框架</td><td><span class="tag orange">管理</span></td></tr>
+</tbody>
+</table>
+
+<div class="section"><h2>👥 团队 <span class="line"></span></h2></div>
+<table>
+<thead><tr><th>角色</th><th>谁</th><th>状态</th><th>职责</th></tr></thead>
+<tbody>
+<tr><td><strong>创始人/客户</strong></td><td>序章</td><td><span class="tag green">在线</span></td><td>产品定义、决策、市场</td></tr>
+<tr><td><strong>Leader</strong></td><td>风止/小回</td><td><span class="tag green">在线</span></td><td>拆任务、写方案、固件、管进度</td></tr>
+<tr><td><strong>Worker</strong></td><td>虾条 🦞</td><td><span class="tag red">离线</span></td><td>写后端代码、推GitHub</td></tr>
+<tr><td><strong>Verifier</strong></td><td>待补</td><td><span class="tag gray">未分配</span></td><td>验收成果、沉淀skill</td></tr>
+</tbody>
+</table>
+
+<div class="section"><h2>💵 定价 <span class="line"></span></h2></div>
+<table>
+<thead><tr><th>产品</th><th>售价</th><th>年费</th><th>批量成本</th></tr></thead>
+<tbody>
+<tr><td>USB版</td><td>¥88/台</td><td>¥1,488/年（商务）</td><td>¥46.5</td></tr>
+<tr><td>蚊香液版</td><td>¥118/台</td><td>¥3,288/年（大型）</td><td>—</td></tr>
+<tr><td>试用</td><td colspan="3">押金¥300装7天，不满意退款</td></tr>
+</tbody>
+</table>
+
+<div class="footer">
+  <p>🦞 灵犀 · 空间感知智能节能系统 · 回响酒店管理有限公司</p>
+  <p style="margin-top:4px;color:#475569">页面自动从项目文档生成 · 更新日期 2026-06-22</p>
+</div>
+
+</div>
+</body>
+</html>

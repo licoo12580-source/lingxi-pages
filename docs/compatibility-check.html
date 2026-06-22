@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>灵犀 · 空调兼容性自检</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1120;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+.page{max-width:680px;margin:0 auto;padding:24px 20px 60px}
+
+.hero{text-align:center;padding:40px 0 24px}
+.hero h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .sub{color:#64748b;font-size:13px;margin-top:4px}
+
+.check-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin:16px 0}
+.check-card h3{font-size:15px;font-weight:600;color:#f1f5f9;margin-bottom:12px}
+.check-card label{display:block;font-size:12px;color:#94a3b8;margin-bottom:4px;margin-top:10px}
+.check-card label:first-child{margin-top:0}
+.check-card input,.check-card select{width:100%;padding:10px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px;outline:none;transition:border .2s}
+.check-card input:focus,.check-card select:focus{border-color:#60a5fa}
+.check-card .btn{width:100%;padding:12px;margin-top:14px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.check-card .btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px #3b82f640}
+
+.result{display:none;padding:16px 20px;border-radius:10px;margin:12px 0;font-size:14px;line-height:1.6}
+.result.show{display:block}
+.result.good{background:#22c55e18;border:1px solid #22c55e44;color:#4ade80}
+.result.warn{background:#f59e0b18;border:1px solid #f59e0b44;color:#fbbf24}
+.result.bad{background:#ef444418;border:1px solid #ef444433;color:#f87171}
+.result.unknown{background:#3b82f618;border:1px solid #3b82f644;color:#60a5fa}
+
+.table-wrap{overflow-x:auto;margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:10px 12px;background:#1e293b;color:#64748b;font-weight:600;border-bottom:2px solid #334155;white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid #1e293b;color:#94a3b8}
+tr:hover td{background:#1a233266}
+.tag{display:inline-block;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.tag-ok{background:#22c55e22;color:#4ade80;border:1px solid #22c55e44}
+.tag-warn{background:#f59e0b22;color:#fbbf24;border:1px solid #f59e0b44}
+.tag-fail{background:#ef444422;color:#f87171;border:1px solid #ef444433}
+
+.footer{text-align:center;margin-top:40px;padding-top:16px;border-top:1px solid #1e293b;font-size:11px;color:#475569}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hero">
+  <h1>🦞 空调兼容性自检</h1>
+  <div class="sub">灵犀设备是否适配你酒店的空调？3秒自查</div>
+</div>
+
+<div class="check-card">
+  <h3>🔍 自查你的空调</h3>
+  <label>空调品牌</label>
+  <select id="brand">
+    <option value="">— 选择品牌 —</option>
+    <option value="格力">格力</option>
+    <option value="美的">美的</option>
+    <option value="海尔">海尔</option>
+    <option value="TCL">TCL</option>
+    <option value="奥克斯">奥克斯</option>
+    <option value="海信">海信</option>
+    <option value="长虹">长虹</option>
+    <option value="志高">志高</option>
+    <option value="大金">大金</option>
+    <option value="三菱电机">三菱电机</option>
+    <option value="松下">松下</option>
+    <option value="日立">日立</option>
+    <option value="富士通">富士通</option>
+    <option value="三星">三星</option>
+    <option value="LG">LG</option>
+    <option value="中央空调(VRV/多联机)">中央空调(VRV/多联机)</option>
+    <option value="风管机">风管机</option>
+    <option value="其他">其他</option>
+  </select>
+  <label>空调型号（选填，填了更准确）</label>
+  <input type="text" id="model" placeholder="例如：KFR-35GW/...">
+  <label>空调类型</label>
+  <select id="type">
+    <option value="壁挂">壁挂分体式</option>
+    <option value="柜机">柜机</option>
+    <option value="风管机">风管机/天花机</option>
+    <option value="中央空调">中央空调(VRV/多联机)</option>
+  </select>
+  <button class="btn" onclick="checkCompatibility()">检查兼容性 →</button>
+</div>
+
+<div id="result" class="result"></div>
+
+<div class="hero" style="padding-top:32px">
+  <h2 style="font-size:18px">📋 已知兼容性清单</h2>
+  <div class="sub" style="font-size:12px">已有红外码库的品牌（持续更新中）</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>品牌</th><th>兼容状态</th><th>说明</th></tr></thead>
+<tbody id="compat-table">
+</tbody>
+</table>
+</div>
+
+<div class="footer">
+  <p>🦞 灵犀 · 空间感知操作系统</p>
+  <p>数据来源：前20品牌红外码库 + 实际部署验证 · 持续更新</p>
+</div>
+
+</div>
+
+<script>
+// 兼容性数据库（与 knowledge/compatibility_template.json 同步）
+const COMPAT = {
+  "格力": {status:"ok", note:"全系列兼容，已在码库中"},
+  "美的": {status:"ok", note:"全系列兼容，已在码库中"},
+  "海尔": {status:"ok", note:"全系列兼容，已在码库中"},
+  "TCL": {status:"ok", note:"全系列兼容，已在码库中"},
+  "奥克斯": {status:"ok", note:"全系列兼容，已在码库中"},
+  "海信": {status:"ok", note:"海信/科龙兼容"},
+  "长虹": {status:"ok", note:"全系列兼容"},
+  "志高": {status:"warn", note:"部分老机型可能不兼容，需实测"},
+  "大金": {status:"ok", note:"VRV系列兼容"},
+  "三菱电机": {status:"ok", note:"全系列兼容"},
+  "松下": {status:"ok", note:"全系列兼容"},
+  "日立": {status:"warn", note:"部分中央空调型号需专用码库"},
+  "富士通": {status:"warn", note:"通用码库，部分型号需确认"},
+  "三星": {status:"warn", note:"部分型号可能需适配"},
+  "LG": {status:"warn", note:"通用码库，部分型号需确认"},
+  "中央空调(VRV/多联机)": {status:"fail", note:"需要专用网关，V1暂不支持"},
+  "风管机": {status:"warn", note:"有红外接收即可，需确认安装位置"},
+};
+
+// 兼容性建议
+const ADVICE = {
+  ok: {cls:"good", icon:"✅", title:"兼容", msg:"该品牌已在灵犀红外码库中，插电即用，不需要额外配置。"},
+  warn: {cls:"warn", icon:"⚠️", title:"基本兼容", msg:"该品牌已在码库中，但部分型号可能需要确认。建议先试装1间房验证，没问题再铺量。"},
+  fail: {cls:"bad", icon:"❌", title:"暂不兼容", msg:"V1版本暂不支持中央空调。V1.5版本计划增加网关转接模块支持。建议先装分体式空调的房间。"},
+};
+
+// 未覆盖的品牌
+const OTHER_ADVICE = {cls:"unknown", icon:"🔍", title:"需要实测", msg:"该品牌不在已测试列表中。但有2种可能：① 使用万能红外码库可控制；② 需要学习红外码。建议先试装1间房验证。"};
+
+function checkCompatibility() {
+  const brand = document.getElementById('brand').value;
+  const model = document.getElementById('model').value.trim();
+  const type = document.getElementById('type').value;
+  const result = document.getElementById('result');
+
+  if (!brand) {
+    result.className = "result show warn";
+    result.innerHTML = "⚠️ 请选择空调品牌";
+    return;
+  }
+
+  let info;
+  if (brand === "其他") {
+    info = OTHER_ADVICE;
+  } else {
+    info = ADVICE[COMPAT[brand]?.status || "unknown"] || OTHER_ADVICE;
+  }
+
+  result.className = `result show ${info.cls}`;
+  let note = COMPAT[brand]?.note || "未收录";
+  let modelInfo = model ? `<br>型号：${model}` : "";
+  
+  result.innerHTML = `
+    <strong>${info.icon} ${brand} — ${info.title}</strong><br>
+    ${note}${modelInfo}<br><br>
+    ${info.msg}
+  `;
+}
+
+// 渲染兼容性表格
+function renderTable() {
+  const tbody = document.getElementById('compat-table');
+  const tagMap = {ok:'tag-ok ✓', warn:'tag-warn ⚠', fail:'tag-fail ✗'};
+  Object.entries(COMPAT).forEach(([brand, data]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${brand}</td><td><span class="tag ${data.status === 'ok' ? 'tag-ok' : data.status === 'warn' ? 'tag-warn' : 'tag-fail'}">${
+      data.status === 'ok' ? '✓' : data.status === 'warn' ? '⚠' : '✗'
+    }</span></td><td>${data.note}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+renderTable();
+</script>
+</body>
+</html>

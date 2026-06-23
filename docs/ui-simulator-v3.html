@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>灵犀 · 屏端UI模拟器 v3</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;padding:20px}
+
+/* 屏体模拟 */
+.screen{width:320px;height:480px;background:#0b1120;border-radius:16px;border:2px solid #2a3a4a;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.screen-inner{padding:16px;height:100%;display:flex;flex-direction:column}
+
+/* 状态栏 */
+.status-bar{display:flex;justify-content:space-between;font-size:10px;color:#475569;padding-bottom:8px;border-bottom:1px solid #1e293b;margin-bottom:8px}
+.status-bar .online{color:#22c55e}
+.status-bar .offline{color:#ef4444}
+
+/* 标题 */
+.page-title{font-size:14px;font-weight:700;margin-bottom:10px;text-align:center}
+
+/* 卡片网格 */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
+.card{background:#131c31;border:1px solid #1e293b;border-radius:8px;padding:10px;text-align:center}
+.card .val{font-size:20px;font-weight:700;margin:2px 0}
+.card .label{font-size:9px;color:#64748b}
+
+.zone{background:#131c31;border:1px solid #1e293b;border-radius:8px;padding:10px;text-align:center;transition:all .3s}
+.zone.occupied{border-color:#22c55e44;background:#22c55e18}
+.zone .zi{font-size:16px}
+.zone .zs{font-size:10px;margin-top:4px}
+.zone .zs.green{color:#4ade80}
+.zone .zs.gray{color:#64748b}
+
+.system-row{display:flex;justify-content:space-between;padding:6px 0;font-size:11px;border-bottom:1px solid #131c31}
+.system-row:last-child{border:none}
+.system-row .k{color:#64748b}
+.system-row .v{color:#e2e8f0}
+
+/* 翻页导航 */
+.nav-dots{display:flex;justify-content:center;gap:6px;margin-top:auto;padding-top:10px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:#334155;cursor:pointer;transition:all .3s}
+.nav-dot.active{background:#60a5fa;width:24px;border-radius:4px}
+
+/* 页面容器 */
+.page{display:none;flex:1;overflow:hidden}
+.page.active{display:flex;flex-direction:column}
+
+/* 大数字 */
+.big-num{font-size:42px;font-weight:800;text-align:center;margin:8px 0}
+.big-unit{font-size:12px;color:#64748b;text-align:center}
+
+/* 控制面板 */
+.controls{display:none;margin-top:16px;padding:12px;background:#1a2a3a;border-radius:8px}
+.controls.show{display:block}
+.controls label{font-size:11px;color:#94a3b8;display:block;margin:6px 0 2px}
+.controls input[type=range]{width:100%;accent-color:#60a5fa}
+.controls .row{display:flex;gap:8px;margin:4px 0}
+.controls .btn{flex:1;padding:6px;border:none;border-radius:4px;font-size:11px;cursor:pointer;transition:all .2s;color:#fff}
+.controls .btn:hover{opacity:.8}
+.btn-green{background:#22c55e}
+.btn-gray{background:#475569}
+
+.status-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.badge-on{background:#22c55e22;color:#4ade80;border:1px solid #22c55e44}
+.badge-off{background:#ef444422;color:#f87171;border:1px solid #ef444433}
+
+@media(max-width:360px){
+  .screen{width:100%;border-radius:0}
+}
+</style>
+</head>
+<body>
+
+<div class="screen" id="screen">
+  <div class="screen-inner">
+
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <span>🦞 灵犀</span>
+      <span id="statusBadge" class="online">● 在线</span>
+      <span>v0621Z</span>
+    </div>
+
+    <!-- 页面1: 节能 -->
+    <div class="page active" id="page0">
+      <div class="page-title" style="color:#4ade80">⚡ 节能</div>
+      <div class="big-num" style="color:#4ade80" id="todaySaved">3.2</div>
+      <div class="big-unit">今日省电 kWh</div>
+
+      <div class="grid-2" style="margin:10px 0">
+        <div class="card"><div class="val" style="color:#a78bfa" id="monthSaved">96.8</div><div class="label">本月省电 kWh</div></div>
+        <div class="card"><div class="val" style="color:#60a5fa" id="todayUsage">8.5</div><div class="label">今日用电 kWh</div></div>
+        <div class="card"><div class="val" style="color:#fbbf24" id="savedRooms">2</div><div class="label">节能中房间</div></div>
+        <div class="card"><div class="val" style="color:#22c55e" id="tempSet">26°</div><div class="label">设定温度</div></div>
+      </div>
+    </div>
+
+    <!-- 页面2: 感知 -->
+    <div class="page" id="page1">
+      <div class="page-title" style="color:#60a5fa">📡 空间感知</div>
+      <div class="big-num" style="color:#60a5fa" id="totalPeople">2</div>
+      <div class="big-unit">房间人数</div>
+
+      <div class="grid-2" style="margin:10px 0" id="zoneGrid">
+        <div class="zone occupied" data-zone="0"><div class="zi">🛏️</div><div class="zs green">床 · 有人</div></div>
+        <div class="zone" data-zone="1"><div class="zi">🚪</div><div class="zs gray">门 · 无人</div></div>
+        <div class="zone" data-zone="2"><div class="zi">🪟</div><div class="zs gray">窗 · 无人</div></div>
+        <div class="zone occupied" data-zone="3"><div class="zi">🚿</div><div class="zs green">浴室 · 有人</div></div>
+      </div>
+      <div style="text-align:center;font-size:11px;color:#64748b;margin-top:4px" id="statusText">🟢 实时监测</div>
+    </div>
+
+    <!-- 页面3: 系统 -->
+    <div class="page" id="page2">
+      <div class="page-title" style="color:#a78bfa">⚙️ 系统</div>
+      <div style="margin-top:8px">
+        <div class="system-row"><span class="k">版本</span><span class="v" id="sysVersion">v0621Z</span></div>
+        <div class="system-row"><span class="k">设备</span><span class="v" id="sysDevice">ESP32-S3</span></div>
+        <div class="system-row"><span class="k">屏幕</span><span class="v" id="sysScreen">ILI9488 320×480</span></div>
+        <div class="system-row"><span class="k">触摸</span><span class="v" id="sysTouch"><span class="status-badge badge-on">✅ 正常</span></span></div>
+        <div class="system-row"><span class="k">信号</span><span class="v" id="sysRssi">-65 dBm</span></div>
+        <div class="system-row"><span class="k">运行</span><span class="v" id="sysUptime">3 天</span></div>
+      </div>
+    </div>
+
+    <!-- 翻页导航 -->
+    <div class="nav-dots">
+      <div class="nav-dot active" onclick="switchPage(0)"></div>
+      <div class="nav-dot" onclick="switchPage(1)"></div>
+      <div class="nav-dot" onclick="switchPage(2)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 控制面板（隐藏，点屏幕底部出现） -->
+<div class="controls show" id="controls">
+  <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:6px">🎮 实时调试</div>
+  <div class="row">
+    <button class="btn btn-green" onclick="simulateData('eco')">⚡ 节能模式</button>
+    <button class="btn btn-gray" onclick="simulateData('comfort')">🌡 舒适模式</button>
+  </div>
+  <div class="row">
+    <button class="btn btn-green" onclick="simulateData('zone-bed')">🛏 床上有人</button>
+    <button class="btn btn-gray" onclick="simulateData('zone-all')">🏠 全房无人</button>
+  </div>
+  <div class="row">
+    <button class="btn" style="background:#ef4444" onclick="simulateData('alarm')">🚨 模拟告警</button>
+    <button class="btn" style="background:#6366f1" onclick="simulateData('normal')">🔄 恢复正常</button>
+  </div>
+</div>
+
+<script>
+let currentPage = 0;
+
+function switchPage(idx) {
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i===idx));
+  document.querySelectorAll('.nav-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+  currentPage = idx;
+}
+
+function setZones(zones) {
+  const grid = document.getElementById('zoneGrid');
+  const names = {0:'🛏️',1:'🚪',2:'🪟',3:'🚿'};
+  const labels = {0:'床',1:'门',2:'窗',3:'浴室'};
+  grid.innerHTML = '';
+  zones.forEach((z, i) => {
+    const div = document.createElement('div');
+    div.className = 'zone' + (z.s === '有人' ? ' occupied' : '');
+    div.innerHTML = `<div class="zi">${names[i]}</div><div class="zs ${z.s === '有人' ? 'green' : 'gray'}">${labels[i]} · ${z.s}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+function simulateData(mode) {
+  const data = {
+    eco: {
+      energy: {today_saved: 4.7, month_saved: 142.3, today_usage: 6.2, month_usage: 198, saved_rooms: 3, temp_set: 26},
+      sense: {zones: [{s:'有人'},{s:'无人'},{s:'无人'},{s:'有人'}], total_people: 2, status_text: '🟢 节能模式运行中'},
+      system: {version:'v0622A', device:'ESP32-S3', screen:'ILI9488 320×480', online:1, touch_ok:1, rssi:-65, uptime_days:3}
+    },
+    comfort: {
+      energy: {today_saved: 1.2, month_saved: 98.5, today_usage: 12.8, month_usage: 285, saved_rooms: 1, temp_set: 22},
+      sense: {zones: [{s:'有人'},{s:'有人'},{s:'无人'},{s:'无人'}], total_people: 3, status_text: '🟡 舒适模式'},
+      system: {version:'v0622A', device:'ESP32-S3', screen:'ILI9488 320×480', online:1, touch_ok:1, rssi:-72, uptime_days:3}
+    },
+    'zone-bed': {
+      energy: {today_saved: 3.2, month_saved: 96.8, today_usage: 8.5, month_usage: 255, saved_rooms: 2, temp_set: 26},
+      sense: {zones: [{s:'有人'},{s:'无人'},{s:'无人'},{s:'有人'}], total_people: 2, status_text: '🟢 实时监测'},
+      system: {version:'v0621Z', device:'ESP32-S3', screen:'ILI9488 320×480', online:1, touch_ok:1, rssi:-65, uptime_days:3}
+    },
+    'zone-all': {
+      energy: {today_saved: 3.2, month_saved: 96.8, today_usage: 8.5, month_usage: 255, saved_rooms: 2, temp_set: 26},
+      sense: {zones: [{s:'无人'},{s:'无人'},{s:'无人'},{s:'无人'}], total_people: 0, status_text: '🔴 全房无人，节能中'},
+      system: {version:'v0621Z', device:'ESP32-S3', screen:'ILI9488 320×480', online:1, touch_ok:1, rssi:-65, uptime_days:4}
+    },
+    alarm: {
+      energy: {today_saved: 2.8, month_saved: 90.1, today_usage: 9.2, month_usage: 248, saved_rooms: 2, temp_set: 26},
+      sense: {zones: [{s:'有人'},{s:'有人'},{s:'无人'},{s:'有人'}], total_people: 2, status_text: '🔴 异常：夜间门窗打开', has_alarm: true, alarm_text: '门窗异常'},
+      system: {version:'v0621Z', device:'ESP32-S3', screen:'ILI9488 320×480', online:1, touch_ok:1, rssi:-65, uptime_days:4}
+    },
+    normal: {
+      energy: {today_saved: 3.2, month_saved: 96.8, today_usage: 8.5, month_usage: 255, saved_rooms: 2, temp_set: 26},
+      sense: {zones: [{s:'有人'},{s:'无人'},{s:'无人'},{s:'有人'}], total_people: 2, status_text: '🟢 实时监测'},
+      system: {version:'v0621Z', device:'ESP32-S3', screen:'ILI9488 320×480', online:1, touch_ok:1, rssi:-65, uptime_days:3}
+    }
+  };
+
+  const d = data[mode] || data.normal;
+
+  // Update energy page
+  document.getElementById('todaySaved').textContent = d.energy.today_saved;
+  document.getElementById('monthSaved').textContent = d.energy.month_saved;
+  document.getElementById('todayUsage').textContent = d.energy.today_usage;
+  document.getElementById('savedRooms').textContent = d.energy.saved_rooms;
+  document.getElementById('tempSet').textContent = d.energy.temp_set + '°';
+
+  // Update sense page
+  document.getElementById('totalPeople').textContent = d.sense.total_people;
+  document.getElementById('statusText').textContent = d.sense.status_text;
+  if (d.sense.has_alarm) document.getElementById('statusText').style.color = '#ef4444';
+  else document.getElementById('statusText').style.color = '#64748b';
+  setZones(d.sense.zones);
+
+  // Update system page
+  document.getElementById('sysVersion').textContent = d.system.version;
+  document.getElementById('sysDevice').textContent = d.system.device;
+  document.getElementById('sysScreen').textContent = d.system.screen;
+  document.getElementById('sysRssi').textContent = d.system.rssi + ' dBm';
+  document.getElementById('sysUptime').textContent = d.system.uptime_days + ' 天';
+  document.getElementById('sysTouch').innerHTML = d.system.touch_ok
+    ? '<span class="status-badge badge-on">✅ 正常</span>'
+    : '<span class="status-badge badge-off">❌ 异常</span>';
+  document.getElementById('statusBadge').className = d.system.online ? 'online' : 'offline';
+  document.getElementById('statusBadge').textContent = d.system.online ? '● 在线' : '● 离线';
+
+  // Switch to page 0
+  switchPage(0);
+}
+</script>
+</body>
+</html>

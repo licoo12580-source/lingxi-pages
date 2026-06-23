@@ -108,36 +108,37 @@ PubSubClient mqttClient(wifiClient);
 const String TOPIC_PREFIX = "lingxi/v1/";
 String deviceTopic;  // lingxi/v1/{device_id}/#
 
-// ====== 数据状态 ======
-struct SenseData {
-    String zones[4];        // bed, door, window, bath
-    int people = 0;
-    float temp = 0;
-    int humidity = 0;
-    int light = 0;
-    unsigned long ts = 0;
-} senseData;
-
+// ====== 数据状态（对齐 lingxi-mqtt-v3.h display 段） ======
 struct EnergyData {
-    float today_kwh = 0;
-    float month_kwh = 0;
-    int power_w = 0;
-    int devices_online = 0;
-    int devices_total = 0;
-    int saving_rooms = 0;
-    float room_temp = 0;
-    unsigned long ts = 0;
+    float today_saved = 0;      // 今日省电 kWh
+    float month_saved = 0;      // 本月省电 kWh
+    int   saved_rooms = 0;      // 节能房间数
+    float today_usage = 0;      // 今日用电 kWh
+    float month_usage = 0;      // 本月用电 kWh
+    float temp_set = 0;         // 空调设定温度 °C
 } energyData;
+
+struct ZoneData {
+    String status;      // "有人" / "无人" / "检测中"
+    String color;       // "green" / "gray" / "orange"
+};
+
+struct SenseData {
+    ZoneData zones[4];  // bed, door, window, bath
+    int total_people = 0;
+    String status_text;
+    bool has_alarm = false;
+    String alarm_text;
+} senseData;
 
 struct SystemData {
     String version;
-    String device;
-    String screen;
-    bool touch_ok = false;
+    String device_type;
+    String screen_info;
     bool online = false;
-    bool alarm = false;
-    String alarm_msg;
-    unsigned long ts = 0;
+    bool touch_ok = false;
+    int wifi_rssi = 0;
+    int uptime_days = 0;
 } systemData;
 
 // ====== UI 对象 ======
@@ -164,59 +165,58 @@ static unsigned long lastSystemUpdate = 0;
 const char *ZONE_NAMES[4] = {"bed", "door", "window", "bath"};
 const char *ZONE_LABELS[4] = {"🛏 床", "🚪 门", "🪟 窗", "🚿 浴室"};
 
-// ====== MQTT 回调 ======
+// ====== MQTT 回调（单topic: lingxi/v1/{id}/display） ======
 void mqttCallback(char *topic, byte *payload, unsigned int length) {
-    // 转 string
     String topicStr = String(topic);
     String payloadStr = String((char *)payload).substring(0, length);
+
+    // 只处理 display topic
+    if (!topicStr.endsWith("/display")) return;
 
     // 解析 JSON
     JsonDocument doc;
     DeserializationError err = deserializeJson(doc, payloadStr);
     if (err) { Serial.println("[MQTT] JSON parse error"); return; }
 
-    String type = doc["type"] | "";
-    unsigned long ts = doc["ts"] | 0UL;
-
-    if (type == "sense") {
-        // === sense topic ===
-        JsonObject zones = doc["zones"];
-        senseData.zones[0] = zones["bed"] | "vacant";
-        senseData.zones[1] = zones["door"] | "vacant";
-        senseData.zones[2] = zones["window"] | "vacant";
-        senseData.zones[3] = zones["bath"] | "vacant";
-        senseData.people = doc["people"] | 0;
-        senseData.temp = doc["temp"] | 0.0f;
-        senseData.humidity = doc["humidity"] | 0;
-        senseData.light = doc["light"] | 0;
-        senseData.ts = ts;
-        lastSenseUpdate = millis();
-        updateSenseUI();
-
-    } else if (type == "energy") {
-        // === energy topic ===
-        energyData.today_kwh = doc["today_kwh"] | 0.0f;
-        energyData.month_kwh = doc["month_kwh"] | 0.0f;
-        energyData.power_w = doc["power_w"] | 0;
-        energyData.devices_online = doc["devices_online"] | 0;
-        energyData.devices_total = doc["devices_total"] | 0;
-        energyData.saving_rooms = doc["saving_rooms"] | 0;
-        energyData.room_temp = doc["room_temp"] | 0.0f;
-        energyData.ts = ts;
-        lastEnergyUpdate = millis();
+    // === energy 段 ===
+    JsonObject energy = doc["energy"];
+    if (!energy.isNull()) {
+        energyData.today_saved = energy["today_saved"] | 0.0f;
+        energyData.month_saved = energy["month_saved"] | 0.0f;
+        energyData.saved_rooms = energy["saved_rooms"] | 0;
+        energyData.today_usage = energy["today_usage"] | 0.0f;
+        energyData.month_usage = energy["month_usage"] | 0.0f;
+        energyData.temp_set = energy["temp_set"] | 0.0f;
         updateEnergyUI();
+    }
 
-    } else if (type == "system") {
-        // === system topic ===
-        systemData.version = doc["version"] | "";
-        systemData.device = doc["device"] | "";
-        systemData.screen = doc["screen"] | "";
-        systemData.touch_ok = doc["touch_ok"] | false;
-        systemData.online = doc["online"] | false;
-        systemData.alarm = doc["alarm"] | false;
-        systemData.alarm_msg = doc["alarm_msg"] | "";
-        systemData.ts = ts;
-        lastSystemUpdate = millis();
+    // === sense 段 ===
+    JsonObject sense = doc["sense"];
+    if (!sense.isNull()) {
+        JsonArray zones = sense["zones"];
+        if (!zones.isNull()) {
+            for (int i = 0; i < 4 && i < zones.size(); i++) {
+                senseData.zones[i].status = zones[i]["s"] | "检测中";
+                senseData.zones[i].color = zones[i]["c"] | "gray";
+            }
+        }
+        senseData.total_people = sense["total_people"] | 0;
+        senseData.status_text = sense["status_text"] | "";
+        senseData.has_alarm = sense["has_alarm"] | false;
+        senseData.alarm_text = sense["alarm_text"] | "";
+        updateSenseUI();
+    }
+
+    // === system 段 ===
+    JsonObject sys = doc["system"];
+    if (!sys.isNull()) {
+        systemData.version = sys["version"] | "";
+        systemData.device_type = sys["device"] | "";
+        systemData.screen_info = sys["screen"] | "";
+        systemData.online = sys["online"] | false;
+        systemData.touch_ok = sys["touch_ok"] | false;
+        systemData.wifi_rssi = sys["wifi_rssi"] | 0;
+        systemData.uptime_days = sys["uptime_days"] | 0;
         updateSystemUI();
     }
 }
@@ -228,8 +228,8 @@ void mqttReconnect() {
         String clientId = "lingxi-screen-" + String(DEVICE_ID);
         if (mqttClient.connect(clientId.c_str())) {
             Serial.println(" 已连接");
-            // 订阅所有设备topic
-            deviceTopic = TOPIC_PREFIX + String(DEVICE_ID) + "/#";
+            // 订阅 display topic
+            deviceTopic = TOPIC_PREFIX + String(DEVICE_ID) + "/display";
             mqttClient.subscribe(deviceTopic.c_str());
             Serial.println("[MQTT] 订阅: " + deviceTopic);
         } else {
@@ -248,27 +248,33 @@ void updateSenseUI() {
     char buf[64];
 
     // 人数
-    snprintf(buf, sizeof(buf), "%d", senseData.people);
+    snprintf(buf, sizeof(buf), "%d", senseData.total_people);
     lv_label_set_text(label_people, buf);
 
-    // 温度
-    snprintf(buf, sizeof(buf), "%.1f°C", senseData.temp);
-    lv_label_set_text(label_temp, buf);
+    // 状态文字
+    if (senseData.has_alarm) {
+        lv_label_set_text(label_temp, ("⚠ " + senseData.alarm_text).c_str());
+        lv_obj_set_style_text_color(label_temp, lv_color_hex(0xef4444), 0);
+    } else {
+        lv_label_set_text(label_temp, senseData.status_text.c_str());
+        lv_obj_set_style_text_color(label_temp, lv_color_hex(0x4ade80), 0);
+    }
 
-    // 湿度
-    snprintf(buf, sizeof(buf), "%d%%", senseData.humidity);
-    lv_label_set_text(label_humidity, buf);
-
-    // 光照
-    snprintf(buf, sizeof(buf), "%d lux", senseData.light);
-    lv_label_set_text(label_light, buf);
-
-    // Zones 状态
+    // Zones 状态（颜色映射）
     for (int i = 0; i < 4; i++) {
         if (zone_indicators[i]) {
-            bool occupied = (senseData.zones[i] == "occupied");
-            lv_obj_set_style_bg_color(zone_indicators[i],
-                occupied ? lv_color_hex(0x22c55e) : lv_color_hex(0x334155), 0);
+            uint32_t color;
+            if (senseData.zones[i].color == "green")      color = 0x22c55e;
+            else if (senseData.zones[i].color == "orange") color = 0xf59e0b;
+            else                                           color = 0x334155;
+            lv_obj_set_style_bg_color(zone_indicators[i], lv_color_hex(color), 0);
+
+            // 更新 zone 内文字
+            lv_obj_t *child = lv_obj_get_child(zone_indicators[i], 0);
+            if (child) {
+                snprintf(buf, sizeof(buf), "%s\n%s", ZONE_LABELS[i], senseData.zones[i].status.c_str());
+                lv_label_set_text(child, buf);
+            }
         }
     }
 }
@@ -277,16 +283,16 @@ void updateEnergyUI() {
     if (!pages[1]) return;
     char buf[64];
 
-    snprintf(buf, sizeof(buf), "%d W", energyData.power_w);
+    snprintf(buf, sizeof(buf), "今日省 %.1f", energyData.today_saved);
     lv_label_set_text(label_power, buf);
 
-    snprintf(buf, sizeof(buf), "今日 %.2f kWh", energyData.today_kwh);
+    snprintf(buf, sizeof(buf), "月省 %.1f kWh", energyData.month_saved);
     lv_label_set_text(label_today, buf);
 
-    snprintf(buf, sizeof(buf), "本月 %.1f kWh", energyData.month_kwh);
+    snprintf(buf, sizeof(buf), "用电 %.1f/%.0f", energyData.today_usage, energyData.month_usage);
     lv_label_set_text(label_month, buf);
 
-    snprintf(buf, sizeof(buf), "节能中 %d/%d 间", energyData.saving_rooms, energyData.devices_total);
+    snprintf(buf, sizeof(buf), "节能 %d间  设备在线", energyData.saved_rooms);
     lv_label_set_text(label_saving, buf);
 }
 
@@ -294,20 +300,15 @@ void updateSystemUI() {
     if (!pages[2]) return;
     char buf[64];
 
-    snprintf(buf, sizeof(buf), "版本 %s", systemData.version.c_str());
+    snprintf(buf, sizeof(buf), "%s / %s", systemData.version.c_str(), systemData.device_type.c_str());
     lv_label_set_text(label_version, buf);
 
     snprintf(buf, sizeof(buf), "状态: %s", systemData.online ? "✅ 在线" : "❌ 离线");
     lv_label_set_text(label_online, buf);
 
-    if (systemData.alarm) {
-        snprintf(buf, sizeof(buf), "⚠️ %s", systemData.alarm_msg.c_str());
-        lv_label_set_text(label_alarm, buf);
-        lv_obj_set_style_text_color(label_alarm, lv_color_hex(0xef4444), 0);
-    } else {
-        lv_label_set_text(label_alarm, "✅ 无告警");
-        lv_obj_set_style_text_color(label_alarm, lv_color_hex(0x22c55e), 0);
-    }
+    snprintf(buf, sizeof(buf), "触摸: %s", systemData.touch_ok ? "✅ 正常" : "❌ 异常");
+    lv_label_set_text(label_alarm, buf);
+    lv_obj_set_style_text_color(label_alarm, systemData.touch_ok ? lv_color_hex(0x22c55e) : lv_color_hex(0xef4444), 0);
 }
 
 // ====== UI 创建 ======

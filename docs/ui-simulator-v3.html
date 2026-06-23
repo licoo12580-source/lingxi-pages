@@ -139,6 +139,13 @@ body{background:#1a1a2e;display:flex;justify-content:center;align-items:center;m
 <!-- 控制面板（隐藏，点屏幕底部出现） -->
 <div class="controls show" id="controls">
   <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:6px">🎮 实时调试</div>
+  <div class="row" style="margin-bottom:6px">
+    <span id="wsStatus" style="font-size:10px;color:#64748b;display:flex;align-items:center;gap:4px">
+      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#64748b" id="wsDot"></span>
+      <span id="wsLabel">未连接</span>
+    </span>
+    <span style="font-size:10px;color:#475569;margin-left:auto" id="wsTs"></span>
+  </div>
   <div class="row">
     <button class="btn btn-green" onclick="simulateData('eco')">⚡ 节能模式</button>
     <button class="btn btn-gray" onclick="simulateData('comfort')">🌡 舒适模式</button>
@@ -156,12 +163,14 @@ body{background:#1a1a2e;display:flex;justify-content:center;align-items:center;m
 <script>
 let currentPage = 0;
 
+// ===== 页面切换 =====
 function switchPage(idx) {
   document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i===idx));
   document.querySelectorAll('.nav-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
   currentPage = idx;
 }
 
+// ===== 区域渲染 =====
 function setZones(zones) {
   const grid = document.getElementById('zoneGrid');
   const names = {0:'🛏️',1:'🚪',2:'🪟',3:'🚿'};
@@ -175,6 +184,123 @@ function setZones(zones) {
   });
 }
 
+// ===== 核心渲染函数（v3 协议 display JSON → UI） =====
+function applyDisplayData(d) {
+  if (!d) return;
+
+  const energy = d.energy || {};
+  const sense = d.sense || {};
+  const system = d.system || {};
+
+  // 页面1: 节能
+  if (energy.today_saved !== undefined) document.getElementById('todaySaved').textContent = energy.today_saved;
+  if (energy.month_saved !== undefined) document.getElementById('monthSaved').textContent = energy.month_saved;
+  if (energy.today_usage !== undefined) document.getElementById('todayUsage').textContent = energy.today_usage;
+  if (energy.saved_rooms !== undefined) document.getElementById('savedRooms').textContent = energy.saved_rooms;
+  if (energy.temp_set !== undefined) document.getElementById('tempSet').textContent = energy.temp_set + '°';
+
+  // 页面2: 感知
+  if (sense.total_people !== undefined) document.getElementById('totalPeople').textContent = sense.total_people;
+  if (sense.status_text !== undefined) document.getElementById('statusText').textContent = sense.status_text;
+  if (sense.has_alarm) {
+    document.getElementById('statusText').style.color = '#ef4444';
+  } else {
+    document.getElementById('statusText').style.color = '#64748b';
+  }
+  if (sense.zones && sense.zones.length > 0) {
+    setZones(sense.zones);
+  }
+
+  // 页面3: 系统
+  if (system.version !== undefined) document.getElementById('sysVersion').textContent = system.version;
+  if (system.device !== undefined) document.getElementById('sysDevice').textContent = system.device;
+  if (system.screen !== undefined) document.getElementById('sysScreen').textContent = system.screen;
+  if (system.rssi !== undefined) document.getElementById('sysRssi').textContent = system.rssi + ' dBm';
+  if (system.uptime_days !== undefined) document.getElementById('sysUptime').textContent = system.uptime_days + ' 天';
+  if (system.touch_ok !== undefined) {
+    document.getElementById('sysTouch').innerHTML = system.touch_ok
+      ? '<span class="status-badge badge-on">✅ 正常</span>'
+      : '<span class="status-badge badge-off">❌ 异常</span>';
+  }
+  if (system.online !== undefined) {
+    document.getElementById('statusBadge').className = system.online ? 'online' : 'offline';
+    document.getElementById('statusBadge').textContent = system.online ? '● 在线' : '● 离线';
+  }
+}
+
+// ===== WebSocket 实时连接 =====
+let ws = null;
+let wsReconnectTimer = null;
+
+function wsConnect(host) {
+  if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+
+  const url = host || 'ws://localhost:8765';
+  try {
+    ws = new WebSocket(url);
+  } catch (e) {
+    updateWsStatus(false, '连接失败');
+    scheduleReconnect();
+    return;
+  }
+
+  ws.onopen = function() {
+    updateWsStatus(true, '已连接');
+    // 请求重发最新数据
+    ws.send(JSON.stringify({cmd: 'resend'}));
+  };
+
+  ws.onmessage = function(event) {
+    try {
+      const data = JSON.parse(event.data);
+      // 忽略控制消息
+      if (data.cmd) return;
+      applyDisplayData(data);
+      // 更新时间戳
+      const now = new Date();
+      document.getElementById('wsTs').textContent =
+        now.getHours().toString().padStart(2,'0') + ':' +
+        now.getMinutes().toString().padStart(2,'0') + ':' +
+        now.getSeconds().toString().padStart(2,'0');
+    } catch(e) {
+      console.warn('[WS] parse error:', e);
+    }
+  };
+
+  ws.onclose = function() {
+    updateWsStatus(false, '已断开');
+    ws = null;
+    scheduleReconnect();
+  };
+
+  ws.onerror = function() {
+    updateWsStatus(false, '连接失败');
+    ws && ws.close();
+  };
+}
+
+function updateWsStatus(connected, label) {
+  const dot = document.getElementById('wsDot');
+  const lbl = document.getElementById('wsLabel');
+  dot.style.background = connected ? '#22c55e' : '#ef4444';
+  lbl.textContent = label || (connected ? '已连接' : '未连接');
+}
+
+function scheduleReconnect() {
+  if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
+  wsReconnectTimer = setTimeout(function() {
+    console.log('[WS] 尝试重连...');
+    wsConnect();
+  }, 3000);
+}
+
+// 页面加载后自动连接
+window.addEventListener('DOMContentLoaded', function() {
+  // 延迟1s连接（确保页面完全就绪）
+  setTimeout(function() { wsConnect(); }, 1000);
+});
+
+// ===== 手动调试按钮（保留） =====
 function simulateData(mode) {
   const data = {
     eco: {
@@ -209,35 +335,7 @@ function simulateData(mode) {
     }
   };
 
-  const d = data[mode] || data.normal;
-
-  // Update energy page
-  document.getElementById('todaySaved').textContent = d.energy.today_saved;
-  document.getElementById('monthSaved').textContent = d.energy.month_saved;
-  document.getElementById('todayUsage').textContent = d.energy.today_usage;
-  document.getElementById('savedRooms').textContent = d.energy.saved_rooms;
-  document.getElementById('tempSet').textContent = d.energy.temp_set + '°';
-
-  // Update sense page
-  document.getElementById('totalPeople').textContent = d.sense.total_people;
-  document.getElementById('statusText').textContent = d.sense.status_text;
-  if (d.sense.has_alarm) document.getElementById('statusText').style.color = '#ef4444';
-  else document.getElementById('statusText').style.color = '#64748b';
-  setZones(d.sense.zones);
-
-  // Update system page
-  document.getElementById('sysVersion').textContent = d.system.version;
-  document.getElementById('sysDevice').textContent = d.system.device;
-  document.getElementById('sysScreen').textContent = d.system.screen;
-  document.getElementById('sysRssi').textContent = d.system.rssi + ' dBm';
-  document.getElementById('sysUptime').textContent = d.system.uptime_days + ' 天';
-  document.getElementById('sysTouch').innerHTML = d.system.touch_ok
-    ? '<span class="status-badge badge-on">✅ 正常</span>'
-    : '<span class="status-badge badge-off">❌ 异常</span>';
-  document.getElementById('statusBadge').className = d.system.online ? 'online' : 'offline';
-  document.getElementById('statusBadge').textContent = d.system.online ? '● 在线' : '● 离线';
-
-  // Switch to page 0
+  applyDisplayData(data[mode] || data.normal);
   switchPage(0);
 }
 </script>

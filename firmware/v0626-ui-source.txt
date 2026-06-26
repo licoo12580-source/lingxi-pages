@@ -1,207 +1,15 @@
-╔══════════════════════════════════════════════╗
-║  灵犀 空间感知 · v0626-mqtt r3  源码       ║
-║  LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U  ║
-║  三页中文UI + 触摸翻页 + 无操作5秒自动翻页  ║
-╚══════════════════════════════════════════════╝
-构建时间: 2026-06-26 19:38 CST
-目标平台: ESP32-S3 (Freenove) · 16MB Flash · 8MB PSRAM (OPI)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- 文件列表
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ├── platformio.ini      → 构建配置
- ├── src/test_lgfx.cpp   → 主固件(三页UI+轮播)
- ├── src/FT6336U.h       → 触摸驱动头文件(类成员修复+坐标映射)
- ├── src/FT6336U.cpp     → 触摸驱动实现(软件I2C bit-bang)
- └── src/font_cjk_20.c   → 中文20px字库(~31KB, 二进制数据, 不在此预览)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📄 platformio.ini
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-[env:esp32-s3-devkitc-1]
-platform = espressif32
-board = freenove_esp32_s3_wroom
-framework = arduino
-board_build.mcu = esp32s3
-board_build.f_cpu = 240000000L
-board_build.flash_mode = dio
-board_build.flash_freq = 40m
-board_build.partitions = partitions_industrial.csv
-board_build.flash_size = 16MB
-board_build.psram = disable
-board_build.psram_mode = opi
-board_upload.flash_size = 16MB
-board_build.usb_cdc_enabled = yes
-board_build.usb_mode = 1
-board_build.cdc_filter = 1
-monitor_speed = 115200
-build_flags = 
-    -DARDUINO_USB_MODE=1
-    -DARDUINO_USB_CDC_ON_BOOT=1
-    -DCORE_DEBUG_LEVEL=5
-board_build.arduino_stack_size = 16384
-lib_deps = 
-    olikraus/U8g2 @ ^2.34.12
-    adafruit/DHT sensor library @ ^1.4.4
-    crankyoldgit/IRremoteESP8266 @ ^2.8.8
-    bodmer/TFT_eSPI @ ^2.5.43
-
-[env:test-all]
-platform = espressif32
-board = freenove_esp32_s3_wroom
-framework = arduino
-board_build.mcu = esp32s3
-board_build.f_cpu = 240000000L
-board_build.flash_mode = dio
-board_build.flash_freq = 40m
-board_build.partitions = partitions_industrial.csv
-board_build.flash_size = 16MB
-board_build.psram = enable
-board_build.psram_mode = opi
-board_upload.flash_size = 16MB
-board_build.usb_cdc_enabled = yes
-board_build.usb_mode = 1
-board_build.cdc_filter = 1
-board_build.arduino_stack_size = 16384
-monitor_speed = 115200
-build_flags = 
-    -DARDUINO_USB_MODE=1
-    -DARDUINO_USB_CDC_ON_BOOT=1
-    -DCORE_DEBUG_LEVEL=5
-    -DUSE_HSPI_PORT
-    -DLV_LVGL_H_INCLUDE_SIMPLE
-    -Icomponents/touch
-    -I.
-src_filter = +<*> -<main.cpp>
-lib_deps = 
-    bodmer/TFT_eSPI @ ^2.5.43
-    lvgl/lvgl @ ^9.5.0
-
-[env:test-lgfx]
-platform = espressif32
-board = freenove_esp32_s3_wroom
-framework = arduino
-board_build.mcu = esp32s3
-board_build.f_cpu = 240000000L
-board_build.flash_mode = dio
-board_build.flash_freq = 40m
-board_build.partitions = partitions_16mb_ota.csv
-board_build.flash_size = 16MB
-board_build.psram = enable
-board_build.psram_mode = opi
-board_upload.flash_size = 16MB
-board_build.usb_cdc_enabled = yes
-board_build.usb_mode = 1
-board_build.cdc_filter = 1
-board_build.arduino_stack_size = 16384
-monitor_speed = 115200
-build_flags = 
-    -DARDUINO_USB_MODE=1
-    -DARDUINO_USB_CDC_ON_BOOT=1
-    -DCORE_DEBUG_LEVEL=3
-    -DLV_LVGL_H_INCLUDE_SIMPLE
-    -DLV_COLOR_DEPTH=16
-    -I.
-    -Icomponents/touch
-src_filter = +<test_lgfx.cpp> +<lingxi-mqtt.cpp> +<FT6336U.cpp> +<font_cjk_20.c> -<main.cpp> -<test_all.cpp>
-lib_deps = 
-    lovyan03/LovyanGFX @ ^1.1.7
-    lvgl/lvgl @ ^9.5.0
-    knolleary/PubSubClient @ ^2.8
-    bblanchon/ArduinoJson @ ^7.0.0
-
-[env:lgfx-native]
-platform = espressif32
-board = freenove_esp32_s3_wroom
-framework = arduino
-board_build.mcu = esp32s3
-board_build.f_cpu = 240000000L
-board_build.flash_mode = dio
-board_build.flash_freq = 40m
-board_build.partitions = partitions_16mb_ota.csv
-board_build.flash_size = 16MB
-board_build.psram = enable
-board_build.psram_mode = opi
-board_upload.flash_size = 16MB
-board_build.usb_cdc_enabled = yes
-board_build.usb_mode = 1
-board_build.cdc_filter = 1
-board_build.arduino_stack_size = 16384
-monitor_speed = 115200
-build_flags = 
-    -DARDUINO_USB_MODE=1
-    -DARDUINO_USB_CDC_ON_BOOT=1
-    -DCORE_DEBUG_LEVEL=5
-    -DLV_LVGL_H_INCLUDE_SIMPLE
-    -DLV_CONF_INCLUDE_SIMPLE
-    -I.
-src_filter = +<test_lgfx.cpp> +<FT6336U.cpp> +<font_cjk_20.c> -<main.cpp> -<lingxi-mqtt.cpp> -<lingxi-room-ui.cpp> -<lingxi-ota.cpp> -<demos/**/*.c>
-lib_deps = 
-    lovyan03/LovyanGFX @ ^1.1.7
-    lvgl/lvgl @ ^9.5.0
-
-[env:tft-test]
-platform = espressif32
-board = freenove_esp32_s3_wroom
-framework = arduino
-board_build.mcu = esp32s3
-board_build.f_cpu = 240000000L
-board_build.flash_mode = dio
-board_build.flash_freq = 40m
-board_build.partitions = partitions_industrial.csv
-board_build.flash_size = 16MB
-board_build.psram = enable
-board_build.psram_mode = opi
-board_upload.flash_size = 16MB
-board_build.usb_cdc_enabled = yes
-board_build.usb_mode = 1
-board_build.cdc_filter = 1
-board_build.arduino_stack_size = 16384
-monitor_speed = 115200
-build_flags = 
-    -DARDUINO_USB_MODE=1
-    -DARDUINO_USB_CDC_ON_BOOT=1
-    -DCORE_DEBUG_LEVEL=5
-src_filter = +<main.cpp>
-lib_deps = 
-    bodmer/TFT_eSPI @ ^2.5.43
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- v0626-mqtt 改动说明
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-✅ FT6336U: 类成员变量 _sda/_scl, mapCoord() 坐标映射宏
-✅ 自动轮播: 无操作5秒翻页, 触摸按下/释放均重置计时器
-✅ 修复bug: LVGL每10ms轮询touch_read, 之前REL分支每次都重置计时器→永不翻页
-✅ 版本号统一: v0626-mqtt, 注释/串口/底栏/系统页一致
-✅ 系统页触摸状态实时显示: 正常/异常
-✅ 删除 mapCoord() 末尾冗余 (void)x; (void)y;
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📄 src/test_lgfx.cpp  (437行)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 /**
  * 灵犀 · 空间感知 — 中文三页 + 触摸  v0626-mqtt
  * LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U(厂家协议) + 中文20px字库
  * 完整UI + 新触摸驱动
  */
 #include <Arduino.h>
-#include "soc/rtc_cntl_reg.h"
-#include "soc/soc.h"
 #include <lvgl.h>
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
 #include <FT6336U.h>
-#include "soc/timer_group_reg.h"
-#include "soc/timer_group_struct.h"
-
-static void tg1_feed() {
-    TIMERG1.wdtwprotect.val = 0x50D83AA1;
-    TIMERG1.wdtfeed.val = 1;
-    TIMERG1.wdtwprotect.val = 0;
-}
+#include <soc/timer_group_struct.h>
+#include <soc/timer_group_reg.h>
 
 #define LCD_CS   45
 #define LCD_DC   47
@@ -561,26 +369,24 @@ static void create_bottom_bar(lv_obj_t *parent) {
 }
 
 void setup() {
-    last_touch_ms = millis();  // 开机5秒后才开始自动翻页
-    WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
-    disableCore0WDT();
-    disableCore1WDT();
-    disableLoopWDT();
-    tg1_feed();
+    // 关闭bootloader启动的TG1WDT，防止初始化耗时过长触发硬件复位
+    TIMERG1.wdtwprotect.val = TIMG_WDT_WKEY_V;
+    TIMERG1.wdtconfig0.wdt_en = 0;
+    TIMERG1.wdtwprotect.val = 0;
 
     Serial.begin(115200);
-    Serial.println("[Boot] Lingxi v0626-mqtt - 中文三页 + 触摸(厂家协议)");
-    tg1_feed();
+    delay(80);  // 等USB-CDC稳定,保证后面的日志能出来
+    Serial.println("[Boot] Lingxi v0626-ui");
+
+    last_touch_ms = millis();  // 开机5秒后才开始自动翻页
 
     // LCD
     tft.begin();
     factory_init();
     tft.setBrightness(255);
-    tg1_feed();
 
-    // 触摸初始化 — 软件I2C bit-bang（不用硬件Wire）
+    // 触摸初始化 — 软件I2C bit-bang
     g_touch_ok = touch.begin(FT6336U_SDA, FT6336U_SCL);
-    tg1_feed();
 
     // LVGL
     lv_init();
@@ -601,13 +407,11 @@ void setup() {
     create_page_sense(scr);
     create_page_settings(scr);
     create_bottom_bar(scr);
-    tg1_feed();
 
     Serial.printf("[Boot] 就绪 - Touch: %s\n", g_touch_ok ? "OK" : "FAIL");
 }
 
 void loop() {
-    tg1_feed();
     lv_timer_handler();
 
     // 无操作5秒自动翻页（触摸也会重置计时器）
@@ -617,283 +421,5 @@ void loop() {
         switch_to_page(next);
     }
 
-    delay(5);
-}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📄 src/FT6336U.h  (78行)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// FT6336U.h — 电容触摸屏驱动 (FocalTech FT6336U)
-#ifndef FT6336U_H
-#define FT6336U_H
-
-#include <Wire.h>
-#include <Arduino.h>
-
-#define FT6336U_SDA  35
-#define FT6336U_SCL  36
-#define FT6336U_RST  37
-#define FT6336U_INT  40
-#define FT6336U_ADDR 0x38
-
-#ifndef TOUCH_SWAP_XY
-#define TOUCH_SWAP_XY 0
-#endif
-#ifndef TOUCH_INVERT_X
-#define TOUCH_INVERT_X 0
-#endif
-#ifndef TOUCH_INVERT_Y
-#define TOUCH_INVERT_Y 0
-#endif
-#ifndef TOUCH_RES_X
-#define TOUCH_RES_X 320
-#endif
-#ifndef TOUCH_RES_Y
-#define TOUCH_RES_Y 480
-#endif
-
-#define REG_DEVICE_MODE  0x00
-#define REG_GESTURE_ID   0x01
-#define REG_TD_STATUS    0x02
-#define REG_P1_XH        0x03
-#define REG_P1_XL        0x04
-#define REG_P1_YH        0x05
-#define REG_P1_YL        0x06
-#define REG_P1_WEIGHT    0x07
-#define REG_P1_MISC      0x08
-#define REG_P2_XH        0x09
-#define REG_P2_XL        0x0A
-#define REG_P2_YH        0x0B
-#define REG_P2_YL        0x0C
-#define REG_P2_WEIGHT    0x0D
-#define REG_P2_MISC      0x0E
-#define REG_CHIP_ID      0xA3
-#define REG_G_MODE       0xA4
-#define REG_VENDOR_ID    0xA8
-
-enum TouchEvt : uint8_t {
-  EVT_PRESS   = 0,
-  EVT_RELEASE = 1,
-  EVT_CONTACT = 2,
-  EVT_NONE    = 3
-};
-
-struct TPoint { TouchEvt event; uint16_t x, y; uint8_t weight, area; };
-struct TScan { uint8_t count; TPoint pts[2]; uint8_t gesture; };
-
-class FT6336U {
-public:
-  FT6336U();
-  bool begin(int sda = -1, int scl = -1);
-  void reset();
-  TScan scan();
-  uint8_t touchCount();
-  bool getPoint(uint16_t &x, uint16_t &y);
-  bool isTouched();
-  bool waitRelease(uint32_t timeout_ms = 500);
-private:
-  int _sda = FT6336U_SDA;
-  int _scl = FT6336U_SCL;
-  uint8_t  readReg8(uint8_t reg);
-  bool     readRegs(uint8_t reg, uint8_t *buf, uint8_t len);
-  void     writeReg8(uint8_t reg, uint8_t val);
-  void     mapCoord(uint16_t &x, uint16_t &y);
-};
-
-#endif
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📄 src/FT6336U.cpp  (190行)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// FT6336U.cpp — 电容触摸屏驱动 (软件I2C bit-bang版)
-// 变更: _sda/_scl 改为类成员变量, 新增坐标映射 mapCoord()
-#include "FT6336U.h"
-
-FT6336U::FT6336U() {}
-
-static inline void i2c_delay() { delayMicroseconds(5); }
-
-static void gpio_init(int sda, int scl) {
-    pinMode(sda, OUTPUT_OPEN_DRAIN);
-    pinMode(scl, OUTPUT_OPEN_DRAIN);
-    digitalWrite(sda, HIGH);
-    digitalWrite(scl, HIGH);
-    i2c_delay();
-}
-
-static void i2c_start(int sda, int scl) {
-    digitalWrite(sda, HIGH);
-    digitalWrite(scl, HIGH);
-    i2c_delay();
-    digitalWrite(sda, LOW);
-    i2c_delay();
-    digitalWrite(scl, LOW);
-}
-
-static void i2c_stop(int sda, int scl) {
-    digitalWrite(sda, LOW);
-    digitalWrite(scl, HIGH);
-    i2c_delay();
-    digitalWrite(sda, HIGH);
-    i2c_delay();
-}
-
-static bool i2c_write_byte(int sda, int scl, uint8_t data) {
-    for (int i = 0; i < 8; i++) {
-        digitalWrite(sda, (data & 0x80) ? HIGH : LOW);
-        data <<= 1;
-        digitalWrite(scl, HIGH);
-        i2c_delay();
-        digitalWrite(scl, LOW);
-        i2c_delay();
-    }
-    pinMode(sda, INPUT);
-    digitalWrite(scl, HIGH);
-    i2c_delay();
-    bool ack = (digitalRead(sda) == LOW);
-    digitalWrite(scl, LOW);
-    pinMode(sda, OUTPUT_OPEN_DRAIN);
-    return ack;
-}
-
-static uint8_t i2c_read_byte(int sda, int scl, bool send_ack) {
-    uint8_t data = 0;
-    pinMode(sda, INPUT);
-    for (int i = 0; i < 8; i++) {
-        data <<= 1;
-        digitalWrite(scl, HIGH);
-        i2c_delay();
-        if (digitalRead(sda)) data |= 1;
-        digitalWrite(scl, LOW);
-        i2c_delay();
-    }
-    pinMode(sda, OUTPUT_OPEN_DRAIN);
-    digitalWrite(sda, send_ack ? LOW : HIGH);
-    digitalWrite(scl, HIGH);
-    i2c_delay();
-    digitalWrite(scl, LOW);
-    digitalWrite(sda, HIGH);
-    return data;
-}
-
-static bool bb_read_regs(int sda, int scl, uint8_t addr, uint8_t reg, uint8_t *buf, uint8_t len) {
-    i2c_start(sda, scl);
-    if (!i2c_write_byte(sda, scl, addr << 1)) { i2c_stop(sda, scl); return false; }
-    if (!i2c_write_byte(sda, scl, reg)) { i2c_stop(sda, scl); return false; }
-    i2c_start(sda, scl);
-    if (!i2c_write_byte(sda, scl, (addr << 1) | 1)) { i2c_stop(sda, scl); return false; }
-    for (uint8_t i = 0; i < len; i++)
-        buf[i] = i2c_read_byte(sda, scl, (i < len - 1));
-    i2c_stop(sda, scl);
-    return true;
-}
-
-static bool bb_write_reg(int sda, int scl, uint8_t addr, uint8_t reg, uint8_t val) {
-    i2c_start(sda, scl);
-    if (!i2c_write_byte(sda, scl, addr << 1)) { i2c_stop(sda, scl); return false; }
-    if (!i2c_write_byte(sda, scl, reg)) { i2c_stop(sda, scl); return false; }
-    i2c_write_byte(sda, scl, val);
-    i2c_stop(sda, scl);
-    return true;
-}
-
-// ====== FT6336U 驱动接口 ======
-bool FT6336U::begin(int sda, int scl) {
-    if (sda >= 0 && scl >= 0) { _sda = sda; _scl = scl; }
-    gpio_init(_sda, _scl);
-    pinMode(FT6336U_RST, OUTPUT);
-    digitalWrite(FT6336U_RST, LOW); delay(20);
-    digitalWrite(FT6336U_RST, HIGH); delay(300);
-    pinMode(FT6336U_INT, INPUT_PULLUP);
-    uint8_t id_a8 = 0xFF, id_a3 = 0xFF;
-    bb_read_regs(_sda, _scl, FT6336U_ADDR, 0xA8, &id_a8, 1);
-    bb_read_regs(_sda, _scl, FT6336U_ADDR, 0xA3, &id_a3, 1);
-    Serial.printf("[Touch] ID_A8=0x%02X ID_A3=0x%02X\n", id_a8, id_a3);
-    bb_write_reg(_sda, _scl, FT6336U_ADDR, REG_G_MODE, 0x01);
-    bb_write_reg(_sda, _scl, FT6336U_ADDR, REG_DEVICE_MODE, 0x00);
-    bool ok = (id_a8 != 0xFF && id_a3 != 0xFF);
-    Serial.printf("[Touch] %s\n", ok ? "OK" : "FAIL");
-    return ok;
-}
-
-void FT6336U::reset() {
-    pinMode(FT6336U_RST, OUTPUT);
-    digitalWrite(FT6336U_RST, LOW); delay(20);
-    digitalWrite(FT6336U_RST, HIGH); delay(300);
-}
-
-void FT6336U::mapCoord(uint16_t &x, uint16_t &y) {
-    #if TOUCH_INVERT_X
-    x = (uint16_t)(TOUCH_RES_X - 1) - x;
-    #endif
-    #if TOUCH_INVERT_Y
-    y = (uint16_t)(TOUCH_RES_Y - 1) - y;
-    #endif
-    #if TOUCH_SWAP_XY
-    uint16_t t = x; x = y; y = t;
-    #endif
-}
-
-uint8_t FT6336U::readReg8(uint8_t reg) {
-    uint8_t val = 0xFF;
-    bb_read_regs(_sda, _scl, FT6336U_ADDR, reg, &val, 1);
-    return val;
-}
-
-bool FT6336U::readRegs(uint8_t reg, uint8_t *buf, uint8_t len) {
-    return bb_read_regs(_sda, _scl, FT6336U_ADDR, reg, buf, len);
-}
-
-void FT6336U::writeReg8(uint8_t reg, uint8_t val) {
-    bb_write_reg(_sda, _scl, FT6336U_ADDR, reg, val);
-}
-
-uint8_t FT6336U::touchCount() {
-    uint8_t td = readReg8(REG_TD_STATUS);
-    if (td == 0xFF) return 0;
-    return td & 0x0F;
-}
-
-bool FT6336U::getPoint(uint16_t &x, uint16_t &y) {
-    uint8_t buf[4] = {0};
-    if (!readRegs(REG_P1_XH, buf, 4)) return false;
-    uint8_t evt = (buf[0] >> 6) & 0x03;
-    if (evt == 0 || evt == 2) {
-        x = ((uint16_t)(buf[0] & 0x0F) << 8) | buf[1];
-        y = ((uint16_t)(buf[2] & 0x0F) << 8) | buf[3];
-        mapCoord(x, y);
-        return true;
-    }
-    return false;
-}
-
-TScan FT6336U::scan() {
-    TScan data = {0};
-    uint8_t td = readReg8(REG_TD_STATUS);
-    if (td == 0xFF) return data;
-    data.count = td & 0x0F;
-    data.gesture = readReg8(REG_GESTURE_ID);
-    for (uint8_t i = 0; i < data.count && i < 2; i++) {
-        uint8_t buf[4];
-        if (readRegs(REG_P1_XH + i * 6, buf, 4)) {
-            data.pts[i].event = (TouchEvt)((buf[0] >> 6) & 0x03);
-            data.pts[i].x = ((uint16_t)(buf[0] & 0x0F) << 8) | buf[1];
-            data.pts[i].y = ((uint16_t)(buf[2] & 0x0F) << 8) | buf[3];
-            mapCoord(data.pts[i].x, data.pts[i].y);
-        }
-    }
-    return data;
-}
-
-bool FT6336U::isTouched() { return touchCount() > 0; }
-
-bool FT6336U::waitRelease(uint32_t timeout_ms) {
-    uint32_t start = millis();
-    while (millis() - start < timeout_ms) {
-        if (!isTouched()) return true;
-        delay(10);
-    }
-    return false;
+    delay(5);  // delay会喂狗,不需要手动喂
 }

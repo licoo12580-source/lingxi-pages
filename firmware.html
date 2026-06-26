@@ -119,9 +119,9 @@ const FW = [
     changes:"✅ PSRAM关闭(跳过PSRAM初始化,节省~270ms)\n✅ 其余同v0626-ui(中文三页+触摸+OTA)\n⚠️ 用于诊断TG1WDT循环是否为PSRAM初始化超时导致",
     source:"v0626-ui"},
   // ==== v0626-UI (含OTA+TG1WDT禁用) ====
-  {ver:"v0626-ui", date:"2026-06-27 01:26", type:"stable", tags:["中文UI","触摸","三页","FT6336U修复","自动轮播","TG1WDT禁用","OTA"], files:{full:"v0626-ui.bin",merge:"v0626-ui-merged.bin"}, size:"1.1MB / 1.2MB",
-    desc:"🎯 三页中文UI + 触摸翻页 + 无操作5秒自动翻页 + OTA | 构造函数级TG1WDT禁用",
-    changes:"✅ TG1WDT禁用(构造函数级+正确解锁密钥0x50D83AA1)\n✅ 三页中文UI(节能/感知/系统) + 触摸翻页\n✅ OTA无线升级(ArduinoOTA, SoftAP)\n✅ 无操作5秒自动翻页\n✅ FT6336U: 类成员修复+坐标映射宏\n✅ font_cjk_20中文字库\n✅ 16MB OTA分区",
+  {ver:"v0626-ui", date:"2026-06-27 01:41", type:"stable", tags:["中文UI","触摸","三页","FT6336U修复","自动轮播","OTA"], files:{full:"v0626-ui.bin",merge:"v0626-ui-merged.bin"}, size:"1.1MB / 1.2MB",
+    desc:"🎯 改用官方板配置: board=esp32-s3-devkitc-1 + memory_type=qio_opi, 正确bootloader配PSRAM",
+    changes:"✅ board=esp32-s3-devkitc-1 (不再用freenove板定义)\n✅ memory_type=qio_opi (QIO flash + OPI PSRAM,正确预编译bootloader)\n✅ 中文三页UI + 触摸翻页 + OTA\n✅ TG1WDT构造函数级禁用(备用)\n✅ FT6336U类成员修复\n✅ 16MB OTA分区",
     source:"v0626-ui"},
   // ==== v0626 系列 (MQTT + 中文UI) ====
   {ver:"v0626", date:"2026-06-26", type:"stable", tags:["中文UI","MQTT","触摸","三页"], files:{full:"v0626-screen-ui.bin"}, size:"815KB",

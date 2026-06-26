@@ -1,0 +1,167 @@
+/**
+ * Lingxi CS-Port — based on ConstStrings/ESP32-S3-LVGL-Board template
+ * TFT_eSPI + LVGL 8.3.9 + ILI9488 SPI + FT6336U(bitbang I2C) + OTA
+ * Board: ESP32-S3-DevKitC-1 (N16R8 compatible)
+ * Pins: CS=45 DC=47 RST=48 MOSI=21 SCLK=20 BL=19
+ * Touch: SDA=35 SCL=36 RST=37 INT=40
+ *
+ * Compile: pio run -e cs-port && esptool.py merge_bin ...
+ */
+
+/********** main.cpp **********/
+#include <Arduino.h>
+#include <lvgl.h>
+#include <SPI.h>
+#include <TFT_eSPI.h>
+#include <WiFi.h>
+#include <ArduinoOTA.h>
+#include "FT6336U_Driver.h"
+#include "timer.h"
+
+TFT_eSPI tft = TFT_eSPI();
+static lv_disp_draw_buf_t draw_buf;
+static lv_color_t buf[480 * 320 / 10];
+
+static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
+{
+    uint32_t w = area->x2 - area->x1 + 1;
+    uint32_t h = area->y2 - area->y1 + 1;
+    tft.startWrite();
+    tft.setAddrWindow(area->x1, area->y1, w, h);
+    tft.pushColors((uint16_t *)&color_p->full, w * h, true);
+    tft.endWrite();
+    lv_disp_flush_ready(disp_drv);
+}
+
+static void touch_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
+{
+    FT6336U_TOUCH_POS touch;
+    ft6336u_read_touch_pos(&touch);
+    if (touch.touch_num) {
+        data->state = LV_INDEV_STATE_PR;
+        data->point.x = touch.touch0_y;
+        data->point.y = touch.touch0_x;
+    } else {
+        data->state = LV_INDEV_STATE_REL;
+    }
+}
+
+void setup()
+{
+    Serial.begin(115200);
+    delay(80);
+    Serial.println("[Boot] Lingxi CS-Port");
+
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP("Lingxi-OTA", "lingxi123");
+    ArduinoOTA.setHostname("lingxi-cs");
+    ArduinoOTA.onStart([]() { Serial.println("[OTA] Start"); });
+    ArduinoOTA.onEnd([]() { Serial.println("[OTA] Done"); });
+    ArduinoOTA.onProgress([](unsigned int p, unsigned int t) {
+        Serial.printf("[OTA] %u/%u\r", p, t);
+    });
+    ArduinoOTA.onError([](ota_error_t e) {
+        Serial.printf("[OTA] Err: %d\n", e);
+    });
+    ArduinoOTA.begin();
+    Serial.println("[OTA] Ready — AP: Lingxi-OTA");
+
+    lv_init();
+    tft.begin();
+    tft.setRotation(3);
+    pinMode(19, OUTPUT);
+    digitalWrite(19, HIGH);
+
+    lv_disp_draw_buf_init(&draw_buf, buf, NULL, 480 * 320 / 10);
+    static lv_disp_drv_t disp_drv;
+    lv_disp_drv_init(&disp_drv);
+    disp_drv.hor_res = 480;
+    disp_drv.ver_res = 320;
+    disp_drv.flush_cb = disp_flush;
+    disp_drv.draw_buf = &draw_buf;
+    lv_disp_drv_register(&disp_drv);
+
+    ft6336u_init();
+    static lv_indev_drv_t indev_drv;
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = touch_read;
+    lv_indev_drv_register(&indev_drv);
+
+    Timer0_Init();
+
+    lv_obj_t *scr = lv_scr_act();
+    lv_obj_set_style_bg_color(scr, lv_color_make(11, 14, 23), 0);
+    lv_obj_t *label = lv_label_create(scr);
+    lv_label_set_text(label, "Lingxi CS-Port");
+    lv_obj_align(label, LV_ALIGN_CENTER, 0, -40);
+    lv_obj_t *info = lv_label_create(scr);
+    lv_label_set_text(info, "TFT_eSPI + LVGL 8.3.9\nILI9488 + FT6336U\nAP: Lingxi-OTA");
+    lv_obj_set_style_text_color(info, lv_color_make(107, 122, 153), 0);
+    lv_obj_align(info, LV_ALIGN_CENTER, 0, 20);
+
+    Serial.println("[Boot] OK");
+}
+
+void loop()
+{
+    ArduinoOTA.handle();
+    lv_timer_handler();
+    delay(5);
+}
+
+/********** User_Setup.h (TFT_eSPI config) **********/
+#define USER_SETUP_LOADED 1
+#define ILI9488_DRIVER     1
+#define TFT_CS   45
+#define TFT_DC   47
+#define TFT_RST  48
+#define TFT_MOSI 21
+#define TFT_SCLK 20
+#define TFT_BL   19
+#define TOUCH_CS -1
+#define SPI_FREQUENCY       40000000
+#define SPI_READ_FREQUENCY  16000000
+#define SPI_TOUCH_FREQUENCY  2500000
+#define TFT_SPI_PORT 1
+#define TFT_WIDTH  320
+#define TFT_HEIGHT 480
+#define CGRAM_OFFSET
+#define LOAD_GLCD
+#define LOAD_FONT2
+#define LOAD_FONT4
+#define LOAD_FONT6
+#define LOAD_FONT7
+#define LOAD_FONT8
+#define LOAD_GFXFF
+#define SMOOTH_FONT
+
+/********** platformio.ini (cs-port env) **********/
+[env:cs-port]
+platform = espressif32
+board = esp32-s3-devkitc-1
+framework = arduino
+board_build.mcu = esp32s3
+board_build.f_cpu = 240000000L
+board_build.arduino.memory_type = qio_opi
+board_build.partitions = partitions_16mb_ota.csv
+board_build.flash_size = 16MB
+board_upload.flash_size = 16MB
+board_build.usb_cdc_enabled = yes
+board_build.usb_mode = 1
+board_build.cdc_filter = 1
+board_build.arduino_stack_size = 16384
+monitor_speed = 115200
+build_flags = 
+    -DARDUINO_USB_MODE=1
+    -DARDUINO_USB_CDC_ON_BOOT=1
+    -DBOARD_HAS_PSRAM
+    -DLV_LVGL_H_INCLUDE_SIMPLE
+    -DCORE_DEBUG_LEVEL=3
+    -I src/cs_port
+    -I src/cs_port/lib/touch
+    -I src/cs_port/lib/timer
+src_filter = +<cs_port/main.cpp> +<cs_port/lib/**>
+lib_deps = 
+    bodmer/TFT_eSPI @ ^2.5.43
+    lvgl/lvgl @ ^8.3.9

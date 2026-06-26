@@ -115,9 +115,9 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 <script>
 const FW = [
   // ==== v0626-UI 系列 (三页中文UI + FT6336U修复) ====
-  {ver:"v0626-ui", date:"2026-06-26 19:38", type:"stable", tags:["中文UI","触摸","三页","FT6336U修复","自动轮播"], files:{full:"v0626-ui.bin",merge:"v0626-ui-merged.bin"}, size:"671KB / 735KB",
+  {ver:"v0626-ui", date:"2026-06-27 00:14", type:"stable", tags:["中文UI","触摸","三页","FT6336U修复","自动轮播"], files:{full:"v0626-ui.bin",merge:"v0626-ui-merged.bin"}, size:"671KB / 735KB",
     desc:"🎯 三页中文UI(节能/感知/系统) + 触摸翻页 + 无操作5秒自动翻页 | FT6336U类成员变量修复 + 坐标映射宏 | LovyanGFX+LVGL 9.5",
-    changes:"✅ 无操作5秒自动翻页(触摸按下/释放均重置计时器)\\\n✅ 修复bug: LVGL每10ms轮询导致计时器被频繁重置(状态切换才重置)\\\n✅ 三页UI(节能/感知/系统) 底部导航+圆点指示器\\\\n✅ FT6336U: _sda/_scl改为类成员\\\\n✅ FT6336U: 新增mapCoord坐标映射宏(TOUCH_SWAP_XY/INVERT)\\\n✅ 版本号统一v0626-ui/系统页触摸状态实时显示\\\\n✅ font_cjk_20中文字库\\\\n✅ 16MB OTA(app0 7MB) + LovyanGFX + LVGL 9.5 + ILI9488 320x480",
+    changes:"✅ TG1WDT彻底禁用(不靠喂狗,写0清寄存器)\\\n✅ 无操作5秒自动翻页(触摸按下/释放均重置计时器)\\\n✅ 修复bug: LVGL每10ms轮询导致计时器被频繁重置(状态切换才重置)\\\n✅ 三页UI(节能/感知/系统) 底部导航+圆点指示器\\\\n✅ FT6336U: _sda/_scl改为类成员\\\\n✅ FT6336U: 新增mapCoord坐标映射宏(TOUCH_SWAP_XY/INVERT)\\\n✅ 版本号统一v0626-ui/系统页触摸状态实时显示\\\\n✅ font_cjk_20中文字库\\\\n✅ 16MB OTA(app0 7MB) + LovyanGFX + LVGL 9.5 + ILI9488 320x480",
     source:"v0626-ui"},
   // ==== v0626 系列 (MQTT + 中文UI) ====
   {ver:"v0626", date:"2026-06-26", type:"stable", tags:["中文UI","MQTT","触摸","三页"], files:{full:"v0626-screen-ui.bin"}, size:"815KB",

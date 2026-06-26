@@ -1,9 +1,9 @@
 ╔══════════════════════════════════════════════╗
-║  灵犀 空间感知 · v0626-mqtt r2  源码       ║
+║  灵犀 空间感知 · v0626-mqtt r3  源码       ║
 ║  LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U  ║
 ║  三页中文UI + 触摸翻页 + 无操作5秒自动翻页  ║
 ╚══════════════════════════════════════════════╝
-构建时间: 2026-06-26 19:33 CST
+构建时间: 2026-06-26 19:38 CST
 目标平台: ESP32-S3 (Freenove) · 16MB Flash · 8MB PSRAM (OPI)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -168,30 +168,22 @@ lib_deps =
     bodmer/TFT_eSPI @ ^2.5.43
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- v0626-mqtt r2 改动说明
+ v0626-mqtt 改动说明
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔧 FT6336U 改良:
-  · 删除文件级全局变量 int _sda/_scl, 改为类 private 成员
-  · begin() 正确保存 sda/scl 到 this->_sda / this->_scl
-  · 新增 mapCoord() 坐标映射, 支持 TOUCH_SWAP_XY / TOUCH_INVERT_X / TOUCH_INVERT_Y
-  · getPoint() / scan() 调用 mapCoord()
-  · 删除 mapCoord() 末尾冗余 (void)x; (void)y;
-🔄 自动轮播:
-  · 无操作5秒自动翻页(无论触摸是否正常)
-  · 触摸按下/释放均重置计时器
-  · 开机5秒后才开始翻页
-📋 统一:
-  · 所有版本号 v0626-mqtt
-  · 系统页触摸状态实时显示(正常/异常)
-  · g_touch_ok 前移声明, 对所有函数可见
+✅ FT6336U: 类成员变量 _sda/_scl, mapCoord() 坐标映射宏
+✅ 自动轮播: 无操作5秒翻页, 触摸按下/释放均重置计时器
+✅ 修复bug: LVGL每10ms轮询touch_read, 之前REL分支每次都重置计时器→永不翻页
+✅ 版本号统一: v0626-mqtt, 注释/串口/底栏/系统页一致
+✅ 系统页触摸状态实时显示: 正常/异常
+✅ 删除 mapCoord() 末尾冗余 (void)x; (void)y;
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📄 src/test_lgfx.cpp  (432行)
+📄 src/test_lgfx.cpp  (437行)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 /**
- * 灵犀 · 空间感知 — 中文三页 + 触摸  v0621Y
+ * 灵犀 · 空间感知 — 中文三页 + 触摸  v0626-mqtt
  * LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U(厂家协议) + 中文20px字库
  * 完整UI + 新触摸驱动
  */
@@ -305,6 +297,7 @@ static void disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_ma
 
 static unsigned long last_touch_ms = 0;
 bool g_touch_ok = false;
+static lv_indev_state_t last_indev_state = LV_INDEV_STATE_REL;
 
 // 触摸读取函数
 static void touch_read(lv_indev_t *indev, lv_indev_data_t *data) {
@@ -312,11 +305,15 @@ static void touch_read(lv_indev_t *indev, lv_indev_data_t *data) {
     if (touch.getPoint(x, y)) {
         data->point.x = x; data->point.y = y;
         data->state = LV_INDEV_STATE_PR;
-        last_touch_ms = millis();
+        last_touch_ms = millis();        // 触摸按下重置计时器
     } else {
         data->state = LV_INDEV_STATE_REL;
-        last_touch_ms = millis();  // 释放也重置计时器，避免长按后立即翻页
+        // 仅当从按下变释放时重置（避免长按后立即翻页）
+        if (last_indev_state == LV_INDEV_STATE_PR) {
+            last_touch_ms = millis();
+        }
     }
+    last_indev_state = data->state;       // 记录本次状态供下次判断
 }
 
 #define LV_BUF_SIZE (320 * 40)

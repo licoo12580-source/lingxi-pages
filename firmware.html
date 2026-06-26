@@ -119,6 +119,11 @@ const FW = [
     desc:"🧪 ConstStrings模板移植: TFT_eSPI+LVGL8.3.9+ILI9488+FT6336U+OTA,引脚适配CS=45,DC=47,MOSI=21,SCLK=20,BL=19",
     changes:"✅ 基于ConstStrings/ESP32-S3-LVGL-Board(已验证同款N16R8硬件)\\n✅ TFT_eSPI驱动(非LovyanGFX)\\n✅ LVGL 8.3.9(非9.5)\\n✅ 软件I2C bitbang触摸(SDA=35,SCL=36,RST=37)\\n✅ WiFi AP + ArduinoOTA\\n✅ board=esp32-s3-devkitc-1 + qio_opi + BOARD_HAS_PSRAM\\n✅ OTA分区(partitions_16mb_ota.csv)",
     source:"v0626-cs-port"},
+  // ==== v0626-CS-Port-r2 (SPI.begin修复 + 版本号) ====
+  {ver:"v0626-cs-port-r2", date:"2026-06-27 02:22", type:"testing", tags:["CS模板","SPI修复","LVGL8.3","OTA"], files:{merge:"v0626-cs-port-r2-merged.bin"}, size:"1011KB",
+    desc:"🔧 r2: 修复SPI空指针崩溃 + 显示版本号",
+    changes:"✅ 修复: tft.begin()前显式调用SPI.begin(20,-1,21,-1)\\n✅ 屏显: 灵犀 + v0626-cs-port-r2\\n✅ 其余同r1(ConstStrings移植+TFT_eSPI+LVGL8.3.9+OTA\\n✅ board=esp32-s3-devkitc-1 + qio_opi + OTA分区",
+    source:"v0626-cs-port"},
   {ver:"v0626-ui-nopsram", date:"2026-06-27 01:33", type:"testing", tags:["中文UI","测试","PSRAM关闭","TG1WDT"], files:{full:"v0626-ui-nopsram.bin",merge:"v0626-ui-nopsram-merged.bin"}, size:"1.1MB / 1.2MB",
     desc:"🧪 验证版: 关PSRAM,其他同v0626-ui。如果此版能启动→PSRAM初始化超时触发TG1WDT",
     changes:"✅ PSRAM关闭(跳过PSRAM初始化,节省~270ms)\n✅ 其余同v0626-ui(中文三页+触摸+OTA)\n⚠️ 用于诊断TG1WDT循环是否为PSRAM初始化超时导致",

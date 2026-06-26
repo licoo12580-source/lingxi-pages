@@ -114,10 +114,14 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
-  // ==== v0626-UI (TG1WDT构造函数级禁用+OTA) ====
+  {ver:"v0626-ui-nopsram", date:"2026-06-27 01:33", type:"testing", tags:["中文UI","测试","PSRAM关闭","TG1WDT"], files:{full:"v0626-ui-nopsram.bin",merge:"v0626-ui-nopsram-merged.bin"}, size:"1.1MB / 1.2MB",
+    desc:"🧪 验证版: 关PSRAM,其他同v0626-ui。如果此版能启动→PSRAM初始化超时触发TG1WDT",
+    changes:"✅ PSRAM关闭(跳过PSRAM初始化,节省~270ms)\n✅ 其余同v0626-ui(中文三页+触摸+OTA)\n⚠️ 用于诊断TG1WDT循环是否为PSRAM初始化超时导致",
+    source:"v0626-ui"},
+  // ==== v0626-UI (含OTA+TG1WDT禁用) ====
   {ver:"v0626-ui", date:"2026-06-27 01:26", type:"stable", tags:["中文UI","触摸","三页","FT6336U修复","自动轮播","TG1WDT禁用","OTA"], files:{full:"v0626-ui.bin",merge:"v0626-ui-merged.bin"}, size:"1.1MB / 1.2MB",
-    desc:"🎯 三页中文UI + 触摸翻页 + 无操作5秒自动翻页 + OTA | 构造函数级TG1WDT禁用(正确解锁密钥)",
-    changes:"✅ TG1WDT禁用: 构造函数级+正确解锁密钥0x50D83AA1(之前错写成0xFFFFFFFF)\n✅ 三页中文UI(节能/感知/系统) + 触摸翻页\n✅ OTA无线升级(ArduinoOTA, SoftAP)\n✅ 无操作5秒自动翻页\n✅ FT6336U: 类成员修复+坐标映射宏\n✅ font_cjk_20中文字库\n✅ 16MB OTA分区",
+    desc:"🎯 三页中文UI + 触摸翻页 + 无操作5秒自动翻页 + OTA | 构造函数级TG1WDT禁用",
+    changes:"✅ TG1WDT禁用(构造函数级+正确解锁密钥0x50D83AA1)\n✅ 三页中文UI(节能/感知/系统) + 触摸翻页\n✅ OTA无线升级(ArduinoOTA, SoftAP)\n✅ 无操作5秒自动翻页\n✅ FT6336U: 类成员修复+坐标映射宏\n✅ font_cjk_20中文字库\n✅ 16MB OTA分区",
     source:"v0626-ui"},
   // ==== v0626 系列 (MQTT + 中文UI) ====
   {ver:"v0626", date:"2026-06-26", type:"stable", tags:["中文UI","MQTT","触摸","三页"], files:{full:"v0626-screen-ui.bin"}, size:"815KB",

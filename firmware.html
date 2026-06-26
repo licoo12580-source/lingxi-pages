@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== v0626 系列 (MQTT + 中文UI) ====
+  {ver:"v0626", date:"2026-06-26", type:"stable", tags:["中文UI","MQTT","触摸","三页"], files:{full:"v0626-screen-ui.bin"}, size:"815KB",
+    desc:"🌐 MQTT实时通信 + 中文三页UI + 触摸翻页，客房屏固件",
+    changes:"✅ MQTT客户端(lingxi/v1/+ 订阅)\\n✅ 中文三页(节能/感知/系统)\\n✅ 触摸翻页+5秒自动轮播\\n✅ PubSubClient + ArduinoJson\\n✅ LovyanGFX + LVGL 驱动\\n✅ ILI9488 + FT6336U",
+    source:"v0626-screen-ui"},
   // ==== v0622 系列 (诊断测试) ====
   {ver:"v0622A-mini", date:"2026-06-21", type:"diagnostic", tags:["最简","裸LCD","颜色轮换"], files:{full:"v0622A-mini.bin"}, size:"407KB",
     desc:"⚡ 最简亮屏测试：只开LCD+颜色轮换(红绿蓝白黑灵犀色)，无LVGL/触摸/字库/PSRAM",

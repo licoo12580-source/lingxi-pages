@@ -124,6 +124,11 @@ const FW = [
     desc:"🔧 r2: 修复SPI空指针崩溃 + 显示版本号",
     changes:"✅ 修复: tft.begin()前显式调用SPI.begin(20,-1,21,-1)\\n✅ 屏显: 灵犀 + v0626-cs-port-r2\\n✅ 其余同r1(ConstStrings移植+TFT_eSPI+LVGL8.3.9+OTA\\n✅ board=esp32-s3-devkitc-1 + qio_opi + OTA分区",
     source:"v0626-cs-port"},
+  // ==== v0626-CS-Port-r3 (USE_HSPI_PORT: 避免与PSRAM的FSPI冲突) ====
+  {ver:"v0626-cs-port-r3", date:"2026-06-27 02:25", type:"testing", tags:["CS模板","HSPI","PSRAM兼容","OTA"], files:{merge:"v0626-cs-port-r3-merged.bin"}, size:"1017KB",
+    desc:"🔧 r3: USE_HSPI_PORT—PSRAM占用FSPI,冲突导致SPI空指针。切到SPI3_HOST(HSPI)",
+    changes:"✅ 修复: build_flags加-DUSE_HSPI_PORT,使用SPI3_HOST(HSPI)\\n✅ PSRAM与SPI各走各的,不再冲突\\n✅ 屏显: 灵犀 + v0626-cs-port-r3\\n✅ 其余同r1",
+    source:"v0626-cs-port"},
   {ver:"v0626-ui-nopsram", date:"2026-06-27 01:33", type:"testing", tags:["中文UI","测试","PSRAM关闭","TG1WDT"], files:{full:"v0626-ui-nopsram.bin",merge:"v0626-ui-nopsram-merged.bin"}, size:"1.1MB / 1.2MB",
     desc:"🧪 验证版: 关PSRAM,其他同v0626-ui。如果此版能启动→PSRAM初始化超时触发TG1WDT",
     changes:"✅ PSRAM关闭(跳过PSRAM初始化,节省~270ms)\n✅ 其余同v0626-ui(中文三页+触摸+OTA)\n⚠️ 用于诊断TG1WDT循环是否为PSRAM初始化超时导致",

@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== v0627-lgfx-ota (OTA后台任务+TG0/1WDT+引脚修正) ====
+  {ver:"v0627-lgfx-ota", date:"2026-06-27 04:13", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","WDT全部禁用","OTA后台任务","LCD_RST=4","触摸I2C"], files:{merge:"v0627-lgfx-ota-merged.bin"}, size:"1.5MB",
+    desc:"OTA下载走独立FreeRTOS任务+64K缓冲区+TG0/TG1全部WDT禁用+LCD_RST从48修正为4(按hw-678a原理图)+AirJoy OTA模块接入",
+    source:"test_lgfx.cpp + lingxi-ota.cpp"},
+
   // ==== v0627-lgfx-native (LovyanGFX + TG1WDT禁用) ====
   {ver:"v0627-lgfx-native", date:"2026-06-27 03:20", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","TG1WDT禁用","OTA"], files:{merge:"v0627-lgfx-native-merged.bin"}, size:"1.2MB",
     desc:"🔥 LovyanGFX+LVGL9.5+中文三页+触摸(硬件I2C)+屏显自检, board=esp32-s3-devkitc-1+qio_opi",

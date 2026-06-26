@@ -116,8 +116,8 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 const FW = [
   // ==== v0627-lgfx-native (LovyanGFX + TG1WDT禁用) ====
   {ver:"v0627-lgfx-native", date:"2026-06-27 03:20", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","TG1WDT禁用","OTA"], files:{merge:"v0627-lgfx-native-merged.bin"}, size:"1.2MB",
-    desc:"🔥 原版LovyanGFX+LVGL9.5+中文三页+触摸+OTA, board=esp32-s3-devkitc-1+qio_opi,TG1WDT禁用",
-    changes:"✅ 基于test_lgfx.cpp(已验证显示+触摸正确)\n✅ board=esp32-s3-devkitc-1 + qio_opi(过TG1WDT)\n✅ setup最前禁用TG1WDT(TIMERG1.wdtconfig0=0)\n✅ SPI3_HOST(FSPI与PSRAM各走各的,不冲突)\n✅ 中文三页(节能/感知/系统)\n✅ FT6336U触摸+自动翻页\n✅ WiFi AP + ArduinoOTA\n✅ 16MB OTA分区",
+    desc:"🔥 原版LovyanGFX+LVGL9.5+中文三页+触摸+OTA, board=esp32-s3-devkitc-1+qio_opi,TG1WDT禁用,触摸I2C上拉+慢时序",
+    changes:"✅ 基于test_lgfx.cpp(已验证显示+触摸正确)\n✅ board=esp32-s3-devkitc-1 + qio_opi(过TG1WDT)\n✅ setup最前禁用TG1WDT(TIMERG1.wdtconfig0=0)\n✅ SPI3_HOST(FSPI与PSRAM各走各的,不冲突)\n✅ 中文三页(节能/感知/系统)\n✅ FT6336U触摸+自动翻页\n✅ 触摸I2C bitbang加内部上拉+放慢到10µs\n✅ WiFi AP + ArduinoOTA\n✅ 16MB OTA分区\n✅ 正确合并(bootloader+partitions+app)",
     source:"test_lgfx.cpp v0627-lgfx-native"},
   // ==== v0626-CS-Port (ConstStrings模板移植) ====
   {ver:"v0626-cs-port", date:"2026-06-27 02:30", type:"testing", tags:["CS模板","TFT_eSPI","LVGL8.3","OTA"], files:{merge:"v0626-cs-port-merged.bin"}, size:"1006KB",

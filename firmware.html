@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== v0626-MQTT 系列 (PubSubClient + ArduinoJson) ====
+  {ver:"v0626-mqtt", date:"2026-06-26", type:"stable", tags:["中文UI","MQTT","触摸","三页","实时数据"], files:{full:"v0626-screen-mqtt.bin"}, size:"1.12MB",
+    desc:"🌐 MQTT实时数据接入屏端固件，PubSubClient+ArduinoJson，WiFi重连修复，触摸坐标映射宏",
+    changes:"✅ MQTT(PubSubClient+ArduinoJson, lingxi/v1/+/# 订阅)\\n✅ 三页UI实时刷新(今日省电/月省电/设备在线/节能数/室温)\\n✅ 区域感知(床/门/窗/浴室 有人/无人动态)\\n✅ WiFi重连标志bug修复(开机持续重试)\\n✅ 16MB OTA分区表(7MB app)\\n✅ FT6336U类成员变量+坐标映射宏",
+    source:"v0626-screen-mqtt"},
   // ==== v0626 系列 (MQTT + 中文UI) ====
   {ver:"v0626", date:"2026-06-26", type:"stable", tags:["中文UI","MQTT","触摸","三页"], files:{full:"v0626-screen-ui.bin"}, size:"815KB",
     desc:"🌐 MQTT实时通信 + 中文三页UI + 触摸翻页，客房屏固件",

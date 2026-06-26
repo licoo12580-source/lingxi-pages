@@ -1,5 +1,5 @@
 /**
- * 灵犀 · 空间感知 — 中文三页 + 触摸  v0626-mqtt
+ * 灵犀 · 空间感知 — 中文三页 + 触摸 + OTA  v0626-ui
  * LovyanGFX + LVGL 9.5 + ILI9488 + FT6336U(厂家协议) + 中文20px字库
  * 完整UI + 新触摸驱动
  */
@@ -12,6 +12,13 @@
 #include <soc/timer_group_reg.h>
 #include <WiFi.h>
 #include <ArduinoOTA.h>
+
+// CRT阶段关闭TG1WDT，在Arduino框架初始化(PSRAM等)之前执行
+__attribute__((constructor)) static void early_disable_tg1wdt() {
+    TIMERG1.wdtwprotect.val = TIMG_WDT_WKEY_V;
+    TIMERG1.wdtconfig0.wdt_en = 0;
+    TIMERG1.wdtwprotect.val = 0;
+}
 
 #define LCD_CS   45
 #define LCD_DC   47
@@ -364,18 +371,13 @@ static void create_bottom_bar(lv_obj_t *parent) {
     lv_obj_set_style_radius(line, 1, 0);
 
     lv_obj_t *footer = lv_label_create(parent);
-    lv_label_set_text(footer, "v0626-mqtt  灵犀  空间感知");
+    lv_label_set_text(footer, "v0626-ui  灵犀  空间感知");
     lv_obj_set_style_text_color(footer, C_GRAY, 0);
     lv_obj_set_style_text_font(footer, &font_cjk_20, 0);
     lv_obj_set_pos(footer, 12, 386);
 }
 
 void setup() {
-    // 关闭bootloader启动的TG1WDT，防止初始化耗时过长触发硬件复位
-    TIMERG1.wdtwprotect.val = TIMG_WDT_WKEY_V;
-    TIMERG1.wdtconfig0.wdt_en = 0;
-    TIMERG1.wdtwprotect.val = 0;
-
     Serial.begin(115200);
     delay(80);  // 等USB-CDC稳定,保证后面的日志能出来
     Serial.println("[Boot] Lingxi v0626-ui");

@@ -10,6 +10,8 @@
 #include <FT6336U.h>
 #include <soc/timer_group_struct.h>
 #include <soc/timer_group_reg.h>
+#include <WiFi.h>
+#include <ArduinoOTA.h>
 
 #define LCD_CS   45
 #define LCD_DC   47
@@ -378,6 +380,21 @@ void setup() {
     delay(80);  // 等USB-CDC稳定,保证后面的日志能出来
     Serial.println("[Boot] Lingxi v0626-ui");
 
+    // WiFi + OTA — AP模式(192.168.4.1), 电脑连上去就能无线推送
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP("Lingxi-OTA", "lingxi123");
+    ArduinoOTA.setHostname("lingxi-screen");
+    ArduinoOTA.onStart([]() { Serial.println("[OTA] 开始接收..."); });
+    ArduinoOTA.onEnd([]() { Serial.println("[OTA] 完成!"); });
+    ArduinoOTA.onProgress([](unsigned int p, unsigned int t) {
+        Serial.printf("[OTA] %u/%u bytes\r", p, t);
+    });
+    ArduinoOTA.onError([](ota_error_t e) {
+        Serial.printf("[OTA] 错误: %d\n", e);
+    });
+    ArduinoOTA.begin();
+    Serial.printf("[OTA] 就绪! 连WiFi 'Lingxi-OTA' → pio run -t upload --upload-port 192.168.4.1\n");
+
     last_touch_ms = millis();  // 开机5秒后才开始自动翻页
 
     // LCD
@@ -412,6 +429,7 @@ void setup() {
 }
 
 void loop() {
+    ArduinoOTA.handle();
     lv_timer_handler();
 
     // 无操作5秒自动翻页（触摸也会重置计时器）

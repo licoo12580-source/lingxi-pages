@@ -14,9 +14,10 @@
 #include <ArduinoOTA.h>
 
 // CRT阶段关闭TG1WDT，在Arduino框架初始化(PSRAM等)之前执行
+// 注意: TIMG_WDT_WKEY_V=0xFFFFFFFF是位掩码,硬件解锁值是0x50D83AA1(复位默认值)
 __attribute__((constructor)) static void early_disable_tg1wdt() {
-    TIMERG1.wdtwprotect.val = TIMG_WDT_WKEY_V;
-    TIMERG1.wdtconfig0.wdt_en = 0;
+    TIMERG1.wdtwprotect.val = 0x50D83AA1;  // 解锁写保护
+    TIMERG1.wdtconfig0.wdt_en = 0;          // 关闭TG1WDT
     TIMERG1.wdtwprotect.val = 0;
 }
 

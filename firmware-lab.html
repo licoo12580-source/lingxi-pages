@@ -709,9 +709,11 @@ function renderFlash(ver){
 }
 
 // ===== 反馈弹窗 =====
+let fbVersion=null; // 打开弹窗时锁定的版本
 function openFeedback(){
   if(!selectedVer){alert('请先选择版本');return;}
-  document.getElementById('fbVer').textContent=selectedVer.ver+' ('+(selectedVer.date||'')+')';
+  fbVersion=selectedVer; // 锁定当前版本
+  document.getElementById('fbVer').textContent=fbVersion.ver+' ('+(fbVersion.date||'')+')';
   // 重置表单
   ['fb-reproduced','fb-new','fb-solved','fb-rollback','fb-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fb-log').value='';
@@ -721,27 +723,38 @@ function closeFeedback(){
   document.getElementById('feedbackModal').classList.remove('show');
 }
 function submitFeedback(result){
-  if(!selectedVer){closeFeedback();return;}
+  if(!fbVersion){closeFeedback();return;}
+  // 检测版本是否被切换
+  if(selectedVer!==fbVersion){
+    if(!confirm(`⚠ 当前版本已从 ${fbVersion.ver} 切换到 ${selectedVer.ver}，确认仍为 ${fbVersion.ver} 提交反馈？`)){
+      closeFeedback();
+      return;
+    }
+  }
   const log=document.getElementById('fb-log').value;
   const note=document.getElementById('fb-note').value;
-  const r={ver:selectedVer.ver,result:result,time:new Date().toLocaleString(),note:note||'反馈报告',files:[],
+  const r={ver:fbVersion.ver,result:result,time:new Date().toLocaleString(),note:note||'反馈报告',files:[],
     log:log?log.slice(0,500):'',
     feedback:{reproduced:document.getElementById('fb-reproduced').value,new:document.getElementById('fb-new').value,
       solved:document.getElementById('fb-solved').value,rollback:document.getElementById('fb-rollback').value}};
   TEST_HISTORY.push(r);
   renderTestHistory();
-  selectedVer.status=result==='pass'?'verified':'fail';
+  // 更新目标版本状态（非当前版本）
+  const targetVer=FW.find(f=>f.ver===fbVersion.ver);
+  if(targetVer)targetVer.status=result==='pass'?'verified':'fail';
   render();
   closeFeedback();
+  fbVersion=null;
   alert(result==='pass'?'✅ 烧录通过已记录':'❌ 烧录失败已记录');
 }
 function copyFeedbackReport(){
-  if(!selectedVer){alert('请先选择版本');return;}
+  if(!fbVersion&&!selectedVer){alert('请先选择版本');return;}
+  const ver=fbVersion||selectedVer;
   const log=document.getElementById('fb-log').value;
   const note=document.getElementById('fb-note').value;
   const repo=`### 烧录测试报告
-版本：${selectedVer.ver} (${selectedVer.date||'无日期'})
-修改：${(selectedVer.changes||[]).join('、')||'无'}
+版本：${ver.ver} (${ver.date||'无日期'})
+修改：${(ver.changes||[]).join('、')||'无'}
 是否复现：${document.getElementById('fb-reproduced').value||'未填'}
 新问题：${document.getElementById('fb-new').value||'未填'}
 原问题解决：${document.getElementById('fb-solved').value||'未填'}

@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== v0628-lgfx (最新: I2C超时缩短+版本更新+编译修复) ====
+  {ver:"v0628-lgfx", date:"2026-06-28 10:56", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","WDT全部禁用","OTA","I2C缩短","编译修复"], files:{merge:"v0628-lgfx-merged.bin"}, size:"1.5MB",
+    desc:"🛠 修复版: lingxi-ota.cpp加入编译+ArduinoJson依赖+I2C超时从50ms缩短到10ms+版本号统一v0628",
+    changes:"✅ 编译修复: src_filter添加lingxi-ota.cpp, lib_deps添加ArduinoJson\\n✅ I2C扫描超时: 50ms→10ms, 127地址扫描从6.3s降至1.3s\\n✅ 版本号统一: v0628-lgfx\\n✅ 基于v0627-lgfx-ota全部代码(OTA+LovyanGFX+LVGL9.5+中文三页+触摸)\\n✅ TG1WDT构造函数级禁用(0x50D83AA1解锁)\\n✅ 屏显自检: 版本号→WiFi AP→I2C扫描→触摸状态→LCD序列\\n⚠️ 仍需WiFi STA连接才可联MQTT/backend OTA",
+    source:"test_lgfx.cpp v0628-lgfx"},
   // ==== v0627-lgfx-ota (OTA后台任务+TG0/1WDT+引脚修正) ====
   {ver:"v0627-lgfx-ota", date:"2026-06-27 04:13", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","WDT全部禁用","OTA后台任务","LCD_RST=4","触摸I2C"], files:{merge:"v0627-lgfx-ota-merged.bin"}, size:"1.5MB",
     desc:"OTA下载走独立FreeRTOS任务+64K缓冲区+TG0/TG1全部WDT禁用+LCD_RST从48修正为4(按hw-678a原理图)+AirJoy OTA模块接入",

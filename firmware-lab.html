@@ -301,46 +301,12 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
         <button class="btn btn-outline" onclick="copyCmd('monitorCmd')">📋 串口监视</button>
         <a class="btn btn-primary" id="downloadBtn" href="#" style="text-decoration:none">⬇ 下载 BIN</a>
         <button class="btn btn-outline" id="previewBtn" onclick="openPreview()" style="display:none">📄 预览代码</button>
+        <button class="btn btn-outline" id="feedbackBtn" onclick="openFeedback()" style="display:none">📋 反馈问题</button>
       </div>
     </div>
     <div class="card">
       <h2>🔄 回滚列表</h2>
       <div id="rollbackVersions" style="font-size:13px;line-height:2.2"></div>
-    </div>
-    <!-- 测试反馈区域 -->
-    <div class="card" id="testFeedbackCard">
-      <h3>📋 测试反馈</h3>
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:var(--space-sm)">
-        当前测试版本：<strong id="testVerDisplay" style="color:var(--text)">未选择</strong>
-      </div>
-      <div class="confirm-grid">
-        <div class="confirm-group">
-          <label>是否复现？</label>
-          <select class="input" id="f-reproduced"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-        </div>
-        <div class="confirm-group">
-          <label>新问题？</label>
-          <select class="input" id="f-new"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-        </div>
-        <div class="confirm-group">
-          <label>原问题是否解决？</label>
-          <select class="input" id="f-solved"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-        </div>
-        <div class="confirm-group">
-          <label>需要回滚？</label>
-          <select class="input" id="f-rollback"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-        </div>
-      </div>
-      <div class="upload-area" onclick="document.getElementById('flashFileUpload').click()">
-        <div class="icon">📷</div>
-        <div class="label">点击上传串口日志 / 照片 / 视频</div>
-        <input type="file" id="flashFileUpload" multiple accept="image/*,.txt,.log,.csv" style="display:none" onchange="handleFlashUpload(this)">
-      </div>
-      <div style="display:flex;gap:6px;margin-top:var(--space-sm);flex-wrap:wrap">
-        <button class="btn btn-success" onclick="submitFlashTest('pass')">✅ 烧录通过</button>
-        <button class="btn btn-danger" onclick="submitFlashTest('fail')">❌ 烧录失败</button>
-        <button class="btn btn-outline" onclick="copyFlashReport()">📋 复制报告并发送</button>
-      </div>
     </div>
   </div>
 
@@ -360,7 +326,57 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
     </div>
   </div>
 
-  <!-- 测试 -->
+  <!-- 反馈弹窗 -->
+  <div class="modal-overlay" id="feedbackModal" onclick="if(event.target===this)closeFeedback()">
+    <div class="modal" style="max-width:640px">
+      <div class="modal-header">
+        <span class="modal-title" id="feedbackTitle">📋 烧录反馈</span>
+        <button class="modal-close" onclick="closeFeedback()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:var(--space-sm)">
+          版本：<strong id="fbVer" style="color:var(--text)"></strong>
+        </div>
+        <div class="confirm-grid">
+          <div class="confirm-group">
+            <label>是否复现？</label>
+            <select class="input" id="fb-reproduced"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
+          </div>
+          <div class="confirm-group">
+            <label>新问题？</label>
+            <select class="input" id="fb-new"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
+          </div>
+          <div class="confirm-group">
+            <label>原问题是否解决？</label>
+            <select class="input" id="fb-solved"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
+          </div>
+          <div class="confirm-group">
+            <label>需要回滚？</label>
+            <select class="input" id="fb-rollback"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
+          </div>
+        </div>
+        <div style="margin:var(--space-sm) 0">
+          <label style="font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)">📄 串口日志粘贴</label>
+          <textarea class="input" id="fb-log" rows="6" placeholder="在此粘贴串口输出日志...
+例如：
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+...
+" style="resize:vertical;font-family:monospace;font-size:11px;line-height:1.6"></textarea>
+        </div>
+        <div style="margin:var(--space-sm) 0">
+          <label style="font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)">📝 备注</label>
+          <input class="input" id="fb-note" placeholder="可选的附加说明..." style="font-size:12px">
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-success" onclick="submitFeedback('pass')">✅ 烧录通过</button>
+          <button class="btn btn-danger" onclick="submitFeedback('fail')">❌ 烧录失败</button>
+          <button class="btn btn-outline" onclick="copyFeedbackReport()">📋 复制报告并发送</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="tab-content" id="tab-reports">
     <div class="card">
       <h3>📋 测试任务</h3>
@@ -573,18 +589,32 @@ function renderTree(){
 }
 
 function renderDashboard(){
+  const verified=FW.filter(v=>v.status==='verified'||v.status==='stable').length;
+  const failed=FW.filter(v=>v.status==='fail').length;
   const pending=FW.filter(v=>v.status==='pending'||v.status==='test').length;
   document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-card"><div class="num" style="color:var(--accent)">${FW.length}</div><div class="label">总版本数</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--green)">${FW.filter(v=>v.status==='verified'||v.status==='stable').length}</div><div class="label">已验证</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--red)">${FW.filter(v=>v.status==='fail').length}</div><div class="label">已失败</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--yellow)">${pending}</div><div class="label">待测试</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--green)">${ISSUES_KNOWLEDGE.length}</div><div class="label">已解决问题</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--text-muted)">${FW.filter(v=>v.category==='baseline').length}</div><div class="label">基线数</div></div>
+    <div class="stat-card" onclick="showTab('experiments')" style="cursor:pointer" title="点击查看全部版本">
+      <div class="num" style="color:var(--accent)">${FW.length}</div><div class="label">总版本数</div>
+    </div>
+    <div class="stat-card" onclick="showTab('baselines')" style="cursor:pointer" title="点击查看已验证基线">
+      <div class="num" style="color:var(--green)">${verified}</div><div class="label">已验证</div>
+    </div>
+    <div class="stat-card" onclick="filterExp('fail');showTab('experiments')" style="cursor:pointer" title="点击查看失败版本">
+      <div class="num" style="color:var(--red)">${failed}</div><div class="label">已失败</div>
+    </div>
+    <div class="stat-card" onclick="filterExp('pending');showTab('experiments')" style="cursor:pointer" title="点击查看待测试版本">
+      <div class="num" style="color:var(--yellow)">${pending}</div><div class="label">待测试</div>
+    </div>
+    <div class="stat-card" onclick="showTab('issues')" style="cursor:pointer" title="点击查看问题库">
+      <div class="num" style="color:var(--green)">${ISSUES_KNOWLEDGE.length}</div><div class="label">已解决问题</div>
+    </div>
+    <div class="stat-card" onclick="showTab('baselines')" style="cursor:pointer" title="点击查看所有基线">
+      <div class="num" style="color:var(--text-muted)">${FW.filter(v=>v.category==='baseline').length}</div><div class="label">基线数</div>
+    </div>
   `;
   const recent=FW.filter(v=>v.date).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,6);
   document.getElementById('recentActivity').innerHTML=recent.map(v=>
-    `<div style="display:flex;align-items:center;gap:8px;padding:2px 0">
+    `<div onclick="selectVer('${v.ver}')" style="display:flex;align-items:center;gap:8px;padding:3px 6px;border-radius:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
       <span class="dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${statusColor(v.status)};flex-shrink:0"></span>
       <strong>${v.ver}</strong>
       <span style="color:var(--text-dim);margin-left:auto">${v.date||''}</span>
@@ -690,13 +720,13 @@ function renderFlash(ver){
   }else{
     pBtn.style.display='none';
   }
-  // 测试反馈卡版本更新
-  document.getElementById('testVerDisplay').textContent=v.ver+' ('+(v.date||'')+')';
-  // 重置 flash 区测试表单
-  ['f-reproduced','f-new','f-solved','f-rollback'].forEach(id=>document.getElementById(id).value='');
-  flashTestFiles=[];
-  const fa=document.querySelector('#testFeedbackCard .upload-area');
-  if(fa)fa.innerHTML='<div class="icon">📷</div><div class="label">点击上传串口日志 / 照片 / 视频</div>';
+  // 反馈按钮：有版本就显示
+  const fBtn=document.getElementById('feedbackBtn');
+  if(v){
+    fBtn.style.display='inline-flex';
+  }else{
+    fBtn.style.display='none';
+  }
   document.getElementById('rollbackVersions').innerHTML=FW.filter(f=>f.status==='verified'||f.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(v=>
     `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:6px 8px;border-radius:6px;transition:all .15s;border-bottom:1px solid rgba(30,41,59,.5)" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
       <div style="display:flex;align-items:center;gap:10px">
@@ -803,34 +833,51 @@ function submitTest(result){
   alert(result==='pass'?'✅ 测试通过已记录':'❌ 测试失败已记录');
 }
 
-// 烧录页测试反馈
-let flashTestFiles=[];
-function handleFlashUpload(input){
-  flashTestFiles=Array.from(input.files);
-  const area=input.parentElement;
-  area.innerHTML=`<div class="icon">✅</div><div class="label">已上传 ${flashTestFiles.length} 个文件</div>`;
-}
-function submitFlashTest(result){
+// ===== 反馈弹窗 =====
+function openFeedback(){
   if(!selectedVer){alert('请先选择版本');return;}
-  const r={ver:selectedVer.ver,result:result,time:new Date().toLocaleString(),note:'',files:flashTestFiles.map(f=>f.name),
-    feedback:{reproduced:document.getElementById('f-reproduced').value,new:document.getElementById('f-new').value,
-      solved:document.getElementById('f-solved').value,rollback:document.getElementById('f-rollback').value}};
+  document.getElementById('fbVer').textContent=selectedVer.ver+' ('+(selectedVer.date||'')+')';
+  // 重置表单
+  ['fb-reproduced','fb-new','fb-solved','fb-rollback','fb-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fb-log').value='';
+  document.getElementById('feedbackModal').classList.add('show');
+}
+function closeFeedback(){
+  document.getElementById('feedbackModal').classList.remove('show');
+}
+function submitFeedback(result){
+  if(!selectedVer){closeFeedback();return;}
+  const log=document.getElementById('fb-log').value;
+  const note=document.getElementById('fb-note').value;
+  const r={ver:selectedVer.ver,result:result,time:new Date().toLocaleString(),note:note||'反馈报告',files:[],
+    log:log?log.slice(0,500):'',
+    feedback:{reproduced:document.getElementById('fb-reproduced').value,new:document.getElementById('fb-new').value,
+      solved:document.getElementById('fb-solved').value,rollback:document.getElementById('fb-rollback').value}};
   TEST_HISTORY.push(r);
   renderTestHistory();
   selectedVer.status=result==='pass'?'verified':'fail';
-  // 重置表单
-  ['f-reproduced','f-new','f-solved','f-rollback'].forEach(id=>document.getElementById(id).value='');
-  flashTestFiles=[];
-  const area=document.querySelector('#testFeedbackCard .upload-area');
-  if(area)area.innerHTML=`<div class="icon">📷</div><div class="label">点击上传串口日志 / 照片 / 视频</div>`;
   render();
+  closeFeedback();
   alert(result==='pass'?'✅ 烧录通过已记录':'❌ 烧录失败已记录');
 }
-function copyFlashReport(){
+function copyFeedbackReport(){
   if(!selectedVer){alert('请先选择版本');return;}
-  const r=TEST_HISTORY.length?TEST_HISTORY[TEST_HISTORY.length-1]:{result:'未提交',note:''};
-  const report=`### 测试结果\n版本：${selectedVer.ver}\n结果：${r.result==='pass'?'✅ 通过':r.result==='fail'?'❌ 失败':'未测试'}\n日期：${selectedVer.date||'无日期'}\n修改：${(selectedVer.changes||[]).join('、')||'无'}\n现象：${document.getElementById('f-reproduced').value||'未填写'}\n是否新问题：${document.getElementById('f-new').value||'未填写'}\n原问题是否解决：${document.getElementById('f-solved').value||'未填写'}\n需要回滚：${document.getElementById('f-rollback').value||'未填写'}\n文件：${r.files?.length?r.files.join(', '):'无'}\n时间：${new Date().toLocaleString()}`;
-  navigator.clipboard.writeText(report).then(()=>{
+  const log=document.getElementById('fb-log').value;
+  const note=document.getElementById('fb-note').value;
+  const repo=`### 烧录测试报告
+版本：${selectedVer.ver} (${selectedVer.date||'无日期'})
+修改：${(selectedVer.changes||[]).join('、')||'无'}
+是否复现：${document.getElementById('fb-reproduced').value||'未填'}
+新问题：${document.getElementById('fb-new').value||'未填'}
+原问题解决：${document.getElementById('fb-solved').value||'未填'}
+需要回滚：${document.getElementById('fb-rollback').value||'未填'}
+备注：${note||'无'}
+串口日志：
+\`\`\`
+${log||'（无日志）'}
+\`\`\`
+报告时间：${new Date().toLocaleString()}`;
+  navigator.clipboard.writeText(repo).then(()=>{
     const btn=event.target;
     const orig=btn.textContent;
     btn.textContent='✅ 已复制';

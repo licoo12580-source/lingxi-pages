@@ -114,11 +114,16 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
-  // ==== v0628-cs-port-r2 (修复TFT_eSPI全局对象在S3上StoreProhibited) ====
-  {ver:"v0628-cs-port-r2", date:"2026-06-28 13:10", type:"testing", tags:["TFT_eSPI","LVGL8.3","bitbang触控","CS移植","指针构造","SPI先于WiFi"], files:{merge:"v0628-cs-port-r2-merged.bin"}, size:"992KB",
-    desc:"🔧 修复StoreProhibited崩溃: TFT_eSPI全局对象改指针(new TFT_eSPI)+去掉额外SPI.begin(让TFT_eSPI自管理)+LCD初始化提前到WiFi之前(避免SPI总线冲突)",
-    changes:"✅ 修复崩溃: TFT_eSPI从全局对象改指针(new TFT_eSPI()在setup中),避免PSRAM S3 static init StoreProhibited\\\n✅ 去掉SPI.begin(20,-1,21,-1)显式初始化,让TFT_eSPI自己管理SPI总线\\\n✅ LCD初始化(LVGL+屏)提前到WiFi/OTA之前,避免SPI总线冲突\\\n✅ 新增启动屏显:Booting...蓝底白字,然后切黑底进入LVGL UI\\\n✅ 基于cs_port已验证架构: TFT_eSPI 2.5.43+LVGL 8.3.9\\\n✅ FT6336U bitbang I2C触控(SDA=35,SCL=36,RST=37)\\n✅ WiFi AP + ArduinoOTA\\\n✅ PSRAM=enable + qio_opi(匹配S3硬件配置)\\\n⚠️ 需验证显示+触摸都正常工作",
-    source:"src/cs_port/main.cpp (r2修复版)"},
+  // ==== v0628-cs-port-minimal (只TFT_eSPI+OTA,无LVGL/触摸,确认屏能不能亮) ====
+  {ver:"v0628-cs-port-minimal", date:"2026-06-28 13:30", type:"testing", tags:["TFT_eSPI","无LVGL","无触摸","最小测试"], files:{merge:"v0628-cs-port-test.bin"}, size:"838KB",
+    desc:"🔧 最小测试: TFT_eSPI纯显示+OTA,无LVGL无触摸无字库. 确认TFT_eSPI+全局对象在PSRAM S3上能不能亮屏",
+    changes:"✅ 纯TFT_eSPI显示: 蓝底白字+Lingxi版本号\\\n✅ WiFi AP + ArduinoOTA\\\n✅ 无LVGL/无触摸/无字库,排除所有干扰\\\n✅ 背光强制HIGH+setRotation(3)\\\n✅ 基于cs_port User_Setup.h(CS=45,DC=47,RST=48,MOSI=21,SCLK=20)\\\n⚠️ 如果这个能亮,问题在LVGL或触摸\\\n⚠️ 如果这个也崩,问题在TFT_eSPI+PSRAM+board配置",
+    source:"test_cs_minimal.cpp"},
+  // ==== v0628-cs-port-r3 (修复qio_opi内存类型引发的崩溃) ====
+  {ver:"v0628-cs-port-r3", date:"2026-06-28 13:32", type:"testing", tags:["TFT_eSPI","LVGL8.3","bitbang触控","CS移植","无qio_opi"], files:{merge:"v0628-cs-port-r3-merged.bin"}, size:"992KB",
+    desc:"🔧 r3: 去掉board_build.arduino.memory_type=qio_opi(TFT_eSPI+PSRAM下可能有冲突)+TFT_eSPI改指针new构造+分区表改industrial(无OTA分区)",
+    changes:"✅ r3: board_build.arduino.memory_type去掉(默认flash_mode=dio,不强制qio_opi)\\\\n✅ r2一样的TFT_eSPI指针构造+去掉额外SPI.begin\\\n✅ 分区表用partitions_industrial.csv(非OTA分区,需全盘烧录)\\\n✅ LCD初始化提前到WiFi之前\\\n✅ 基于cs_port: TFT_eSPI 2.5.43+LVGL 8.3.9+bitbang触控\\\n⚠️ 需全盘烧录(因分区表变更)\\\n⚠️ 如果不行,先退到minimal测试版确认基础能不能亮",
+    source:"src/cs_port/main.cpp (r3)"},
   // ==== v0628-lgfx-r8 (颜色修复: dlen_16bit=true 修复字节序) ====
   {ver:"v0628-lgfx-r8", date:"2026-06-28 12:02", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","dlen_16bit","字节序修复"], files:{merge:"v0628-lgfx-r8-merged.bin"}, size:"1.5MB",
     desc:"修复紫色(字节交换): LovyanGFX设dlen_16bit=true,像素数据以16位字发送而非2个8位字节,避免ESP32-S3 SPI字节序反转",

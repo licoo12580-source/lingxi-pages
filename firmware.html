@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== v0628-lgfx-r8 (颜色修复: dlen_16bit=true 修复字节序) ====
+  {ver:"v0628-lgfx-r8", date:"2026-06-28 12:02", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","dlen_16bit","字节序修复"], files:{merge:"v0628-lgfx-r8-merged.bin"}, size:"1.5MB",
+    desc:"修复紫色(字节交换): LovyanGFX设dlen_16bit=true,像素数据以16位字发送而非2个8位字节,避免ESP32-S3 SPI字节序反转",
+    changes:"✅ dlen_16bit=true: ILI9488像素数据以16位字发送(非2字节拆分)\\n✅ 紫色背景→正确绿色\\n✅ 基于r5(LovyanGFX回退+cfg.invert=false)\\n✅ RST=48+SPI.begin+背光HIGH\\n✅ LVGL9.5中文三页+触摸+OTA+WDT禁用",
+    source:"test_lgfx.cpp v0628-lgfx-r8"},
   // ==== v0628-lgfx-r7 (颜色修复: 0x3A=0x55移至tft.begin()后立即执行) ====
   {ver:"v0628-lgfx-r7", date:"2026-06-28 11:56", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","像素格式0x55","颜色修复v2","MADCTL"], files:{merge:"v0628-lgfx-r7-merged.bin"}, size:"1.5MB",
     desc:"修复颜色错乱v2: 0x3A=0x55(16位色)从LVGL前移到tft.begin()后立即执行,在fillScreen之前设好像素格式",

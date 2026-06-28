@@ -301,6 +301,7 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
         <a class="btn btn-primary" id="downloadBtn" href="#" style="text-decoration:none">⬇ 下载 BIN</a>
         <button class="btn btn-outline" id="previewBtn" onclick="openPreview()" style="display:none">📄 预览代码</button>
         <button class="btn btn-outline" id="feedbackBtn" onclick="openFeedback()" style="display:none">📋 反馈问题</button>
+        <button class="btn btn-success" id="baselineBtn" onclick="openBaselineConfirm()" style="display:none">🏆 标记基线</button>
       </div>
     </div>
     <div class="card">
@@ -380,6 +381,28 @@ Build:Mar 27 2021
       </div>
     </div>
   </div>
+
+  <!-- 基线确认弹窗 -->
+  <div class="modal-overlay" id="baselineModal" onclick="if(event.target===this)closeBaselineConfirm()">
+    <div class="modal" style="max-width:600px">
+      <div class="modal-header">
+        <span class="modal-title">🏆 标记为黄金基线</span>
+        <button class="modal-close" onclick="closeBaselineConfirm()">✕</button>
+      </div>
+      <div class="modal-body" id="baselineBody">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:var(--space-sm)">
+          版本：<strong id="blVer" style="color:var(--text)"></strong>
+        </div>
+        <div class="cmd-box" id="baselineReport" style="font-size:11px;line-height:1.7;margin:var(--space-sm) 0"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:var(--space-sm)">
+          <button class="btn btn-success" onclick="copyBaselineReport()">📋 复制报告</button>
+          <button class="btn btn-primary" onclick="confirmBaseline()">🏆 确认标记</button>
+          <button class="btn btn-outline" onclick="closeBaselineConfirm()">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 知识库 -->
   <div class="tab-content" id="tab-knowledge">
     <div class="card">
@@ -498,18 +521,18 @@ const BASE = location.hostname === 'licoo12580-source.github.io'
   : 'firmware';
 
 function statusColor(s){
-  const m={verified:'var(--green)',stable:'var(--green)',pass:'var(--green)',
+  const m={verified:'var(--green)',stable:'var(--green)',golden:'var(--green)',pass:'var(--green)',
            pending:'var(--yellow)',fail:'var(--red)',test:'var(--orange)',deprecated:'var(--text-dim)'};
   return m[s]||'var(--text-dim)';
 }
 function statusBadge(s){
-  const m={verified:'badge-verified',stable:'badge-stable',pass:'badge-verified',
+  const m={verified:'badge-verified',stable:'badge-stable',golden:'badge-verified',pass:'badge-verified',
            pending:'badge-pending',fail:'badge-fail',test:'badge-test'};
-  const l={verified:'已验证',stable:'已发布',pass:'通过',pending:'待测试',fail:'失败',test:'测试中',deprecated:'已废弃'};
+  const l={verified:'已验证',stable:'已发布',golden:'🏆 黄金基线',pass:'通过',pending:'待测试',fail:'失败',test:'测试中',deprecated:'已废弃'};
   return `<span class="badge ${m[s]||''}">${l[s]||s}</span>`;
 }
 function statusLabel(s){
-  const m={verified:'🟢 已验证',stable:'🟢 已发布',pass:'✅ 通过',pending:'🟡 待测试',fail:'❌ 失败',test:'🧪 测试中',deprecated:'💤 已废弃'};
+  const m={verified:'🟢 已验证',stable:'🟢 已发布',golden:'🏆 黄金基线',pass:'✅ 通过',pending:'🟡 待测试',fail:'❌ 失败',test:'🧪 测试中',deprecated:'💤 已废弃'};
   return m[s]||s;
 }
 
@@ -690,6 +713,13 @@ function renderFlash(ver){
     fBtn.style.display='inline-flex';
   }else{
     fBtn.style.display='none';
+  }
+  // 基线按钮：已验证/稳定的版本才可标记
+  const bBtn=document.getElementById('baselineBtn');
+  if(v&&(v.status==='verified'||v.status==='stable'||v.status==='golden')){
+    bBtn.style.display='inline-flex';
+  }else{
+    bBtn.style.display='none';
   }
   document.getElementById('rollbackVersions').innerHTML=FW.filter(f=>f.status==='verified'||f.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(v=>
     `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:6px 8px;border-radius:6px;transition:all .15s;border-bottom:1px solid rgba(30,41,59,.5)" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
@@ -885,6 +915,58 @@ function copySourceCode(){
     btn.textContent='✅ 已复制';
     setTimeout(()=>btn.textContent=orig,1500);
   });
+}
+
+// ===== 基线确认 =====
+function openBaselineConfirm(){
+  if(!selectedVer){alert('请先选择版本');return;}
+  const v=selectedVer;
+  document.getElementById('blVer').textContent=v.ver+' ('+(v.date||'')+')';
+  const report=`🏆 黄金基线确认报告
+
+## 确认信息
+- **版本**：${v.ver}
+- **日期**：${v.date||'(未记录)'}
+- **状态**：✅ 黄金基线
+- **确认人**：@小虾
+
+## 变更摘要
+${(v.changes||['无记录']).map(c=>'- '+c).join('\\n')}
+
+## 解决问题
+${(v.solves||['无']).map(s=>'- ✅ '+s).join('\\n')}
+
+## 描述
+${v.desc||'无'}
+
+## 操作
+1. 更新 pinmap.md 黄金基线段
+2. 更新 CHANGELOG.md 标记 ✅ 黄金基线
+3. 冻结该版本代码`;
+  document.getElementById('baselineReport').textContent=report;
+  document.getElementById('baselineModal').classList.add('show');
+}
+function closeBaselineConfirm(){
+  document.getElementById('baselineModal').classList.remove('show');
+}
+function copyBaselineReport(){
+  const text=document.getElementById('baselineReport').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=event.target;
+    const orig=btn.textContent;
+    btn.textContent='✅ 已复制';
+    setTimeout(()=>btn.textContent=orig,1500);
+  });
+}
+function confirmBaseline(){
+  if(!selectedVer)return;
+  const v=selectedVer;
+  v.status='golden';
+  v.tag='golden-baseline';
+  document.getElementById('baselineModal').classList.remove('show');
+  render();
+  alert(`✅ ${v.ver} 已标记为黄金基线！\n\n已将状态报告复制到剪贴板。\n请发给 @小回 更新 pinmap.md 和 CHANGELOG.md。`);
+  copyBaselineReport();
 }
 
 render();

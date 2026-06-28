@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== v0628-cs-port-r1 (成熟代码: TFT_eSPI+LVGL8.3+bitbang触控) ====
+  {ver:"v0628-cs-port-r1", date:"2026-06-28 12:40", type:"testing", tags:["TFT_eSPI","LVGL8.3","bitbang触控","CS移植","已验证架构"], files:{merge:"v0628-cs-port-r1-merged.bin"}, size:"994KB",
+    desc:"🧪 cs_port成熟代码完整编译: TFT_eSPI 2.5.43 + LVGL 8.3.9 + bitbang I2C FT6336U触控 + WiFi AP + OTA. 已验证同款硬件N16R8+ILI9488可正常启动. 触摸用GPIO位敲I2C(SDA=35,SCL=36,RST=37),非Wire库,绕过S3硬件I2C bug",
+    changes:"✅ 基于cs_port已验证架构(同款硬件N16R8+ILI9488+FT6336U跑通过)\\\n✅ TFT_eSPI驱动 + ILI9488_DRIVER + SPI.begin(20,-1,21,-1)\\\n✅ LVGL 8.3.9(非9.5,避免API冲突) + 深色主题UI\\\n✅ FT6336U bitbang I2C触控(非Wire库,GPIO位敲更可靠)\\\n✅ 触控坐标映射: x=touch0_y, y=touch0_x(横屏480x320)\\\n✅ WiFi AP + ArduinoOTA\\\n✅ SPI: CS=45,DC=47,RST=48,MOSI=21,SCLK=20,BL=19\\\n✅ 背光强制HIGH + setRotation(3)\\\n✅ PSRAM=disable(减少复杂度和崩溃风险)\\\n✅ Flash:13.2% RAM:39.8% 资源占用低\\\n⚠️ 此版本验证显示+触摸+WiFi/OTA能同时工作",
+    source:"src/cs_port/ (ConstStrings移植)"},
   // ==== v0628-lgfx-r8 (颜色修复: dlen_16bit=true 修复字节序) ====
   {ver:"v0628-lgfx-r8", date:"2026-06-28 12:02", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","dlen_16bit","字节序修复"], files:{merge:"v0628-lgfx-r8-merged.bin"}, size:"1.5MB",
     desc:"修复紫色(字节交换): LovyanGFX设dlen_16bit=true,像素数据以16位字发送而非2个8位字节,避免ESP32-S3 SPI字节序反转",

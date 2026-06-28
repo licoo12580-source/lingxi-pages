@@ -359,11 +359,13 @@ function render(verList) {
     const changesHtml = f.changes ? `<div class="changes">${f.changes}</div>` : '';
     const descHtml = f.desc ? `<span class="desc">${f.desc}</span>` : '';
     
-    // 下载按钮
+const BASE = location.hostname === 'licoo12580-source.github.io' 
+  ? 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware'
+  : 'firmware';
     let actions = '';
-    if (f.files.full) actions += `<a class="btn btn-download" href="firmware/${f.files.full}" download>全盘</a> `;
-    if (f.files.inc) actions += `<a class="btn btn-download" href="firmware/${f.files.inc}" download>增量</a> `;
-    if (f.files.merge) actions += `<a class="btn btn-download" style="background:#8b5cf6" href="firmware/${f.files.merge}" download>合并</a> `;
+    if (f.files.full) actions += `<a class="btn btn-download" href="${BASE}/${f.files.full}" download>全盘</a> `;
+    if (f.files.inc) actions += `<a class="btn btn-download" href="${BASE}/${f.files.inc}" download>增量</a> `;
+    if (f.files.merge) actions += `<a class="btn btn-download" style="background:#8b5cf6" href="${BASE}/${f.files.merge}" download>合并</a> `;
     if (f.source) actions += `<button class="btn btn-small" onclick="openSource('${f.source}')">源码</button>`;
 
     tbody.innerHTML += `<tr class="fw-row" data-type="${f.type}">

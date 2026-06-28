@@ -203,6 +203,18 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
 .badge-stable{background:var(--green-bg);color:var(--green)}
 .badge-test{background:var(--orange);color:#fff;background:rgba(249,115,22,.15);color:var(--orange)}
 
+/* ===== 弹窗 ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:var(--space-md);animation:fadeIn .2s var(--ease)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:var(--space-md);border-bottom:1px solid var(--border)}
+.modal-title{font-size:14px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}
+.modal-close:hover{background:var(--bg-hover);color:var(--text)}
+.modal-body{flex:1;overflow:auto;padding:var(--space-md)}
+.modal-body pre{margin:0;font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;word-break:break-all;color:var(--text)}
+.code-loading{text-align:center;padding:40px 0;color:var(--text-dim);font-size:13px}
+
 /* ===== 响应式 ===== */
 @media(max-width:768px){
   .sidebar{display:none}
@@ -281,17 +293,32 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
   <div class="tab-content" id="tab-flash">
     <div class="card">
       <h2>⚡ 当前版本</h2>
-      <div style="font-size:13px;margin-bottom:var(--space-sm);color:var(--text-muted)" id="flashVer">请从左侧选择版本</div>
+      <div id="flashHeader" style="margin-bottom:var(--space-sm)"></div>
+      <div id="flashChanges" style="font-size:11px;color:var(--text-dim);margin-bottom:var(--space-sm);line-height:1.6;padding:8px 10px;background:var(--bg-card2);border-radius:var(--radius-xs);border:1px solid var(--border)"></div>
       <div class="cmd-box" id="flashCmd"><span class="prompt">$</span> <span class="cmd"># 请先选择版本</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:var(--space-sm)">
         <button class="btn btn-primary" onclick="copyCmd('flashCmd')">📋 复制烧录命令</button>
         <button class="btn btn-outline" onclick="copyCmd('monitorCmd')">📋 串口监视</button>
         <a class="btn btn-primary" id="downloadBtn" href="#" style="text-decoration:none">⬇ 下载 BIN</a>
+        <button class="btn btn-outline" id="previewBtn" onclick="openPreview()" style="display:none">📄 预览代码</button>
       </div>
     </div>
     <div class="card">
       <h2>🔄 回滚列表</h2>
       <div id="rollbackVersions" style="font-size:13px;line-height:2.2"></div>
+    </div>
+  </div>
+
+  <!-- 代码预览弹窗 -->
+  <div class="modal-overlay" id="sourceModal" onclick="if(event.target===this)closePreview()">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="sourceTitle">📄 代码预览</span>
+        <button class="modal-close" onclick="closePreview()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="code-loading" id="sourceContent">⏳ 加载中...</div>
+      </div>
     </div>
   </div>
 
@@ -356,6 +383,7 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
 // =====================================================================
 const FW = [
   {ver:"display-baseline", date:"2026-06-28 14:45", status:"verified", tag:"display-baseline", category:"baseline",
+   source:"display-baseline",
    changes:["cfg.invert=true (v0621N黄金)", "cfg.rgb_order=true (v0621N黄金)", "仅红绿蓝循环"],
    solves:["无（基线验证工程）"],
    knownIssues:["待烧录验证颜色方向"],
@@ -380,6 +408,7 @@ const FW = [
    desc:"🔥 软件I2C触摸基线 · WDT禁用",
    testSteps:["全擦除烧录","测试触摸翻页","观察是否WDT重启","长时间运行≥5分钟"], expected:"触摸可用，不WDT"},
   {ver:"v0626-ui", date:"2026-06-27 01:41", status:"stable", tag:"release-v1", category:"baseline",
+   source:"v0626-ui",
    changes:["board=esp32-s3-devkitc-1+qio_opi", "中文三页UI", "FT6336U修复", "OTA"],
    solves:["PSRAM工bootloader不匹配","中文UI渲染"],
    knownIssues:[], risk:"低",
@@ -418,11 +447,11 @@ const FW = [
   {ver:"v0621X", status:"verified", category:"experiment", changes:["无触摸+自动翻页"], solves:["纯显示验证"], knownIssues:[]},
   {ver:"v0621Y", status:"fail", category:"experiment", changes:["厂家协议触摸"], solves:[""], knownIssues:[""]},
   {ver:"v0622A-mini", status:"verified", category:"experiment", changes:["纯LCD+颜色轮换","无LVGL/PSRAM"], solves:[""], knownIssues:[]},
-  {ver:"v0626-cs-port", status:"fail", category:"experiment", changes:["ConstStrings模板移植"], solves:[""], knownIssues:["SPI空指针"]},
+  {ver:"v0626-cs-port", status:"fail", category:"experiment", source:"v0626-cs-port", changes:["ConstStrings模板移植"], solves:[""], knownIssues:["SPI空指针"]},
   {ver:"v0626-cs-port-r2", status:"fail", category:"experiment", changes:["SPI.begin修复"], solves:["SPI空指针"], knownIssues:[""]},
   {ver:"v0626-cs-port-r3", status:"fail", category:"experiment", changes:["USE_HSPI_PORT"], solves:["PSRAM冲突"], knownIssues:[""]},
   {ver:"v0626-ui-nopsram", status:"verified", category:"experiment", changes:["关闭PSRAM"], solves:["诊断PSRAM→WDT"], knownIssues:["PSRAM关=性能降级"]},
-  {ver:"v0627-lgfx-native", status:"fail", category:"experiment", changes:["LovyanGFX+LVGL9.5"], solves:[""], knownIssues:["SPI3_HOST+FSPI冲突"]},
+  {ver:"v0627-lgfx-native", status:"fail", category:"experiment", source:"v0627-lgfx-native", changes:["LovyanGFX+LVGL9.5"], solves:[""], knownIssues:["SPI3_HOST+FSPI冲突"]},
   {ver:"v0627-lgfx-ota", status:"fail", category:"experiment", changes:["OTA后台任务+TG0/TG1全部WDT禁用"], solves:[""], knownIssues:["LCD_RST值有歧义"]},
   {ver:"v0310A", status:"verified", tag:"old-base", category:"legacy", changes:["ILI9341诊断"], solves:[""], knownIssues:[], desc:"早期3.2寸屏验证基准"},
 ];
@@ -585,20 +614,50 @@ function renderFlash(ver){
   if(!ver)return;
   const v=typeof ver==='string'?FW.find(f=>f.ver===ver):ver;
   if(!v)return;
-  document.getElementById('flashVer').innerHTML=`⚡ <strong>${v.ver}</strong> <span style="color:var(--text-dim)">${v.date||''}</span> ${statusBadge(v.status)}`;
+  document.getElementById('flashHeader').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:18px">⚡</span>
+      <strong style="font-size:15px">${v.ver}</strong>
+      <span style="color:var(--text-dim);font-size:12px">${v.date||'无日期'}</span>
+      ${statusBadge(v.status)}
+      ${v.tag?`<span class="tag" style="background:rgba(59,130,246,.15);color:var(--accent);padding:2px 8px;border-radius:4px;font-size:10px">${v.tag}</span>`:''}
+    </div>
+    ${v.desc?`<div style="font-size:12px;color:var(--text-muted);margin-top:4px">${v.desc}</div>`:''}
+  `;
+  // 变更摘要
+  const changes=(v.changes||[]).map(c=>`<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;background:var(--bg-card2);color:var(--text-muted);border:1px solid var(--border);margin:2px 4px 2px 0">${c}</span>`).join('');
+  const solved=(v.solves||[]).filter(s=>s).map(s=>`<span style="color:var(--green)">✅ ${s}</span>`).join('');
+  document.getElementById('flashChanges').innerHTML=`
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div><span style="color:var(--text-dim)">修改内容：</span><br>${changes||'<span style="color:var(--text-dim)">无记录</span>'}</div>
+      ${solved?`<div><span style="color:var(--text-dim)">解决问题：</span><br>${solved}</div>`:''}
+      ${(v.knownIssues||[]).length?`<div><span style="color:var(--text-dim)">已知问题：</span><br>${v.knownIssues.map(i=>`<span style="color:var(--yellow)">⚠ ${i}</span>`).join('')}</div>`:''}
+      ${v.risk?`<div><span style="color:var(--text-dim)">风险：</span><br>${riskLabel(v.risk)}</div>`:''}
+    </div>
+  `;
   const file=v.files?.merge||v.files?.full||v.files?.inc;
   if(file){
     document.getElementById('flashCmd').innerHTML=`<span class="prompt">$</span> <span class="cmd">esptool --chip esp32s3 write_flash 0x0 ${BASE}/${file}</span>`;
     document.getElementById('downloadBtn').href=`${BASE}/${file}`;
+    document.getElementById('downloadBtn').style.display='inline-flex';
   }else{
     document.getElementById('flashCmd').innerHTML=`<span class="prompt">$</span> <span class="cmd"># 无可用 BIN 文件</span>`;
-    document.getElementById('downloadBtn').href='#';
+    document.getElementById('downloadBtn').style.display='none';
+  }
+  // 预览按钮：有 source 字段才显示
+  const pBtn=document.getElementById('previewBtn');
+  if(v.source){
+    pBtn.style.display='inline-flex';
+    pBtn.dataset.source=v.source;
+  }else{
+    pBtn.style.display='none';
   }
   document.getElementById('rollbackVersions').innerHTML=FW.filter(f=>f.status==='verified'||f.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(v=>
-    `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:3px 8px;border-radius:6px;display:flex;align-items:center;gap:8px;transition:all .15s" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
-      <span>⏪</span>
+    `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:5px 8px;border-radius:6px;display:flex;align-items:center;gap:10px;transition:all .15s" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+      <span style="font-size:14px">⏪</span>
       <strong>${v.tag||v.ver}</strong>
-      <span style="color:var(--text-dim);font-size:11px">${v.date||''}</span>
+      <span style="color:var(--text-dim);font-size:11px;flex:1">${v.date||''}</span>
+      ${v.files?.merge||v.files?.full||v.files?.inc?`<span style="font-size:10px;color:var(--accent)">⬇ BIN</span>`:''}
     </div>`
   ).join('');
 }
@@ -707,6 +766,41 @@ function copyReport(){
 function rollbackLatest(){
   const bl=FW.filter(v=>v.status==='verified'||v.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
   if(bl)selectVer(bl.ver);
+}
+
+function riskLabel(r){
+  const m={低:'🟢 低',中:'🟠 中',高:'🔴 高'};
+  return m[r]||r;
+}
+
+// 代码预览
+function openPreview(){
+  const pBtn=document.getElementById('previewBtn');
+  const src=pBtn.dataset.source;
+  if(!src)return;
+  document.getElementById('sourceTitle').textContent=`📄 ${src}`;
+  document.getElementById('sourceContent').innerHTML='⏳ 加载中...';
+  document.getElementById('sourceModal').classList.add('show');
+  // 尝试多种路径获取源码
+  const paths=[
+    `${BASE}/${src}-source.txt`,
+    `${BASE}/${src}.txt`,
+    `${BASE}/${src.split('/').pop()}`
+  ];
+  let tried=0;
+  function tryPath(i){
+    if(i>=paths.length){
+      document.getElementById('sourceContent').innerHTML='<div style="color:var(--red);padding:40px;font-size:13px">❌ 未找到源码文件</div>';
+      return;
+    }
+    fetch(paths[i]).then(r=>r.ok?r.text():Promise.reject()).then(code=>{
+      document.getElementById('sourceContent').innerHTML=`<pre>${code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`;
+    }).catch(()=>tryPath(i+1));
+  }
+  tryPath(0);
+}
+function closePreview(){
+  document.getElementById('sourceModal').classList.remove('show');
 }
 
 render();

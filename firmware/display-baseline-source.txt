@@ -1,0 +1,23 @@
+#include <Arduino.h>
+#include <LovyanGFX.hpp>
+#include "LGFX_Lingxi.hpp"
+
+LGFX tft;
+
+void setup()
+{
+    tft.init();
+    tft.fillScreen(TFT_RED);
+    delay(3000);
+    tft.fillScreen(TFT_GREEN);
+    delay(3000);
+    tft.fillScreen(TFT_BLUE);
+    delay(3000);
+    tft.setTextColor(TFT_WHITE);
+    tft.setCursor(20, 20);
+    tft.print("LINGXI LCD OK");
+}
+
+void loop()
+{
+}

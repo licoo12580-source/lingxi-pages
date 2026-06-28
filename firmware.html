@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== display-baseline (最小红绿蓝验证, 无LVGL/触摸/OTA) ====
+  {ver:"display-baseline", date:"2026-06-28 14:45", type:"testing", tags:["LovyanGFX","仅LCD","红绿蓝","基线验证"], files:{merge:"display-baseline-merged.bin"}, size:"415KB",
+    desc:"🔥 最小验证工程: 独立工程,不依赖主固件. 红→绿→蓝各3秒循环. 无LVGL/触摸/WiFi/OTA/MQTT/雷达. 引脚: CS=45 DC=47 RST=48 MOSI=21 SCLK=20 BL=19 (仓库源文件一致,【待确认】)",
+    changes:"✅ 纯LovyanGFX驱动(SPI2_HOST,不与PSRAM冲突)\\\n✅ 红3秒→绿3秒→蓝3秒→循环\\\n✅ board=esp32-s3-devkitc-1 + qio_opi + PSRAM enable\\\n✅ 无LVGL/无触摸/无WiFi/无OTA/无MQTT/无雷达\\\n✅ RAM 6.3% Flash 10.8%\\\n⚠️ 引脚来自仓库源文件,【待确认】用户拍原理图后修正\\\n⚠️ 需全盘烧录(industrial分区)",
+    source:"display-baseline/ (独立工程)"},
   // ==== v0628-demo-v2 (bitbang I2C+SPI2_HOST, 启动红色验证屏活着) ====
   {ver:"v0628-demo-v2", date:"2026-06-28 14:20", type:"testing", tags:["LovyanGFX","bitbang触控","SPI2_HOST","无Wire","启动验证"], files:{merge:"v0628-demo-v2-merged.bin"}, size:"412KB",
     desc:"🔧 v2修复: 硬件I2C(Wire)崩溃→bitbang I2C(直接GPIO操作,不依赖I2C外设)+SPI3→SPI2_HOST(不与PSRAM冲突). 启动时先全屏红色再切色块测试",

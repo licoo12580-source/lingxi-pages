@@ -114,11 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
-  // ==== v0628-demo-v1 (LovyanGFX+FT6336U,无LVGL无MQTT无OTA) ====
-  {ver:"v0628-demo-v1", date:"2026-06-28 14:00", type:"testing", tags:["LovyanGFX","FT6336U","无LVGL","颜色诊断","纯色块"], files:{merge:"v0628-demo-v1-merged.bin"}, size:"426KB",
-    desc:"🔥 演示分支首版: 纯LovyanGFX+FT6336U触摸,无LVGL无MQTT无OTA无雷达. 7色块测试+触摸切换像素格式(0x55/0x66/0x77)+切换invert. RAM仅6.2%(20KB)",
-    changes:"✅ 纯LovyanGFX驱动(SPI2_HOST,不与PSRAM冲突)\\\n✅ 7色块测试: 红绿蓝白黄青紫,触摸左半屏切换0x3A,右半屏切换invert\\\n✅ FT6336U触摸(硬件I2C Wire库)\\\n✅ 无LVGL/无MQTT/无OTA/无雷达/无红外/无4G\\\n✅ v0621N颜色基准: invert=true, rgb_order=true, MADCTL=0x08\\\n✅ board: qio_opi + PSRAM enable + partitions_industrial\\\n⚠️ 需全盘烧录(因分区表为industrial,无OTA分区)\\\n⚠️ 先确认哪个像素格式颜色最正常",
-    source:"firmware-demo-screen分支 test_demo.cpp"},
+  // ==== v0628-demo-v2 (bitbang I2C+SPI2_HOST, 启动红色验证屏活着) ====
+  {ver:"v0628-demo-v2", date:"2026-06-28 14:20", type:"testing", tags:["LovyanGFX","bitbang触控","SPI2_HOST","无Wire","启动验证"], files:{merge:"v0628-demo-v2-merged.bin"}, size:"412KB",
+    desc:"🔧 v2修复: 硬件I2C(Wire)崩溃→bitbang I2C(直接GPIO操作,不依赖I2C外设)+SPI3→SPI2_HOST(不与PSRAM冲突). 启动时先全屏红色再切色块测试",
+    changes:"✅ 修复触摸: 放弃Wire库硬件I2C,改用bitbang I2C(GPIO位敲,SDA=35,SCL=36)\\\n✅ 修复显示: SPI3→SPI2_HOST(不与PSRAM的FSPI总线冲突)\\\n✅ 启动验证: 先全屏红色500ms,确认背光和驱动活着,再切黑色显示色块\\\n✅ 无Wire库依赖(板子I2C硬件初始化不会再崩)\\\n✅ 7色块+触摸切换像素格式(0x55/0x66/0x77)+invert\\\n⚠️ 需全盘烧录\\\n⚠️ 触摸ID读出来打印在串口,可以确认触摸通信",
+    source:"firmware-demo-screen分支 test_demo.cpp v2"},
   // ==== v0628-lgfx-r8 (颜色修复: dlen_16bit=true 修复字节序) ====
   {ver:"v0628-lgfx-r8", date:"2026-06-28 12:02", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","dlen_16bit","字节序修复"], files:{merge:"v0628-lgfx-r8-merged.bin"}, size:"1.5MB",
     desc:"修复紫色(字节交换): LovyanGFX设dlen_16bit=true,像素数据以16位字发送而非2个8位字节,避免ESP32-S3 SPI字节序反转",

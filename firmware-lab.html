@@ -4,245 +4,346 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>🔬 灵犀 Firmware Lab · 嵌入式研发控制台</title>
-<script src="https://cdn.tailwindcss.com"></script>
 <style>
-/* ===== 核心主题变量 ===== */
+/* ===== 设计系统（基于 Tasteskill + UI/UX Pro Max + Motion AI Kit） ===== */
 :root {
-  --bg: #0b0e17;
-  --bg2: #111827;
-  --bg3: #1e293b;
-  --border: #1e3a5f;
-  --fg: #e2e8f0;
-  --muted: #64748b;
+  /* 三层深色调色板 */
+  --bg: #080d1a;
+  --bg-card: #0f172a;
+  --bg-card2: #131c31;
+  --bg-elevated: #1a2744;
+  --bg-hover: rgba(59,130,246,.08);
+  --border: #1e293b;
+  --border-light: #334155;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #475569;
+  /* 语义色 */
   --accent: #3b82f6;
+  --accent-glow: rgba(59,130,246,.25);
   --green: #22c55e;
+  --green-bg: rgba(34,197,94,.1);
   --yellow: #eab308;
+  --yellow-bg: rgba(234,179,8,.1);
   --red: #ef4444;
-  --purple: #a855f7;
-  --pink: #ec4899;
+  --red-bg: rgba(239,68,68,.1);
   --orange: #f97316;
+  --purple: #8b5cf6;
+  --purple-bg: rgba(139,92,246,.1);
+  --pink: #ec4899;
+  --cyan: #06b6d4;
+  /* 间距系统 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --pad: 16px;
+  --gap: 12px;
+  /* 几何 */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --shadow: 0 4px 20px rgba(0,0,0,.3);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.2);
+  /* 侧栏 */
   --sidebar-w: 280px;
+  /* 动画 */
+  --ease: cubic-bezier(.4,0,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;overflow:hidden;height:100vh}
-/* ===== 布局 ===== */
-.fw-lab{display:flex;height:100vh}
-/* ===== 侧栏 ===== */
-.sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
-.sidebar-header{padding:16px;border-bottom:1px solid var(--border)}
-.sidebar-header h1{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
-.sidebar-header .sub{font-size:11px;color:var(--muted);margin-top:2px}
-.sidebar-tree{flex:1;overflow-y:auto;padding:8px 0}
-.tree-node{padding:4px 12px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;transition:all .15s;border-left:3px solid transparent}
-.tree-node:hover{background:rgba(59,130,246,.08)}
-.tree-node.active{background:rgba(59,130,246,.12);border-left-color:var(--accent)}
-.tree-node .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.tree-node .tag{padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600;letter-spacing:.3px}
-.tree-node .ver{font-weight:500;white-space:nowrap}
-.tree-node .date{font-size:10px;color:var(--muted);margin-left:auto}
-.tree-group{padding-left:8px}
-.tree-group-label{padding:8px 12px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
-/* ===== 主区域 ===== */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 12px;background:var(--bg2);flex-shrink:0;overflow-x:auto}
-.tab{padding:10px 16px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:all .15s;white-space:nowrap}
-.tab:hover{color:var(--fg)}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-content{flex:1;overflow-y:auto;padding:16px;display:none}
-.tab-content.active{display:block}
-/* ===== 版本详情卡 ===== */
-.detail-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
-.detail-card h2{font-size:14px;font-weight:600;margin-bottom:8px}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.detail-item{font-size:12px}
-.detail-item label{color:var(--muted);display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
-/* ===== 测试任务卡 ===== */
-.test-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
-.test-card h3{font-size:13px;font-weight:600;margin-bottom:8px}
-.test-step{padding:6px 0;font-size:12px;display:flex;align-items:center;gap:8px}
-.test-step .step-num{width:20px;height:20px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
-.test-action-btn{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{filter:brightness(1.1)}
-.btn-success{background:#166534;color:var(--green)}
-.btn-danger{background:#7f1d1d;color:var(--red)}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
-.btn-outline:hover{border-color:var(--accent);color:var(--fg)}
-/* ===== 问题 ===== */
-.issue-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px}
-.issue-card .title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
-.issue-card .meta{font-size:11px;color:var(--muted);margin-top:4px}
-.issue-card .meta span{margin-right:12px}
-/* ===== 历史问题搜索 ===== */
-.search-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;width:100%;color:var(--fg);font-size:13px;margin-bottom:12px;outline:none}
-.search-box:focus{border-color:var(--accent)}
-/* ===== Dashboard 统计 ===== */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
-.stat-card .num{font-size:28px;font-weight:700}
-.stat-card .label{font-size:11px;color:var(--muted);margin-top:2px}
-/* ===== 确认面板 ===== */
-.confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
-.confirm-group{font-size:12px}
-.confirm-group label{font-size:11px;font-weight:500;display:block;margin-bottom:4px}
-.confirm-group select{padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);color:var(--fg);font-size:11px;width:100%;outline:none}
-/* ===== 闪存中心 ===== */
-.cmd-box{background:#000;border:1px solid var(--border);border-radius:6px;padding:10px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:11px;line-height:1.6;overflow-x:auto;margin:6px 0}
-.copy-btn{padding:4px 10px;border:none;border-radius:4px;cursor:pointer;font-size:10px;font-weight:500;background:var(--bg3);color:var(--muted)}
-.copy-btn:hover{background:var(--accent);color:#fff}
-/* ===== 滚回 ===== */
-.rollback-area{background:linear-gradient(135deg,#1e3a5f,#111827);border:1px solid var(--accent);border-radius:10px;padding:14px;margin:12px 0}
-.rollback-area .big-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
-.rollback-area .big-btn:hover{filter:brightness(1.1)}
-/* ===== 折叠 ===== */
-.collapse{overflow:hidden;transition:max-height .3s ease;max-height:0}
-.collapse.open{max-height:2000px}
-/* ===== 上传按钮 ===== */
-.upload-area{border:1px dashed var(--border);border-radius:8px;padding:20px;text-align:center;margin:8px 0;cursor:pointer;transition:all .2s}
-.upload-area:hover{border-color:var(--accent);background:rgba(59,130,246,.05)}
-.upload-area .icon{font-size:24px;margin-bottom:4px}
-.upload-area .label{font-size:11px;color:var(--muted)}
-/* ===== 滚动条 ===== */
-::-webkit-scrollbar{width:6px}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;overflow:hidden;height:100vh;line-height:1.6}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ===== 布局 ===== */
+.fw-lab{display:flex;height:100vh}
+
+/* ===== 侧栏 ===== */
+.sidebar{width:var(--sidebar-w);background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative}
+.sidebar::after{content:'';position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(180deg,var(--accent),transparent);opacity:.3}
+.sidebar-header{padding:var(--space-md) var(--space-md);border-bottom:1px solid var(--border);position:relative}
+.sidebar-header::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}
+.sidebar-header h1{font-size:15px;font-weight:700;display:flex;align-items:center;gap:var(--space-sm);letter-spacing:-.3px}
+.sidebar-header .sub{font-size:10px;color:var(--text-dim);margin-top:2px;line-height:1.4}
+.sidebar-tree{flex:1;overflow-y:auto;padding:var(--space-sm) 0}
+
+/* 版本树分组 */
+.tree-group-label{padding:var(--space-md) var(--space-md) var(--space-xs);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim)}
+.tree-node{position:relative;padding:5px var(--space-md);cursor:pointer;font-size:12px;display:flex;align-items:center;gap:var(--space-sm);transition:all .2s var(--ease);border-left:3px solid transparent;margin:1px 0}
+.tree-node:hover{background:var(--bg-hover);padding-left:calc(var(--space-md) + 4px)}
+.tree-node.active{background:var(--accent-glow);border-left-color:var(--accent)}
+.tree-node.active::after{content:'';position:absolute;right:8px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.tree-node .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .2s var(--ease)}
+.tree-node:hover .dot{transform:scale(1.2)}
+.tree-node .tag{padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;letter-spacing:.3px;background:rgba(59,130,246,.15);color:var(--accent);white-space:nowrap}
+.tree-node .ver{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tree-node .date{font-size:10px;color:var(--text-dim);margin-left:auto;white-space:nowrap}
+
+/* ===== 主区域 ===== */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* 顶栏标签 */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 var(--space-md);background:var(--bg-card);flex-shrink:0;overflow-x:auto}
+.tab{padding:11px 18px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-dim);transition:all .2s var(--ease);white-space:nowrap;position:relative}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.5}
+
+/* 标签内容区 */
+.tab-content{flex:1;overflow-y:auto;padding:var(--space-md);display:none;animation:fadeIn .3s var(--ease)}
+.tab-content.active{display:block}
+
+/* ===== 卡片 ===== */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--space-md);margin-bottom:var(--space-md);transition:all .25s var(--ease);position:relative}
+.card:hover{border-color:var(--border-light);box-shadow:0 4px 24px rgba(0,0,0,.25)}
+.card h2{font-size:14px;font-weight:600;margin-bottom:var(--space-sm);display:flex;align-items:center;gap:var(--space-sm);color:var(--text)}
+.card h3{font-size:13px;font-weight:600;margin-bottom:var(--space-sm);color:var(--text)}
+.card .muted{color:var(--text-dim);font-size:11px}
+.card-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);display:block;margin-bottom:2px}
+
+/* ===== 统计卡片 ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--gap);animation:fadeIn .4s var(--ease)}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--space-md);text-align:center;position:relative;overflow:hidden;transition:all .25s var(--ease);animation:fadeInUp .4s var(--ease) both}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.stat-card:nth-child(1)::before{background:var(--accent)}
+.stat-card:nth-child(2)::before{background:var(--green)}
+.stat-card:nth-child(3)::before{background:var(--red)}
+.stat-card:nth-child(4)::before{background:var(--yellow)}
+.stat-card:nth-child(5)::before{background:var(--green)}
+.stat-card:nth-child(6)::before{background:var(--yellow)}
+.stat-card:nth-child(1){animation-delay:0s}
+.stat-card:nth-child(2){animation-delay:.06s}
+.stat-card:nth-child(3){animation-delay:.12s}
+.stat-card:nth-child(4){animation-delay:.18s}
+.stat-card:nth-child(5){animation-delay:.24s}
+.stat-card:nth-child(6){animation-delay:.3s}
+.stat-card:hover{transform:translateY(-2px);border-color:var(--border-light);box-shadow:var(--shadow-sm)}
+.stat-card .num{font-size:30px;font-weight:700;letter-spacing:-1px;line-height:1.2}
+.stat-card .label{font-size:11px;color:var(--text-dim);margin-top:2px}
+
+/* ===== 问题卡片 ===== */
+.issue-card{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-md);margin-bottom:var(--space-sm);transition:all .2s var(--ease)}
+.issue-card:hover{border-color:var(--border-light)}
+.issue-card .title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.issue-card .meta{font-size:11px;color:var(--text-dim);margin-top:var(--space-xs);display:flex;flex-wrap:wrap;gap:var(--space-sm)}
+.issue-card .meta span{white-space:nowrap}
+.issue-card .meta strong{color:var(--text-muted);font-weight:500}
+
+/* ===== 实验卡片 ===== */
+.exp-card{cursor:pointer;animation:fadeInUp .4s var(--ease) both}
+.exp-card:nth-child(1){animation-delay:0s}
+.exp-card:nth-child(2){animation-delay:.05s}
+.exp-card:nth-child(3){animation-delay:.1s}
+.exp-card:nth-child(4){animation-delay:.15s}
+.exp-card:nth-child(5){animation-delay:.2s}
+
+/* ===== 测试任务 ===== */
+.test-step{padding:var(--space-xs) 0;font-size:12px;display:flex;align-items:center;gap:var(--space-sm)}
+.test-step .step-num{width:22px;height:22px;border-radius:50%;background:var(--bg-card2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;border:1px solid var(--border);color:var(--text-muted)}
+
+/* ===== 按钮 ===== */
+.btn{padding:7px 14px;border:none;border-radius:var(--radius-xs);cursor:pointer;font-size:11px;font-weight:500;transition:all .2s var(--ease);display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 0 0 rgba(59,130,246,0)}
+.btn-primary:hover{background:#2563eb;box-shadow:0 0 20px var(--accent-glow)}
+.btn-success{background:#166534;color:var(--green)}
+.btn-success:hover{background:#15803d}
+.btn-danger{background:#7f1d1d;color:var(--red)}
+.btn-danger:hover{background:#991b1b}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text);background:var(--bg-hover)}
+.btn-sm{padding:4px 10px;font-size:10px}
+
+/* ===== 输入框 ===== */
+.input{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 12px;width:100%;color:var(--text);font-size:13px;outline:none;transition:border .2s var(--ease)}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none;background:var(--bg-card2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23475569'/%3E%3C/svg%3E") no-repeat right 10px center;padding-right:28px}
+
+/* ===== 命令行 ===== */
+.cmd-box{background:#050b15;border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:11px;line-height:1.6;overflow-x:auto;margin:var(--space-xs) 0;color:var(--green);position:relative}
+.cmd-box .prompt{color:var(--text-dim)}
+.cmd-box .cmd{color:var(--green)}
+
+/* ===== 滚回区域 ===== */
+.rollback-area{background:linear-gradient(135deg,var(--bg-elevated),var(--bg-card));border:1px solid var(--accent);border-radius:var(--radius);padding:var(--space-md);margin:var(--space-md) 0;position:relative;overflow:hidden}
+.rollback-area::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--purple),transparent)}
+.rollback-area .big-btn{padding:10px 24px;border:none;border-radius:var(--radius-xs);background:linear-gradient(135deg,var(--accent),#2563eb);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s var(--ease);display:inline-flex;align-items:center;gap:8px;box-shadow:0 0 20px var(--accent-glow)}
+.rollback-area .big-btn:hover{transform:translateY(-1px);box-shadow:0 0 30px var(--accent-glow)}
+.rollback-area .big-btn:active{transform:scale(.98)}
+
+/* ===== 上传区 ===== */
+.upload-area{border:1px dashed var(--border);border-radius:var(--radius-sm);padding:var(--space-lg);text-align:center;cursor:pointer;transition:all .2s var(--ease);margin:var(--space-sm) 0}
+.upload-area:hover{border-color:var(--accent);background:var(--bg-hover)}
+.upload-area .icon{font-size:28px;margin-bottom:var(--space-xs);opacity:.6}
+.upload-area .label{font-size:11px;color:var(--text-dim)}
+
+/* ===== 确认网格 ===== */
+.confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm);margin:var(--space-sm) 0}
+.confirm-group{font-size:12px}
+.confirm-group label{font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)}
+
+/* ===== 筛选按钮 ===== */
+.filter-bar{display:flex;gap:6px;margin-bottom:var(--space-sm);flex-wrap:wrap}
+
+/* ===== 动效 ===== */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+
+/* ===== 徽章 ===== */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500;gap:4px}
+.badge-verified{background:var(--green-bg);color:var(--green)}
+.badge-pending{background:var(--yellow-bg);color:var(--yellow)}
+.badge-fail{background:var(--red-bg);color:var(--red)}
+.badge-stable{background:var(--green-bg);color:var(--green)}
+.badge-test{background:var(--orange);color:#fff;background:rgba(249,115,22,.15);color:var(--orange)}
+
 /* ===== 响应式 ===== */
 @media(max-width:768px){
   .sidebar{display:none}
   .fw-lab{flex-direction:column}
-  .detail-grid,.confirm-grid{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .confirm-grid{grid-template-columns:1fr}
+  .tab{padding:10px 12px;font-size:11px}
 }
 </style>
 </head>
 <body>
 <div class="fw-lab" id="app">
 
-<!-- ====== 左侧：版本树 ====== -->
+<!-- ====== 侧栏 ====== -->
 <aside class="sidebar">
   <div class="sidebar-header">
     <h1>🔬 Firmware Lab</h1>
-    <div class="sub">HW-678A · ESP32-S3 N16R8 · ILI9488</div>
+    <div class="sub">HW-678A · ESP32-S3 N16R8<br>ILI9488 · FT6336U · 16MB Flash</div>
   </div>
-  <div class="sidebar-tree" id="treeView">
-    <!-- 由 JS 渲染 -->
-  </div>
+  <div class="sidebar-tree" id="treeView"></div>
 </aside>
 
 <!-- ====== 主区域 ====== -->
 <div class="main">
-  <!-- 顶栏标签 -->
   <nav class="tabs" id="tabBar">
     <div class="tab active" data-tab="dashboard">📊 总览</div>
     <div class="tab" data-tab="baselines">📌 基线</div>
     <div class="tab" data-tab="experiments">🧪 实验</div>
     <div class="tab" data-tab="issues">🐛 问题库</div>
-    <div class="tab" data-tab="flash">⚡ 烧录中心</div>
-    <div class="tab" data-tab="reports">📋 测试报告</div>
+    <div class="tab" data-tab="flash">⚡ 烧录</div>
+    <div class="tab" data-tab="reports">📋 测试</div>
     <div class="tab" data-tab="knowledge">📖 知识库</div>
   </nav>
 
-  <!-- ====== Dashboard 总览 ====== -->
+  <!-- Dashboard -->
   <div class="tab-content active" id="tab-dashboard">
     <div class="stat-grid" id="statsGrid"></div>
-    <div class="detail-card" style="margin-top:12px">
+    <div class="card" style="margin-top:var(--space-md)">
       <h2>⏱ 最近活动</h2>
-      <div id="recentActivity" style="font-size:12px;line-height:1.8"></div>
+      <div id="recentActivity" style="font-size:12px;line-height:2"></div>
     </div>
   </div>
 
-  <!-- ====== 基线 ====== -->
+  <!-- 基线 -->
   <div class="tab-content" id="tab-baselines">
-    <div class="detail-card">
+    <div class="card">
       <h2>📌 已验证基线</h2>
-      <div id="baselinesList" style="font-size:13px;line-height:2"></div>
+      <div id="baselinesList" style="font-size:13px;line-height:2.2"></div>
     </div>
-    <div class="rollback-area" id="rollbackArea">
-      <div style="font-size:12px;margin-bottom:8px;color:var(--muted)">
-        🔄 如当前固件不亮，一键回滚到最近基线：
+    <div class="rollback-area">
+      <div style="font-size:12px;margin-bottom:var(--space-sm);color:var(--text-muted);line-height:1.5">
+        🔄 当前固件不亮？一键回到最近一个已知正常的基线。
       </div>
       <button class="big-btn" onclick="rollbackLatest()">⏪ 回滚到最新基线</button>
     </div>
   </div>
 
-  <!-- ====== 实验版本 ====== -->
+  <!-- 实验 -->
   <div class="tab-content" id="tab-experiments">
-    <div class="flex gap-2 mb-3 flex-wrap" id="expFilters">
-      <button class="test-action-btn btn-primary" onclick="filterExp('all')" id="ef-all">全部</button>
-      <button class="test-action-btn btn-outline" onclick="filterExp('pending')" id="ef-pending">待测试</button>
-      <button class="test-action-btn btn-outline" onclick="filterExp('pass')" id="ef-pass">通过</button>
-      <button class="test-action-btn btn-outline" onclick="filterExp('fail')" id="ef-fail">失败</button>
+    <div class="filter-bar" id="expFilters">
+      <button class="btn btn-primary btn-sm" onclick="filterExp('all')" id="ef-all">全部</button>
+      <button class="btn btn-outline btn-sm" onclick="filterExp('verified')" id="ef-pass">已通过</button>
+      <button class="btn btn-outline btn-sm" onclick="filterExp('pending')" id="ef-pending">待测试</button>
+      <button class="btn btn-outline btn-sm" onclick="filterExp('fail')" id="ef-fail">已失败</button>
     </div>
     <div id="expList"></div>
   </div>
 
-  <!-- ====== 问题库 ====== -->
+  <!-- 问题库 -->
   <div class="tab-content" id="tab-issues">
-    <input class="search-box" id="issueSearch" placeholder="🔍 搜索已解决问题..." oninput="renderIssues()">
-    <div id="issuesList"></div>
+    <input class="input" id="issueSearch" placeholder="🔍 搜索问题标题 / 原因 / 解决方案..." oninput="renderIssues()">
+    <div style="margin-top:var(--space-sm)" id="issuesList"></div>
   </div>
 
-  <!-- ====== 烧录中心 ====== -->
+  <!-- 烧录 -->
   <div class="tab-content" id="tab-flash">
-    <div class="detail-card">
-      <h2>⚡ 当前版本烧录</h2>
-      <div style="font-size:13px;margin-bottom:8px" id="flashVer">选择左侧版本</div>
-      <div class="cmd-box" id="flashCmd"># 请先选择版本</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
-        <button class="test-action-btn btn-primary" onclick="copyCmd('flashCmd')">📋 复制烧录命令</button>
-        <button class="test-action-btn btn-outline" onclick="copyCmd('monitorCmd')">📋 复制串口命令</button>
-        <a class="test-action-btn btn-primary" style="text-decoration:none" id="downloadBtn" href="#">⬇ 下载 BIN</a>
+    <div class="card">
+      <h2>⚡ 当前版本</h2>
+      <div style="font-size:13px;margin-bottom:var(--space-sm);color:var(--text-muted)" id="flashVer">请从左侧选择版本</div>
+      <div class="cmd-box" id="flashCmd"><span class="prompt">$</span> <span class="cmd"># 请先选择版本</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:var(--space-sm)">
+        <button class="btn btn-primary" onclick="copyCmd('flashCmd')">📋 复制烧录命令</button>
+        <button class="btn btn-outline" onclick="copyCmd('monitorCmd')">📋 串口监视</button>
+        <a class="btn btn-primary" id="downloadBtn" href="#" style="text-decoration:none">⬇ 下载 BIN</a>
       </div>
     </div>
-    <div class="detail-card">
-      <h2>🔄 回滚</h2>
-      <div id="rollbackVersions" style="font-size:13px;line-height:2"></div>
+    <div class="card">
+      <h2>🔄 回滚列表</h2>
+      <div id="rollbackVersions" style="font-size:13px;line-height:2.2"></div>
     </div>
   </div>
 
-  <!-- ====== 测试报告 ====== -->
+  <!-- 测试 -->
   <div class="tab-content" id="tab-reports">
-    <div class="test-card">
+    <div class="card">
       <h3>📋 测试任务</h3>
-      <div id="testSteps" style="font-size:12px;line-height:1.8"></div>
-      <div style="margin-top:10px">
-        <div class="confirm-grid" id="confirmGrid">
-          <div class="confirm-group">
-            <label>是否复现？</label>
-            <select id="q-reproduced"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-          </div>
-          <div class="confirm-group">
-            <label>新问题？</label>
-            <select id="q-new"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-          </div>
-          <div class="confirm-group">
-            <label>是否解决原问题？</label>
-            <select id="q-solved"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-          </div>
-          <div class="confirm-group">
-            <label>需要回滚？</label>
-            <select id="q-rollback"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-          </div>
+      <div id="testSteps" style="font-size:12px;line-height:1.8;margin-bottom:var(--space-sm)"></div>
+      <div class="confirm-grid" id="confirmGrid">
+        <div class="confirm-group">
+          <label>是否复现？</label>
+          <select class="input" id="q-reproduced"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
         </div>
-        <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
-          <div class="icon">📷</div>
-          <div class="label">点击上传串口日志 / 照片 / 视频</div>
-          <input type="file" id="fileUpload" multiple accept="image/*,.txt,.log,.csv" style="display:none" onchange="handleUpload(this)">
+        <div class="confirm-group">
+          <label>新问题？</label>
+          <select class="input" id="q-new"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
         </div>
-        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-          <button class="test-action-btn btn-success" onclick="submitTest('pass')">✅ 测试通过</button>
-          <button class="test-action-btn btn-danger" onclick="submitTest('fail')">❌ 测试失败</button>
-          <button class="test-action-btn btn-outline" onclick="copyReport()">📋 复制测试报告</button>
+        <div class="confirm-group">
+          <label>原问题是否解决？</label>
+          <select class="input" id="q-solved"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
+        </div>
+        <div class="confirm-group">
+          <label>需要回滚？</label>
+          <select class="input" id="q-rollback"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
         </div>
       </div>
+      <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
+        <div class="icon">📷</div>
+        <div class="label">点击上传串口日志 / 照片 / 视频</div>
+        <input type="file" id="fileUpload" multiple accept="image/*,.txt,.log,.csv" style="display:none" onchange="handleUpload(this)">
+      </div>
+      <div style="display:flex;gap:6px;margin-top:var(--space-sm);flex-wrap:wrap">
+        <button class="btn btn-success" onclick="submitTest('pass')">✅ 测试通过</button>
+        <button class="btn btn-danger" onclick="submitTest('fail')">❌ 测试失败</button>
+        <button class="btn btn-outline" onclick="copyReport()">📋 复制报告</button>
+      </div>
     </div>
-    <div id="testHistory" style="margin-top:12px"></div>
+    <div class="card">
+      <h2>📋 测试历史</h2>
+      <div id="testHistory"></div>
+    </div>
   </div>
 
-  <!-- ====== 知识库 ====== -->
+  <!-- 知识库 -->
   <div class="tab-content" id="tab-knowledge">
-    <div class="detail-card">
-      <h2>📖 已解决问题知识库</h2>
-      <div id="knowledgeBase" style="font-size:12px;line-height:1.8"></div>
+    <div class="card">
+      <h2>📖 已解决问题档案</h2>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:var(--space-md)">
+        共 <span id="kbCount" style="color:var(--green);font-weight:600">0</span> 个已解决问题。
+        下次 AI 让你试已经试过的方案——直接拒绝。
+      </p>
+      <div id="knowledgeBase"></div>
     </div>
   </div>
 </div>
@@ -251,554 +352,363 @@ body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sa
 
 <script>
 // =====================================================================
-// 数据模型
+// 数据 — 全部版本
 // =====================================================================
-const BASELINES = [
-  // { tag, ver, desc, config }
-];
-const VERSION_TREE = []; // 树形结构
-const ALL_VERSIONS = []; // 全部版本扁平列表
-const ISSUES_DB = [];    // 问题库
-const TEST_HISTORY = []; // 测试历史
-
-// 当前选中版本
-let selectedVer = null;
-let testFiles = [];
-
-// =====================================================================
-// 从现有 FW 数据初始化
-// =====================================================================
-// 现有版本数据 (从旧 firmware.html 移植，去重+结构化)
 const FW = [
-  // ==== display-baseline ====
-  {ver:"display-baseline", date:"2026-06-28 14:45", status:"verified", tag:"display-baseline", 
-   parent:"baseline", category:"baseline",
+  {ver:"display-baseline", date:"2026-06-28 14:45", status:"verified", tag:"display-baseline", category:"baseline",
    changes:["cfg.invert=true (v0621N黄金)", "cfg.rgb_order=true (v0621N黄金)", "仅红绿蓝循环"],
    solves:["无（基线验证工程）"],
    knownIssues:["待烧录验证颜色方向"],
    risk:"低",
    env:{board:"esp32-s3-devkitc-1",platform:"espressif32",framework:"arduino",lgfx:"1.2.24"},
    files:{merge:"display-baseline-merged.bin"},
-   desc:"最小验证工程 · 红→绿→蓝→白字，无其他",
+   desc:"最小验证工程 · 红→绿→蓝→白字",
    testSteps:["全擦除烧录","重启观察红屏3秒","观察绿屏3秒","观察蓝屏3秒","确认白字 LINGXI LCD OK"],
    expected:"红→绿→蓝→白字，颜色方向正确"},
-  // ==== Baselines ====
-  {ver:"v0621N", date:"2026-06-21 03:33", status:"verified", tag:"display-baseline-golden",
-   parent:"baseline", category:"baseline",
+  {ver:"v0621N", date:"2026-06-21 03:33", status:"verified", tag:"display-baseline-golden", category:"baseline",
    changes:["MADCTL=0x08", "cfg.invert=true", "cfg.rgb_order=true"],
    solves:["颜色方向错误"],
-   knownIssues:[],
-   risk:"低",
+   knownIssues:[], risk:"低",
    files:{inc:"v0621N-lingxi-ui.bin"},
    desc:"✅ 黄金基线 · 用户确认\"所有全对了\"",
    testSteps:["全擦除烧录","观察颜色方向","确认触摸可用"], expected:"颜色方向正确"},
-  {ver:"v0621Z", date:"2026-06-21", status:"verified", tag:"touch-baseline",
-   parent:"v0621N", category:"baseline",
+  {ver:"v0621Z", date:"2026-06-21", status:"verified", tag:"touch-baseline", category:"baseline",
    changes:["软件I2C bitbang触摸", "TG1WDT禁用"],
    solves:["触摸初始化崩溃","WDT复位"],
-   knownIssues:["PSRAM下偶发不稳定"],
-   risk:"中",
+   knownIssues:["PSRAM下偶发不稳定"], risk:"中",
    files:{full:"v0621Z-lingxi-ui-full.bin"},
    desc:"🔥 软件I2C触摸基线 · WDT禁用",
-   testSteps:["全擦除烧录","测试触摸翻页","观察是否WDT重启","测试长时间运行(5分钟以上)"], expected:"触摸可用，不WDT"},
-  {ver:"v0626-ui", date:"2026-06-27 01:41", status:"stable", tag:"release-v1",
-   parent:"v0621Z", category:"baseline",
+   testSteps:["全擦除烧录","测试触摸翻页","观察是否WDT重启","长时间运行≥5分钟"], expected:"触摸可用，不WDT"},
+  {ver:"v0626-ui", date:"2026-06-27 01:41", status:"stable", tag:"release-v1", category:"baseline",
    changes:["board=esp32-s3-devkitc-1+qio_opi", "中文三页UI", "FT6336U修复", "OTA"],
    solves:["PSRAM工bootloader不匹配","中文UI渲染"],
-   knownIssues:[],
-   risk:"低",
+   knownIssues:[], risk:"低",
    files:{full:"v0626-ui.bin",merge:"v0626-ui-merged.bin"},
    desc:"🎯 首个验证通过的可发布固件",
-   testSteps:["全擦除烧录","检查中文UI三页(节能/感知/系统)","触摸翻页","OTA升级"], expected:"中文UI+触摸+OTA正常"},
-  // ==== Experiments (测试版) ====
-  {ver:"v0628-lgfx", date:"2026-06-28 10:56", status:"fail", tag:"experiment",
-   parent:"v0626-ui", category:"experiment",
-   changes:["LovyanGFX+LVDL9.5", "I2C超时50ms→10ms"],
-   solves:["尝试解决I2C卡死"],
-   knownIssues:["紫色底色"],
-   risk:"中",
-   files:{merge:"v0628-lgfx-merged.bin"}},
-  {ver:"v0628-lgfx-r2", date:"2026-06-28 11:08", status:"fail", tag:"experiment",
-   parent:"v0628-lgfx", category:"experiment",
-   changes:["SPI.begin(20,-1,21,-1)", "背光GPIO HIGH", "LCD_RST=48"],
-   solves:["屏全黑"],
-   knownIssues:["颜色仍然不对"],
-   risk:"低",
-   files:{merge:"v0628-lgfx-r2-merged.bin"}},
-  {ver:"v0628-lgfx-r3", date:"2026-06-28 11:23", status:"fail", tag:"experiment",
-   parent:"v0628-lgfx-r2", category:"experiment",
-   changes:["LovyanGFX→TFT_eSPI"],
-   solves:["尝试换驱动修复颜色"],
-   knownIssues:["TFT_eSPI全局构造崩溃"],
-   risk:"高",
-   files:{merge:"v0628-lgfx-r3-merged.bin"}},
-  {ver:"v0628-lgfx-r4", date:"2026-06-28 11:32", status:"fail", tag:"experiment",
-   parent:"v0628-lgfx-r3", category:"experiment",
-   changes:["TFT_eSPI指针构造","去重#include <SPI.h>"],
-   solves:["StoreProhibited崩溃"],
-   knownIssues:["全局构造仍不稳定"],
-   risk:"中",
-   files:{merge:"v0628-lgfx-r4-merged.bin"}},
-  {ver:"v0628-lgfx-r5", date:"2026-06-28 11:44", status:"fail", tag:"experiment",
-   parent:"v0628-lgfx-r4", category:"experiment",
-   changes:["回退到LovyanGFX","去掉factory_init","cfg.invert=false"],
-   solves:["TFT_eSPI崩溃→回退"],
-   knownIssues:["颜色不对（rgb_order未设）"],
-   risk:"低",
-   files:{merge:"v0628-lgfx-r5-merged.bin"}},
-  {ver:"v0628-lgfx-r6", date:"2026-06-28 11:53", status:"fail", tag:"experiment",
-   parent:"v0628-lgfx-r5", category:"experiment",
-   changes:["加0x3A=0x55像素格式"],
-   solves:["紫色底色"],
-   knownIssues:["0x3A时序需在fillScreen前执行"],
-   risk:"低",
-   files:{merge:"v0628-lgfx-r6-merged.bin"}},
-  {ver:"v0628-lgfx-r7", date:"2026-06-28 11:56", status:"fail", tag:"experiment",
-   parent:"v0628-lgfx-r6", category:"experiment",
-   changes:["0x3A移至tft.begin后立即执行","MADCTL=0x08"],
-   solves:["颜色错乱v2"],
-   knownIssues:["紫底仍存"],
-   risk:"低",
-   files:{merge:"v0628-lgfx-r7-merged.bin"}},
-  {ver:"v0628-lgfx-r8", date:"2026-06-28 12:02", status:"fail", tag:"experiment",
-   parent:"v0628-lgfx-r7", category:"experiment",
-   changes:["dlen_16bit=true"],
-   solves:["ESP32-S3 SPI字节序反转"],
-   knownIssues:["需确认"],
-   risk:"低",
-   files:{merge:"v0628-lgfx-r8-merged.bin"}},
-  {ver:"v0628-demo-v2", date:"2026-06-28 14:20", status:"pending", tag:"experiment",
-   parent:"v0628-lgfx-r8", category:"experiment",
-   changes:["bitbang I2C触摸","SPI2_HOST"],
-   solves:["Wire库I2C崩溃→bitbang"],
-   knownIssues:["待测试"],
-   risk:"中",
-   files:{merge:"v0628-demo-v2-merged.bin"}},
-  // ==== 早期 ====
-  {ver:"v0621L", status:"fail", tag:"experiment", category:"experiment",
-   changes:["恢复厂家初始化序列","像素格式0x55"], solves:[""],
-   knownIssues:["颜色颠倒(用户反馈)"]},
-  {ver:"v0621M", status:"fail", tag:"experiment", category:"experiment",
-   changes:["MADCTL=0x88"], solves:[""],
-   knownIssues:["上下左右颠倒"]},
-  {ver:"v0621O", status:"fail", tag:"experiment", category:"experiment",
-   changes:["setRotation API替换"], solves:[""],
-   knownIssues:["颜色仍有问题"]},
-  {ver:"v0621P", status:"verified", tag:"experiment", category:"experiment",
-   changes:["英文三页ENERGY/SENSE/SETUP"], solves:[""],
-   knownIssues:[]},
-  {ver:"v0621Q", status:"verified", category:"experiment",
-   changes:["中文三页+20px字库"], solves:[""],
-   knownIssues:[]},
-  {ver:"v0621R", status:"fail", category:"experiment",
-   changes:["PSRAM开启"], solves:[""],
-   knownIssues:["TG1WDT触发"]},
-  {ver:"v0621S", status:"fail", category:"experiment",
-   changes:["I2C超时+WDT禁用"], solves:[""],
-   knownIssues:["I2C初始化卡死"]},
-  {ver:"v0621T", status:"fail", category:"experiment",
-   changes:["统一版本号+触摸降级"], solves:[""],
-   knownIssues:["SPI3_HOST冲突"]},
-  {ver:"v0621U", status:"fail", category:"experiment",
-   changes:["SPI2_HOST"], solves:["SPI3冲突"],
-   knownIssues:["TG1WDT写禁未生效"]},
-  {ver:"v0621V", status:"fail", category:"experiment",
-   changes:["TG1WDT喂狗"], solves:["尝试"],
-   knownIssues:["仍需手动喂狗"]},
-  {ver:"v0621W", status:"fail", category:"experiment",
-   changes:["触摸RST时序修正"], solves:[""],
-   knownIssues:[""]},
-  {ver:"v0621X", status:"verified", category:"experiment",
-   changes:["无触摸+自动翻页"], solves:["纯显示验证"],
-   knownIssues:[]},
-  {ver:"v0621Y", status:"fail", category:"experiment",
-   changes:["厂家协议触摸"], solves:[""],
-   knownIssues:[""]},
-  {ver:"v0622A-mini", status:"verified", category:"experiment",
-   changes:["纯LCD+颜色轮换","无LVGL/PSRAM"], solves:[""],
-   knownIssues:[]},
-  {ver:"v0626-cs-port", status:"fail", category:"experiment",
-   changes:["ConstStrings模板移植"], solves:[""],
-   knownIssues:["SPI空指针"]},
-  {ver:"v0626-cs-port-r2", status:"fail", category:"experiment",
-   changes:["SPI.begin修复"], solves:["SPI空指针"],
-   knownIssues:[""]},
-  {ver:"v0626-cs-port-r3", status:"fail", category:"experiment",
-   changes:["USE_HSPI_PORT"], solves:["PSRAM冲突"],
-   knownIssues:[""]},
-  {ver:"v0626-ui-nopsram", status:"verified", category:"experiment",
-   changes:["关闭PSRAM"], solves:["诊断PSRAM→WDT"],
-   knownIssues:["PSRAM关=性能降级"]},
-  {ver:"v0627-lgfx-native", status:"fail", category:"experiment",
-   changes:["LovyanGFX+LVGL9.5"], solves:[""],
-   knownIssues:["SPI3_HOST+FSPI冲突"]},
-  {ver:"v0627-lgfx-ota", status:"fail", category:"experiment",
-   changes:["OTA后台任务+TG0/TG1全部WDT禁用"], solves:[""],
-   knownIssues:["LCD_RST值有歧义"]},
-  {ver:"v0310A", status:"verified", tag:"old-base", category:"legacy",
-   changes:["ILI9341诊断"], solves:[""], knownIssues:[],
-   desc:"早期3.2寸屏验证基准"},
+   testSteps:["全擦除烧录","检查中文UI三页","触摸翻页","OTA升级"], expected:"中文UI+触摸+OTA正常"},
+  {ver:"v0628-lgfx", date:"2026-06-28 10:56", status:"fail", category:"experiment",
+   changes:["LovyanGFX+LVGL9.5", "I2C超时50ms→10ms"], solves:["尝试解决I2C卡死"], knownIssues:["紫色底色"], risk:"中", files:{merge:"v0628-lgfx-merged.bin"}},
+  {ver:"v0628-lgfx-r2", date:"2026-06-28 11:08", status:"fail", category:"experiment",
+   changes:["SPI.begin(20,-1,21,-1)", "背光GPIO HIGH", "LCD_RST=48"], solves:["屏全黑"], knownIssues:["颜色仍然不对"], risk:"低", files:{merge:"v0628-lgfx-r2-merged.bin"}},
+  {ver:"v0628-lgfx-r3", date:"2026-06-28 11:23", status:"fail", category:"experiment",
+   changes:["LovyanGFX→TFT_eSPI"], solves:["尝试换驱动修复颜色"], knownIssues:["TFT_eSPI全局构造崩溃"], risk:"高", files:{merge:"v0628-lgfx-r3-merged.bin"}},
+  {ver:"v0628-lgfx-r4", date:"2026-06-28 11:32", status:"fail", category:"experiment",
+   changes:["TFT_eSPI指针构造","去重#include <SPI.h>"], solves:["StoreProhibited崩溃"], knownIssues:["全局构造仍不稳定"], risk:"中", files:{merge:"v0628-lgfx-r4-merged.bin"}},
+  {ver:"v0628-lgfx-r5", date:"2026-06-28 11:44", status:"fail", category:"experiment",
+   changes:["回退到LovyanGFX","去掉factory_init","cfg.invert=false"], solves:["TFT_eSPI崩溃→回退"], knownIssues:["颜色不对（rgb_order未设）"], risk:"低", files:{merge:"v0628-lgfx-r5-merged.bin"}},
+  {ver:"v0628-lgfx-r6", date:"2026-06-28 11:53", status:"fail", category:"experiment",
+   changes:["加0x3A=0x55像素格式"], solves:["紫色底色"], knownIssues:["0x3A时序需在fillScreen前执行"], risk:"低", files:{merge:"v0628-lgfx-r6-merged.bin"}},
+  {ver:"v0628-lgfx-r7", date:"2026-06-28 11:56", status:"fail", category:"experiment",
+   changes:["0x3A移至tft.begin后立即执行","MADCTL=0x08"], solves:["颜色错乱v2"], knownIssues:["紫底仍存"], risk:"低", files:{merge:"v0628-lgfx-r7-merged.bin"}},
+  {ver:"v0628-lgfx-r8", date:"2026-06-28 12:02", status:"fail", category:"experiment",
+   changes:["dlen_16bit=true"], solves:["ESP32-S3 SPI字节序反转"], knownIssues:["需确认"], risk:"低", files:{merge:"v0628-lgfx-r8-merged.bin"}},
+  {ver:"v0628-demo-v2", date:"2026-06-28 14:20", status:"pending", category:"experiment",
+   changes:["bitbang I2C触摸","SPI2_HOST"], solves:["Wire库I2C崩溃→bitbang"], knownIssues:["待测试"], risk:"中", files:{merge:"v0628-demo-v2-merged.bin"}},
+  {ver:"v0621L", status:"fail", category:"experiment", changes:["恢复厂家初始化序列","像素格式0x55"], solves:[""], knownIssues:["颜色颠倒(用户反馈)"]},
+  {ver:"v0621M", status:"fail", category:"experiment", changes:["MADCTL=0x88"], solves:[""], knownIssues:["上下左右颠倒"]},
+  {ver:"v0621O", status:"fail", category:"experiment", changes:["setRotation API替换"], solves:[""], knownIssues:["颜色仍有问题"]},
+  {ver:"v0621P", status:"verified", category:"experiment", changes:["英文三页ENERGY/SENSE/SETUP"], solves:[""], knownIssues:[]},
+  {ver:"v0621Q", status:"verified", category:"experiment", changes:["中文三页+20px字库"], solves:[""], knownIssues:[]},
+  {ver:"v0621R", status:"fail", category:"experiment", changes:["PSRAM开启"], solves:[""], knownIssues:["TG1WDT触发"]},
+  {ver:"v0621S", status:"fail", category:"experiment", changes:["I2C超时+WDT禁用"], solves:[""], knownIssues:["I2C初始化卡死"]},
+  {ver:"v0621T", status:"fail", category:"experiment", changes:["统一版本号+触摸降级"], solves:[""], knownIssues:["SPI3_HOST冲突"]},
+  {ver:"v0621U", status:"fail", category:"experiment", changes:["SPI2_HOST"], solves:["SPI3冲突"], knownIssues:["TG1WDT写禁未生效"]},
+  {ver:"v0621V", status:"fail", category:"experiment", changes:["TG1WDT喂狗"], solves:["尝试"], knownIssues:["仍需手动喂狗"]},
+  {ver:"v0621W", status:"fail", category:"experiment", changes:["触摸RST时序修正"], solves:[""], knownIssues:[""]},
+  {ver:"v0621X", status:"verified", category:"experiment", changes:["无触摸+自动翻页"], solves:["纯显示验证"], knownIssues:[]},
+  {ver:"v0621Y", status:"fail", category:"experiment", changes:["厂家协议触摸"], solves:[""], knownIssues:[""]},
+  {ver:"v0622A-mini", status:"verified", category:"experiment", changes:["纯LCD+颜色轮换","无LVGL/PSRAM"], solves:[""], knownIssues:[]},
+  {ver:"v0626-cs-port", status:"fail", category:"experiment", changes:["ConstStrings模板移植"], solves:[""], knownIssues:["SPI空指针"]},
+  {ver:"v0626-cs-port-r2", status:"fail", category:"experiment", changes:["SPI.begin修复"], solves:["SPI空指针"], knownIssues:[""]},
+  {ver:"v0626-cs-port-r3", status:"fail", category:"experiment", changes:["USE_HSPI_PORT"], solves:["PSRAM冲突"], knownIssues:[""]},
+  {ver:"v0626-ui-nopsram", status:"verified", category:"experiment", changes:["关闭PSRAM"], solves:["诊断PSRAM→WDT"], knownIssues:["PSRAM关=性能降级"]},
+  {ver:"v0627-lgfx-native", status:"fail", category:"experiment", changes:["LovyanGFX+LVGL9.5"], solves:[""], knownIssues:["SPI3_HOST+FSPI冲突"]},
+  {ver:"v0627-lgfx-ota", status:"fail", category:"experiment", changes:["OTA后台任务+TG0/TG1全部WDT禁用"], solves:[""], knownIssues:["LCD_RST值有歧义"]},
+  {ver:"v0310A", status:"verified", tag:"old-base", category:"legacy", changes:["ILI9341诊断"], solves:[""], knownIssues:[], desc:"早期3.2寸屏验证基准"},
 ];
 
 // 问题知识库
 const ISSUES_KNOWLEDGE = [
-  {id:1,title:"TG1WDT循环复位",cause:"I2C阻塞导致WDT超时未喂",solution:"构造函数级WDT禁用(0x50D83AA1解锁)+qio_opi",resolvedIn:"v0621Z",status:"resolved"},
-  {id:2,title:"ILI9488颜色紫色/颠倒",cause:"ESP32-S3 SPI字节序反转(RGB→BGR需swap)",solution:"dlen_16bit=true(16位字模式)或cfg.rgb_order=true",resolvedIn:"v0628-lgfx-r8",status:"resolved"},
-  {id:3,title:"TFT_eSPI StoreProhibited",cause:"PSRAM+S3上全局对象静态初始化崩溃",solution:"放弃TFT_eSPI，改用LovyanGFX(Panel_ILI9488)",resolvedIn:"v0628-lgfx-r5",status:"resolved"},
-  {id:4,title:"屏幕全黑(背光不亮)",cause:"LCD_RST引脚值错误(GPIO4→48)",solution:"按cs_port源文件配置RST=48",resolvedIn:"v0628-lgfx-r2",status:"resolved"},
-  {id:5,title:"屏幕全黑(SPI未初始化)",cause:"ESP32-S3上隐式SPI init不可靠",solution:"tft.begin前显式SPI.begin(20,-1,21,-1)",resolvedIn:"v0628-lgfx-r2",status:"resolved"},
-  {id:6,title:"PSRAM导致TG1WDT",cause:"PSRAM初始化超时(>812ms)",solution:"qio_opi memory_type编译正确bootloader",resolvedIn:"v0626-ui",status:"resolved"},
-  {id:7,title:"I2C硬件初始化崩溃(Wire)",cause:"ESP32-S3 I2C外设初始化失败(PSRAM占用FSPI冲突)",solution:"软件bitbang I2C(纯GPIO位敲)",resolvedIn:"v0621Z",status:"resolved"},
-  {id:8,title:"SPI空指针崩溃",cause:"PSRAM占FSPI总线,SPI3_HOST不可用",solution:"SPI2_HOST代替SPI3_HOST",resolvedIn:"v0621U",status:"resolved"},
-  {id:9,title:"0x3A像素格式时序",cause:"0x3A=0x55需在fillScreen之前设置",solution:"tft.begin后紧跟着写0x3A=0x55",resolvedIn:"v0628-lgfx-r7",status:"resolved"},
-  {id:10,title:"v0621Z+新芯片颜色错乱",cause:"LovyanGFX默认配置与ILI9488硬件不匹配",solution:"cfg.invert=true+cfg.rgb_order=true+MADCTL=0x08",resolvedIn:"v0621N",status:"resolved"},
-  {id:11,title:"颜色颠倒(用户反馈v0621L)",cause:"厂家初始化序列覆盖了LovyanGFX启动的默认值",solution:"去掉自定义factory_init，用LGFX内置init",resolvedIn:"v0628-lgfx-r5",status:"resolved"},
+  {id:1,title:"TG1WDT循环复位",cause:"I2C阻塞导致WDT超时未喂",solution:"构造函数级WDT禁用(0x50D83AA1解锁)+qio_opi",resolvedIn:"v0621Z"},
+  {id:2,title:"ILI9488颜色紫色/颠倒",cause:"ESP32-S3 SPI字节序反转(RGB→BGR需swap)",solution:"dlen_16bit=true(16位字模式)或cfg.rgb_order=true",resolvedIn:"v0628-lgfx-r8"},
+  {id:3,title:"TFT_eSPI StoreProhibited",cause:"PSRAM+S3上全局对象静态初始化崩溃",solution:"放弃TFT_eSPI，改用LovyanGFX(Panel_ILI9488)",resolvedIn:"v0628-lgfx-r5"},
+  {id:4,title:"屏幕全黑(背光不亮)",cause:"LCD_RST引脚值错误(GPIO4→48)",solution:"按源文件配置RST=48",resolvedIn:"v0628-lgfx-r2"},
+  {id:5,title:"屏幕全黑(SPI未初始化)",cause:"ESP32-S3上隐式SPI init不可靠",solution:"tft.begin前显式SPI.begin(20,-1,21,-1)",resolvedIn:"v0628-lgfx-r2"},
+  {id:6,title:"PSRAM导致TG1WDT",cause:"PSRAM初始化超时(>812ms)",solution:"qio_opi memory_type编译正确bootloader",resolvedIn:"v0626-ui"},
+  {id:7,title:"I2C硬件初始化崩溃(Wire)",cause:"ESP32-S3 I2C外设初始化失败(PSRAM占用FSPI冲突)",solution:"软件bitbang I2C(纯GPIO位敲)",resolvedIn:"v0621Z"},
+  {id:8,title:"SPI空指针崩溃",cause:"PSRAM占FSPI总线,SPI3_HOST不可用",solution:"SPI2_HOST代替SPI3_HOST",resolvedIn:"v0621U"},
+  {id:9,title:"0x3A像素格式时序",cause:"0x3A=0x55需在fillScreen之前设置",solution:"tft.begin后紧跟着写0x3A=0x55",resolvedIn:"v0628-lgfx-r7"},
+  {id:10,title:"v0621Z+新芯片颜色错乱",cause:"LovyanGFX默认配置与ILI9488硬件不匹配",solution:"cfg.invert=true+cfg.rgb_order=true+MADCTL=0x08",resolvedIn:"v0621N"},
+  {id:11,title:"颜色颠倒(用户反馈v0621L)",cause:"厂家初始化序列覆盖了LovyanGFX启动的默认值",solution:"去掉自定义factory_init，用LGFX内置init",resolvedIn:"v0628-lgfx-r5"},
 ];
 
-// =====================================================================
-// 构建版本树
-// =====================================================================
-function buildTreeData() {
-  // 按类别分组
-  const groups = {
-    baseline: [],
-    experiment: [],
-    legacy: []
-  };
-  for (const f of FW) {
-    if (!groups[f.category]) groups[f.category] = [];
-    groups[f.category].push(f);
-  }
-  return groups;
-}
+const TEST_HISTORY = [];
+let selectedVer = null;
+let testFiles = [];
 
-// =====================================================================
-// 渲染
-// =====================================================================
-const BASE = location.hostname === 'licoo12580-source.github.io' 
+const BASE = location.hostname === 'licoo12580-source.github.io'
   ? 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware'
   : 'firmware';
 
-// 状态颜色
-function statusColor(s) {
-  const m = {verified:'var(--green)', stable:'var(--green)', pass:'var(--green)',
-             pending:'var(--yellow)',
-             fail:'var(--red)', test:'var(--orange)',
-             deprecated:'var(--muted)'};
-  return m[s] || 'var(--muted)';
+function statusColor(s){
+  const m={verified:'var(--green)',stable:'var(--green)',pass:'var(--green)',
+           pending:'var(--yellow)',fail:'var(--red)',test:'var(--orange)',deprecated:'var(--text-dim)'};
+  return m[s]||'var(--text-dim)';
 }
-function statusLabel(s) {
-  const m = {verified:'🟢 已验证', stable:'🟢 已发布', pass:'✅ 通过',
-             pending:'🟡 待测试',
-             fail:'❌ 失败', test:'🧪 测试中',
-             deprecated:'💤 已废弃'};
-  return m[s] || s;
+function statusBadge(s){
+  const m={verified:'badge-verified',stable:'badge-stable',pass:'badge-verified',
+           pending:'badge-pending',fail:'badge-fail',test:'badge-test'};
+  const l={verified:'已验证',stable:'已发布',pass:'通过',pending:'待测试',fail:'失败',test:'测试中',deprecated:'已废弃'};
+  return `<span class="badge ${m[s]||''}">${l[s]||s}</span>`;
 }
-function riskLabel(r) {
-  const m = {低:'🟢 低',中:'🟠 中',高:'🔴 高'};
-  return m[r]||r;
+function statusLabel(s){
+  const m={verified:'🟢 已验证',stable:'🟢 已发布',pass:'✅ 通过',pending:'🟡 待测试',fail:'❌ 失败',test:'🧪 测试中',deprecated:'💤 已废弃'};
+  return m[s]||s;
 }
 
-function render() {
-  renderTree();
-  renderDashboard();
-  renderBaselines();
-  renderExperiments('all');
-  renderIssues();
-  renderFlash(null);
-  renderTestTasks(null);
-  renderKnowledge();
-  renderTestHistory();
+function render(){
+  renderTree(); renderDashboard(); renderBaselines();
+  renderExperiments('all'); renderIssues(); renderFlash(null);
+  renderTestTasks(null); renderTestHistory(); renderKnowledge();
 }
 
-// ---- 侧栏版本树 ----
-function renderTree() {
-  const el = document.getElementById('treeView');
-  const groups = buildTreeData();
-  let html = '<div class="tree-group"><div class="tree-group-label">📌 基线</div>';
-  for (const v of groups.baseline.sort((a,b)=>(b.date||'').localeCompare(a.date||''))) {
-    html += `<div class="tree-node" onclick="selectVer('${v.ver}')" data-ver="${v.ver}" style="border-left-color:${statusColor(v.status)}">
+function renderTree(){
+  const el=document.getElementById('treeView');
+  const g={baseline:[],experiment:[],legacy:[]};
+  FW.forEach(f=>{if(g[f.category])g[f.category].push(f)});
+  let html='<div class="tree-group-label">📌 基线</div>';
+  g.baseline.sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(v=>{
+    html+=`<div class="tree-node" onclick="selectVer('${v.ver}')" data-ver="${v.ver}" style="border-left-color:${statusColor(v.status)}">
       <span class="dot" style="background:${statusColor(v.status)}"></span>
       <span class="ver">${v.tag||v.ver}</span>
-      ${v.tag?`<span class="tag" style="background:rgba(59,130,246,.2);color:var(--accent)">${v.tag}</span>`:''}
+      ${v.tag?`<span class="tag">${v.tag}</span>`:''}
       <span class="date">${v.date||''}</span>
     </div>`;
-  }
-  html += '</div><div class="tree-group"><div class="tree-group-label">🧪 实验版本</div>';
-  for (const v of groups.experiment.sort((a,b)=>(b.date||'').localeCompare(a.date||''))) {
-    html += `<div class="tree-node" onclick="selectVer('${v.ver}')" data-ver="${v.ver}" style="border-left-color:${statusColor(v.status)}">
+  });
+  html+='<div class="tree-group-label">🧪 实验</div>';
+  g.experiment.sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(v=>{
+    html+=`<div class="tree-node" onclick="selectVer('${v.ver}')" data-ver="${v.ver}" style="border-left-color:${statusColor(v.status)}">
       <span class="dot" style="background:${statusColor(v.status)}"></span>
       <span class="ver">${v.ver}</span>
       <span class="date">${v.date||''}</span>
     </div>`;
-  }
-  html += '</div>';
-  if (groups.legacy.length) {
-    html += '<div class="tree-group"><div class="tree-group-label">📦 早期</div>';
-    for (const v of groups.legacy) {
-      html += `<div class="tree-node" onclick="selectVer('${v.ver}')" data-ver="${v.ver}" style="border-left-color:${statusColor(v.status)}">
+  });
+  if(g.legacy.length){
+    html+='<div class="tree-group-label">📦 早期</div>';
+    g.legacy.forEach(v=>{
+      html+=`<div class="tree-node" onclick="selectVer('${v.ver}')" data-ver="${v.ver}" style="border-left-color:${statusColor(v.status)}">
         <span class="ver">${v.ver}</span>
         <span class="date">${v.date||''}</span>
       </div>`;
-    }
-    html += '</div>';
+    });
   }
-  el.innerHTML = html;
+  el.innerHTML=html;
 }
 
-// ---- Dashboard ----
-function renderDashboard() {
-  const stats = {
-    total: FW.length,
-    verified: FW.filter(v=>v.status==='verified'||v.status==='stable').length,
-    failed: FW.filter(v=>v.status==='fail').length,
-    pending: FW.filter(v=>v.status==='pending'||v.status==='test').length,
-    issuesSolved: ISSUES_KNOWLEDGE.filter(i=>i.status==='resolved').length,
-    issuesUnresolved: ISSUES_KNOWLEDGE.filter(i=>i.status!=='resolved').length
-  };
-  const recent = [...FW].filter(v=>v.date).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,5);
+function renderDashboard(){
+  const pending=FW.filter(v=>v.status==='pending'||v.status==='test').length;
   document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-card"><div class="num" style="color:var(--accent)">${stats.total}</div><div class="label">总版本数</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--green)">${stats.verified}</div><div class="label">✅ 已验证</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--red)">${stats.failed}</div><div class="label">❌ 失败</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--yellow)">${stats.pending}</div><div class="label">🟡 待测试</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--green)">${stats.issuesSolved}</div><div class="label">✅ 已解决问题</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--yellow)">${stats.issuesUnresolved}</div><div class="label">❓ 未解决问题</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--accent)">${FW.length}</div><div class="label">总版本数</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--green)">${FW.filter(v=>v.status==='verified'||v.status==='stable').length}</div><div class="label">已验证</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--red)">${FW.filter(v=>v.status==='fail').length}</div><div class="label">已失败</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--yellow)">${pending}</div><div class="label">待测试</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--green)">${ISSUES_KNOWLEDGE.length}</div><div class="label">已解决问题</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--text-muted)">${FW.filter(v=>v.category==='baseline').length}</div><div class="label">基线数</div></div>
   `;
-  document.getElementById('recentActivity').innerHTML = recent.map(v => 
-    `<div><span class="dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${statusColor(v.status)};margin-right:6px;vertical-align:middle"></span> <strong>${v.ver}</strong> <span style="color:var(--muted)">${v.date||''}</span> — ${statusLabel(v.status)}</div>`
+  const recent=FW.filter(v=>v.date).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,6);
+  document.getElementById('recentActivity').innerHTML=recent.map(v=>
+    `<div style="display:flex;align-items:center;gap:8px;padding:2px 0">
+      <span class="dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${statusColor(v.status)};flex-shrink:0"></span>
+      <strong>${v.ver}</strong>
+      <span style="color:var(--text-dim);margin-left:auto">${v.date||''}</span>
+      ${statusBadge(v.status)}
+    </div>`
   ).join('');
 }
 
-// ---- 基线 ----
-function renderBaselines() {
-  const bl = FW.filter(v=>v.tag && v.status==='verified');
-  document.getElementById('baselinesList').innerHTML = bl.length ? bl.map(v => 
-    `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:4px 0">⭐ <strong>${v.tag}</strong> = ${v.ver} <span style="color:var(--muted)">${v.desc||''}</span></div>`
-  ).join('') : '<div style="color:var(--muted)">暂无已保存基线</div>';
+function renderBaselines(){
+  document.getElementById('baselinesList').innerHTML=FW.filter(v=>v.tag&&v.status==='verified').map(v=>
+    `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:4px 8px;border-radius:6px;display:flex;align-items:center;gap:8px;transition:all .15s" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+      <span style="font-size:16px">⭐</span>
+      <strong>${v.tag}</strong>
+      <span style="color:var(--text-dim)">= ${v.ver}</span>
+      <span style="color:var(--text-dim);font-size:11px;margin-left:auto">${v.desc||''}</span>
+    </div>`
+  ).join('')||'<div style="color:var(--text-dim)">暂无基线</div>';
 }
 
-// ---- 实验版本 ----
-let expFilter = 'all';
-function filterExp(f) {
-  expFilter = f;
-  document.querySelectorAll('#expFilters .test-action-btn').forEach(b => {
-    b.className = b.id === 'ef-'+f ? 'test-action-btn btn-primary' : 'test-action-btn btn-outline';
+let expFilter='all';
+function filterExp(f){
+  expFilter=f;
+  document.querySelectorAll('#expFilters .btn').forEach(b=>{
+    b.className=b.id==='ef-'+f?'btn btn-primary btn-sm':'btn btn-outline btn-sm';
   });
   renderExperiments(f);
 }
-function renderExperiments(filter) {
-  const exps = FW.filter(v => v.category === 'experiment').sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const filtered = filter === 'all' ? exps : exps.filter(v => v.status === filter);
-  document.getElementById('expList').innerHTML = filtered.map(v => `
-    <div class="test-card" onclick="selectVer('${v.ver}')" style="cursor:pointer">
-      <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap">
-        <div><h3>${v.ver}</h3></div>
-        <span style="font-size:11px">${statusLabel(v.status)}</span>
+function renderExperiments(filter){
+  const items=FW.filter(v=>v.category==='experiment').sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const filtered=filter==='all'?items:items.filter(v=>v.status===filter);
+  document.getElementById('expList').innerHTML=filtered.map(v=>
+    `<div class="card exp-card" onclick="selectVer('${v.ver}')">
+      <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:4px">
+        <h3>${v.ver}</h3>
+        ${statusBadge(v.status)}
       </div>
-      ${v.date ? `<div style="font-size:11px;color:var(--muted)">${v.date}</div>` : ''}
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">
-        ${(v.changes||[]).slice(0,3).map(c=>`<span class="tag" style="background:var(--bg3);color:var(--fg);padding:1px 5px;border-radius:3px;font-size:9px;margin-right:4px">${c}</span>`).join('')}
+      ${v.date?`<div class="muted">${v.date}</div>`:''}
+      <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">
+        ${(v.changes||[]).slice(0,4).map(c=>`<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;background:var(--bg-card2);color:var(--text-muted);border:1px solid var(--border)">${c}</span>`).join('')}
       </div>
-    </div>
-  `).join('');
+    </div>`
+  ).join('');
 }
 
-// ---- 问题库 ----
-function renderIssues() {
-  const q = (document.getElementById('issueSearch').value||'').toLowerCase();
-  const items = q ? ISSUES_KNOWLEDGE.filter(i => 
-    i.title.toLowerCase().includes(q) || i.cause.toLowerCase().includes(q) || i.solution.toLowerCase().includes(q)
-  ) : ISSUES_KNOWLEDGE;
-  document.getElementById('issuesList').innerHTML = items.map(i => `
-    <div class="issue-card">
+function renderIssues(){
+  const q=(document.getElementById('issueSearch').value||'').toLowerCase();
+  const items=q?ISSUES_KNOWLEDGE.filter(i=>i.title.toLowerCase().includes(q)||i.cause.toLowerCase().includes(q)||i.solution.toLowerCase().includes(q)):ISSUES_KNOWLEDGE;
+  document.getElementById('issuesList').innerHTML=items.map(i=>
+    `<div class="issue-card">
       <div class="title">
-        <span>${i.status==='resolved'?'✅':'❌'}</span>
-        ${i.title}
-        <span style="font-size:10px;color:var(--muted);margin-left:auto">#${i.id}</span>
+        <span>✅</span> ${i.title}
+        <span style="font-size:10px;color:var(--text-dim);margin-left:auto">#${i.id}</span>
       </div>
       <div class="meta">
-        <span>🔍 <strong>原因：</strong>${i.cause}</span>
-        <span>💊 <strong>解决：</strong>${i.solution}</span>
-        <span>📌 <strong>版本：</strong>${i.resolvedIn||'待定'}</span>
+        <span>🔍 原因：<strong>${i.cause}</strong></span>
+        <span>💊 解决：<span style="color:var(--green)">${i.solution}</span></span>
+        <span>📌 版本：<strong>${i.resolvedIn||'待定'}</strong></span>
       </div>
-    </div>
-  `).join('');
-}
-
-// ---- 烧录中心 ----
-function renderFlash(ver) {
-  if (!ver) {
-    const latest = FW.filter(v=>v.files&&(v.files.merge||v.files.full||v.files.inc)).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
-    if (latest) ver = latest;
-  }
-  if (!ver) return;
-  const v = typeof ver === 'string' ? FW.find(f=>f.ver===ver) : ver;
-  if (!v) return;
-  document.getElementById('flashVer').textContent = `⚡ ${v.ver} (${v.date||'无日期'}) - ${statusLabel(v.status)}`;
-  const file = v.files?.merge || v.files?.full || v.files?.inc;
-  if (file) {
-    document.getElementById('flashCmd').textContent = `esptool --chip esp32s3 write_flash 0x0 ${BASE}/${file}`;
-    document.getElementById('downloadBtn').href = `${BASE}/${file}`;
-  } else {
-    document.getElementById('flashCmd').textContent = '# 该版本无可用 BIN 文件';
-    document.getElementById('downloadBtn').href = '#';
-  }
-  // 回滚列表
-  const blVersions = FW.filter(f=>f.status==='verified'||f.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  document.getElementById('rollbackVersions').innerHTML = blVersions.map(v => 
-    `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:2px 0">⏪ 回滚到 <strong>${v.ver}</strong> ${v.tag?`(${v.tag})`:''}</div>`
+    </div>`
   ).join('');
 }
 
-// ---- 测试任务 ----
-function renderTestTasks(ver) {
-  v = ver || selectedVer;
-  if (!v) return;
-  const version = typeof v === 'string' ? FW.find(f=>f.ver===v) : v;
-  if (!version) return;
-  document.getElementById('testSteps').innerHTML = (version.testSteps||['全擦除','烧录','观察结果']).map((s,i) => 
+function renderFlash(ver){
+  if(!ver){const l=FW.filter(v=>v.files&&(v.files.merge||v.files.full||v.files.inc)).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];if(l)ver=l;}
+  if(!ver)return;
+  const v=typeof ver==='string'?FW.find(f=>f.ver===ver):ver;
+  if(!v)return;
+  document.getElementById('flashVer').innerHTML=`⚡ <strong>${v.ver}</strong> <span style="color:var(--text-dim)">${v.date||''}</span> ${statusBadge(v.status)}`;
+  const file=v.files?.merge||v.files?.full||v.files?.inc;
+  if(file){
+    document.getElementById('flashCmd').innerHTML=`<span class="prompt">$</span> <span class="cmd">esptool --chip esp32s3 write_flash 0x0 ${BASE}/${file}</span>`;
+    document.getElementById('downloadBtn').href=`${BASE}/${file}`;
+  }else{
+    document.getElementById('flashCmd').innerHTML=`<span class="prompt">$</span> <span class="cmd"># 无可用 BIN 文件</span>`;
+    document.getElementById('downloadBtn').href='#';
+  }
+  document.getElementById('rollbackVersions').innerHTML=FW.filter(f=>f.status==='verified'||f.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(v=>
+    `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:3px 8px;border-radius:6px;display:flex;align-items:center;gap:8px;transition:all .15s" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+      <span>⏪</span>
+      <strong>${v.tag||v.ver}</strong>
+      <span style="color:var(--text-dim);font-size:11px">${v.date||''}</span>
+    </div>`
+  ).join('');
+}
+
+function renderTestTasks(ver){
+  v=ver||selectedVer;if(!v)return;
+  const version=typeof v==='string'?FW.find(f=>f.ver===v):v;
+  if(!version)return;
+  document.getElementById('testSteps').innerHTML=(version.testSteps||['全擦除','烧录','观察结果']).map((s,i)=>
     `<div class="test-step"><span class="step-num">${i+1}</span>${s}</div>`
   ).join('');
-  if (version.expected) {
-    document.getElementById('testSteps').innerHTML += `<div class="test-step" style="margin-top:6px;color:var(--green)">🎯 预期：${version.expected}</div>`;
-  }
+  if(version.expected)document.getElementById('testSteps').innerHTML+=`<div class="test-step" style="margin-top:6px"><span style="color:var(--green)">🎯 预期：${version.expected}</span></div>`;
 }
 
-// ---- 测试历史 ----
-function renderTestHistory() {
-  const h = TEST_HISTORY;
-  if (!h.length) {
-    document.getElementById('testHistory').innerHTML = '<div style="font-size:12px;color:var(--muted)">暂无测试记录。烧录后记录测试结果。</div>';
+function renderTestHistory(){
+  if(!TEST_HISTORY.length){
+    document.getElementById('testHistory').innerHTML='<div class="muted">暂无测试记录。烧录后记录结果。</div>';
     return;
   }
-  document.getElementById('testHistory').innerHTML = '<h3 style="font-size:13px;margin-bottom:6px">📋 测试历史</h3>' +
-    h.slice().reverse().map(r => `<div class="issue-card">
+  document.getElementById('testHistory').innerHTML=TEST_HISTORY.slice().reverse().map(r=>
+    `<div class="issue-card" style="animation:none">
       <div class="title">${r.ver} — ${r.result==='pass'?'✅ 通过':'❌ 失败'}</div>
-      <div class="meta">${r.time}${r.note?' · '+r.note:''}</div>
-    </div>`).join('');
+      <div class="meta"><span>${r.time}</span>${r.note?`<span>${r.note}</span>`:''}</div>
+    </div>`
+  ).join('');
 }
 
-// ---- 知识库 ----
-function renderKnowledge() {
-  const resolved = ISSUES_KNOWLEDGE.filter(i=>i.status==='resolved');
-  document.getElementById('knowledgeBase').innerHTML = resolved.map(i => `
-    <div class="issue-card">
-      <strong>${i.title}</strong>
-      <br><span style="color:var(--muted)">原因：</span>${i.cause}
-      <br><span style="color:var(--green)">解决：</span>${i.solution}
-      ${i.resolvedIn ? `<br><span style="color:var(--accent)">版本：${i.resolvedIn}</span>` : ''}
-    </div>
-  `).join('<div style="height:4px"></div>');
+function renderKnowledge(){
+  document.getElementById('kbCount').textContent=ISSUES_KNOWLEDGE.length;
+  document.getElementById('knowledgeBase').innerHTML=ISSUES_KNOWLEDGE.map(i=>
+    `<div class="issue-card" style="animation:none">
+      <div class="title">✅ ${i.title}</div>
+      <div class="meta">
+        <span>🔍 <strong>原因：</strong>${i.cause}</span>
+        <span style="display:block;margin-top:4px">💊 <strong>解决：</strong><span style="color:var(--green)">${i.solution}</span></span>
+        <span style="display:block;margin-top:4px">📌 <strong>版本：</strong>${i.resolvedIn||'待定'}</span>
+      </div>
+    </div>`
+  ).join('');
 }
 
-// =====================================================================
-// 交互
-// =====================================================================
-let selectedVerObj = null;
-
-function selectVer(verId) {
-  const v = FW.find(f=>f.ver===verId);
-  if (!v) return;
-  selectedVer = v;
-  selectedVerObj = v;
-  
-  // 高亮侧栏
-  document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('active'));
-  const el = document.querySelector(`.tree-node[data-ver="${verId}"]`);
-  if (el) el.classList.add('active');
-  
-  // 渲染详情
-  renderFlash(v);
-  renderTestTasks(v);
-  
-  // 切到详情tab
+// ===== 交互 =====
+function selectVer(verId){
+  const v=FW.find(f=>f.ver===verId);if(!v)return;
+  selectedVer=v;
+  document.querySelectorAll('.tree-node').forEach(n=>n.classList.remove('active'));
+  const el=document.querySelector(`.tree-node[data-ver="${verId}"]`);
+  if(el)el.classList.add('active');
+  renderFlash(v);renderTestTasks(v);
   showTab('flash');
 }
 
-function showTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
-  document.getElementById(`tab-${name}`).classList.add('active');
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  const tab=document.querySelector(`.tab[data-tab="${name}"]`);
+  if(tab)tab.classList.add('active');
+  const content=document.getElementById(`tab-${name}`);
+  if(content)content.classList.add('active');
 }
 
-// 标签切换
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => showTab(tab.dataset.tab));
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>showTab(tab.dataset.tab));
 });
 
-// 复制命令
-function copyCmd(id) {
-  const text = document.getElementById(id).textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = event.target;
-    const orig = btn.textContent;
-    btn.textContent = '✅ 已复制';
-    setTimeout(() => btn.textContent = orig, 1500);
+function copyCmd(id){
+  const text=document.getElementById(id).textContent.replace(/^\$\s*/m,'').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=event.target;
+    const orig=btn.textContent;
+    btn.textContent='✅ 已复制';
+    setTimeout(()=>btn.textContent=orig,1500);
   });
 }
 
-// 文件上传
-function handleUpload(input) {
-  testFiles = Array.from(input.files);
-  const area = input.parentElement;
-  area.innerHTML = `<div class="icon">✅</div><div class="label">已上传 ${testFiles.length} 个文件</div>`;
+function handleUpload(input){
+  testFiles=Array.from(input.files);
+  const area=input.parentElement;
+  area.innerHTML=`<div class="icon">✅</div><div class="label">已上传 ${testFiles.length} 个文件</div>`;
 }
 
-// 提交测试
-function submitTest(result) {
-  if (!selectedVer) { alert('请先选择版本'); return; }
-  const r = {
-    ver: selectedVer.ver,
-    result: result,
-    time: new Date().toLocaleString(),
-    note: '',
-    files: testFiles.map(f=>f.name),
-    feedback: {
-      reproduced: document.getElementById('q-reproduced').value,
-      new: document.getElementById('q-new').value,
-      solved: document.getElementById('q-solved').value,
-      rollback: document.getElementById('q-rollback').value
-    }
-  };
+function submitTest(result){
+  if(!selectedVer){alert('请先选择版本');return;}
+  const r={ver:selectedVer.ver,result:result,time:new Date().toLocaleString(),note:'',files:testFiles.map(f=>f.name),
+    feedback:{reproduced:document.getElementById('q-reproduced').value,new:document.getElementById('q-new').value,
+      solved:document.getElementById('q-solved').value,rollback:document.getElementById('q-rollback').value}};
   TEST_HISTORY.push(r);
   renderTestHistory();
-  
-  // 更新版本状态
-  selectedVer.status = result === 'pass' ? 'verified' : 'fail';
+  selectedVer.status=result==='pass'?'verified':'fail';
   render();
-  alert(result === 'pass' ? '✅ 测试通过已记录' : '❌ 测试失败已记录，问题已进入知识库');
+  alert(result==='pass'?'✅ 测试通过已记录':'❌ 测试失败已记录');
 }
 
-// 复制测试报告
-function copyReport() {
-  if (!selectedVer) { alert('请先选择版本'); return; }
-  const r = TEST_HISTORY.length ? TEST_HISTORY[TEST_HISTORY.length-1] : {result:'未提交',note:''};
-  const report = `### 测试结果
-版本：${selectedVer.ver}
-结果：${r.result === 'pass' ? '✅ 通过' : r.result === 'fail' ? '❌ 失败' : '未测试'}
-现象：${document.getElementById('q-reproduced').value || '未填写'}
-串口日志：${r.files?.length ? r.files.join(', ') : '无'}
-图片：${r.files?.length ? r.files.join(', ') : '无'}
-时间：${new Date().toLocaleString()}`;
-  navigator.clipboard.writeText(report).then(() => {
-    const btn = event.target;
-    const orig = btn.textContent;
-    btn.textContent = '✅ 已复制';
-    setTimeout(() => btn.textContent = orig, 1500);
+function copyReport(){
+  if(!selectedVer){alert('请先选择版本');return;}
+  const r=TEST_HISTORY.length?TEST_HISTORY[TEST_HISTORY.length-1]:{result:'未提交',note:''};
+  const report=`### 测试结果\n版本：${selectedVer.ver}\n结果：${r.result==='pass'?'✅ 通过':r.result==='fail'?'❌ 失败':'未测试'}\n现象：${document.getElementById('q-reproduced').value||'未填写'}\n串口日志/图片：${r.files?.length?r.files.join(', '):'无'}\n时间：${new Date().toLocaleString()}`;
+  navigator.clipboard.writeText(report).then(()=>{
+    const btn=event.target;
+    const orig=btn.textContent;
+    btn.textContent='✅ 已复制';
+    setTimeout(()=>btn.textContent=orig,1500);
   });
 }
 
-// 回滚
-function rollbackLatest() {
-  const bl = FW.filter(v=>v.status==='verified'||v.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
-  if (bl) selectVer(bl.ver);
+function rollbackLatest(){
+  const bl=FW.filter(v=>v.status==='verified'||v.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
+  if(bl)selectVer(bl.ver);
 }
 
-// =====================================================================
-// 初始化
-// =====================================================================
 render();
 </script>
 </body>

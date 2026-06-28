@@ -245,7 +245,6 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
     <div class="tab" data-tab="experiments">🧪 实验</div>
     <div class="tab" data-tab="issues">🐛 问题库</div>
     <div class="tab" data-tab="flash">⚡ 烧录</div>
-    <div class="tab" data-tab="reports">📋 测试</div>
     <div class="tab" data-tab="knowledge">📖 知识库</div>
   </nav>
 
@@ -307,6 +306,10 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
     <div class="card">
       <h2>🔄 回滚列表</h2>
       <div id="rollbackVersions" style="font-size:13px;line-height:2.2"></div>
+    </div>
+    <div class="card">
+      <h2>📋 测试历史</h2>
+      <div id="testHistory" style="font-size:12px"></div>
     </div>
   </div>
 
@@ -377,45 +380,6 @@ Build:Mar 27 2021
       </div>
     </div>
   </div>
-  <div class="tab-content" id="tab-reports">
-    <div class="card">
-      <h3>📋 测试任务</h3>
-      <div id="testSteps" style="font-size:12px;line-height:1.8;margin-bottom:var(--space-sm)"></div>
-      <div class="confirm-grid" id="confirmGrid">
-        <div class="confirm-group">
-          <label>是否复现？</label>
-          <select class="input" id="q-reproduced"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-        </div>
-        <div class="confirm-group">
-          <label>新问题？</label>
-          <select class="input" id="q-new"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-        </div>
-        <div class="confirm-group">
-          <label>原问题是否解决？</label>
-          <select class="input" id="q-solved"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-        </div>
-        <div class="confirm-group">
-          <label>需要回滚？</label>
-          <select class="input" id="q-rollback"><option value="">—</option><option value="yes">✅ 是</option><option value="no">❌ 否</option></select>
-        </div>
-      </div>
-      <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
-        <div class="icon">📷</div>
-        <div class="label">点击上传串口日志 / 照片 / 视频</div>
-        <input type="file" id="fileUpload" multiple accept="image/*,.txt,.log,.csv" style="display:none" onchange="handleUpload(this)">
-      </div>
-      <div style="display:flex;gap:6px;margin-top:var(--space-sm);flex-wrap:wrap">
-        <button class="btn btn-success" onclick="submitTest('pass')">✅ 测试通过</button>
-        <button class="btn btn-danger" onclick="submitTest('fail')">❌ 测试失败</button>
-        <button class="btn btn-outline" onclick="copyReport()">📋 复制报告</button>
-      </div>
-    </div>
-    <div class="card">
-      <h2>📋 测试历史</h2>
-      <div id="testHistory"></div>
-    </div>
-  </div>
-
   <!-- 知识库 -->
   <div class="tab-content" id="tab-knowledge">
     <div class="card">
@@ -552,7 +516,7 @@ function statusLabel(s){
 function render(){
   renderTree(); renderDashboard(); renderBaselines();
   renderExperiments('all'); renderIssues(); renderFlash(null);
-  renderTestTasks(null); renderTestHistory(); renderKnowledge();
+  renderKnowledge(); renderTestHistory();
 }
 
 function renderTree(){
@@ -744,95 +708,6 @@ function renderFlash(ver){
   ).join('');
 }
 
-function renderTestTasks(ver){
-  v=ver||selectedVer;if(!v)return;
-  const version=typeof v==='string'?FW.find(f=>f.ver===v):v;
-  if(!version)return;
-  document.getElementById('testSteps').innerHTML=(version.testSteps||['全擦除','烧录','观察结果']).map((s,i)=>
-    `<div class="test-step"><span class="step-num">${i+1}</span>${s}</div>`
-  ).join('');
-  if(version.expected)document.getElementById('testSteps').innerHTML+=`<div class="test-step" style="margin-top:6px"><span style="color:var(--green)">🎯 预期：${version.expected}</span></div>`;
-}
-
-function renderTestHistory(){
-  if(!TEST_HISTORY.length){
-    document.getElementById('testHistory').innerHTML='<div class="muted">暂无测试记录。烧录后记录结果。</div>';
-    return;
-  }
-  document.getElementById('testHistory').innerHTML=TEST_HISTORY.slice().reverse().map(r=>
-    `<div class="issue-card" style="animation:none">
-      <div class="title">${r.ver} — ${r.result==='pass'?'✅ 通过':'❌ 失败'}</div>
-      <div class="meta"><span>${r.time}</span>${r.note?`<span>${r.note}</span>`:''}</div>
-    </div>`
-  ).join('');
-}
-
-function renderKnowledge(){
-  document.getElementById('kbCount').textContent=ISSUES_KNOWLEDGE.length;
-  document.getElementById('knowledgeBase').innerHTML=ISSUES_KNOWLEDGE.map(i=>
-    `<div class="issue-card" style="animation:none">
-      <div class="title">✅ ${i.title}</div>
-      <div class="meta">
-        <span>🔍 <strong>原因：</strong>${i.cause}</span>
-        <span style="display:block;margin-top:4px">💊 <strong>解决：</strong><span style="color:var(--green)">${i.solution}</span></span>
-        <span style="display:block;margin-top:4px">📌 <strong>版本：</strong>${i.resolvedIn||'待定'}</span>
-      </div>
-    </div>`
-  ).join('');
-}
-
-// ===== 交互 =====
-function selectVer(verId){
-  const v=FW.find(f=>f.ver===verId);if(!v)return;
-  selectedVer=v;
-  document.querySelectorAll('.tree-node').forEach(n=>n.classList.remove('active'));
-  const el=document.querySelector(`.tree-node[data-ver="${verId}"]`);
-  if(el)el.classList.add('active');
-  renderFlash(v);renderTestTasks(v);
-  showTab('flash');
-}
-
-function showTab(name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  const tab=document.querySelector(`.tab[data-tab="${name}"]`);
-  if(tab)tab.classList.add('active');
-  const content=document.getElementById(`tab-${name}`);
-  if(content)content.classList.add('active');
-}
-
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click',()=>showTab(tab.dataset.tab));
-});
-
-function copyCmd(id){
-  const text=document.getElementById(id).textContent.replace(/^\$\s*/m,'').trim();
-  navigator.clipboard.writeText(text).then(()=>{
-    const btn=event.target;
-    const orig=btn.textContent;
-    btn.textContent='✅ 已复制';
-    setTimeout(()=>btn.textContent=orig,1500);
-  });
-}
-
-function handleUpload(input){
-  testFiles=Array.from(input.files);
-  const area=input.parentElement;
-  area.innerHTML=`<div class="icon">✅</div><div class="label">已上传 ${testFiles.length} 个文件</div>`;
-}
-
-function submitTest(result){
-  if(!selectedVer){alert('请先选择版本');return;}
-  const r={ver:selectedVer.ver,result:result,time:new Date().toLocaleString(),note:'',files:testFiles.map(f=>f.name),
-    feedback:{reproduced:document.getElementById('q-reproduced').value,new:document.getElementById('q-new').value,
-      solved:document.getElementById('q-solved').value,rollback:document.getElementById('q-rollback').value}};
-  TEST_HISTORY.push(r);
-  renderTestHistory();
-  selectedVer.status=result==='pass'?'verified':'fail';
-  render();
-  alert(result==='pass'?'✅ 测试通过已记录':'❌ 测试失败已记录');
-}
-
 // ===== 反馈弹窗 =====
 function openFeedback(){
   if(!selectedVer){alert('请先选择版本');return;}
@@ -885,11 +760,61 @@ ${log||'（无日志）'}
   });
 }
 
-function copyReport(){
-  if(!selectedVer){alert('请先选择版本');return;}
-  const r=TEST_HISTORY.length?TEST_HISTORY[TEST_HISTORY.length-1]:{result:'未提交',note:''};
-  const report=`### 测试结果\n版本：${selectedVer.ver}\n结果：${r.result==='pass'?'✅ 通过':r.result==='fail'?'❌ 失败':'未测试'}\n现象：${document.getElementById('q-reproduced').value||'未填写'}\n串口日志/图片：${r.files?.length?r.files.join(', '):'无'}\n时间：${new Date().toLocaleString()}`;
-  navigator.clipboard.writeText(report).then(()=>{
+// ===== 测试历史 =====
+function renderTestHistory(){
+  const el=document.getElementById('testHistory');
+  if(!el)return;
+  if(!TEST_HISTORY.length){
+    el.innerHTML='<div class="muted" style="font-size:12px;padding:8px 0">暂无测试记录。使用烧录页的"反馈问题"按钮记录。</div>';
+    return;
+  }
+  el.innerHTML=TEST_HISTORY.slice().reverse().map(r=>
+    `<div class="issue-card" style="animation:none;padding:8px 10px;margin-bottom:4px">
+      <div class="title" style="font-size:12px">${r.ver} — ${r.result==='pass'?'✅ 通过':'❌ 失败'}</div>
+      <div class="meta" style="font-size:10px"><span>${r.time}</span>${r.note?`<span> · ${r.note}</span>`:''}</div>
+    </div>`
+  ).join('');
+}
+
+// ===== 知识库 =====
+function renderKnowledge(){
+  document.getElementById('kbCount').textContent=ISSUES_KNOWLEDGE.length;
+  document.getElementById('knowledgeBase').innerHTML=ISSUES_KNOWLEDGE.map(i=>
+    `<div class="issue-card" style="animation:none">
+      <div class="title">✅ ${i.title}</div>
+      <div class="meta">
+        <span>🔍 <strong>原因：</strong>${i.cause}</span>
+        <span style="display:block;margin-top:4px">💊 <strong>解决：</strong><span style="color:var(--green)">${i.solution}</span></span>
+        <span style="display:block;margin-top:4px">📌 <strong>版本：</strong>${i.resolvedIn||'待定'}</span>
+      </div>
+    </div>`
+  ).join('');
+}
+
+// ===== 交互 =====
+function selectVer(verId){
+  const v=FW.find(f=>f.ver===verId);if(!v)return;
+  selectedVer=v;
+  document.querySelectorAll('.tree-node').forEach(n=>n.classList.remove('active'));
+  const el=document.querySelector(`.tree-node[data-ver="${verId}"]`);
+  if(el)el.classList.add('active');
+  renderFlash(v);
+  showTab('flash');
+}
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  const tab=document.querySelector(`.tab[data-tab="${name}"]`);
+  if(tab)tab.classList.add('active');
+  const content=document.getElementById(`tab-${name}`);
+  if(content)content.classList.add('active');
+}
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>showTab(tab.dataset.tab));
+});
+function copyCmd(id){
+  const text=document.getElementById(id).textContent.replace(/^\$\s*/m,'').trim();
+  navigator.clipboard.writeText(text).then(()=>{
     const btn=event.target;
     const orig=btn.textContent;
     btn.textContent='✅ 已复制';
@@ -897,6 +822,7 @@ function copyReport(){
   });
 }
 
+// ===== 回滚 =====
 function rollbackLatest(){
   const bl=FW.filter(v=>v.status==='verified'||v.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
   if(bl)selectVer(bl.ver);

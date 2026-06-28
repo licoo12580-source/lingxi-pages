@@ -114,6 +114,11 @@ h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
 <script>
 const FW = [
+  // ==== v0628-lgfx-r7 (颜色修复: 0x3A=0x55移至tft.begin()后立即执行) ====
+  {ver:"v0628-lgfx-r7", date:"2026-06-28 11:56", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","像素格式0x55","颜色修复v2","MADCTL"], files:{merge:"v0628-lgfx-r7-merged.bin"}, size:"1.5MB",
+    desc:"修复颜色错乱v2: 0x3A=0x55(16位色)从LVGL前移到tft.begin()后立即执行,在fillScreen之前设好像素格式",
+    changes:"✅ 颜色修复v2: 0x3A=0x55+MADCTL=0x08移至tft.begin()后紧跟着执行(在fillScreen之前)\\n✅ 基于r6(其他全部不变)\\n✅ RST=48+SPI.begin+背光HIGH\\n✅ LVGL9.5中文三页+触摸+OTA+WDT禁用",
+    source:"test_lgfx.cpp v0628-lgfx-r7"},
   // ==== v0628-lgfx-r6 (颜色修复: 加回0x3A=0x55像素格式设定) ====
   {ver:"v0628-lgfx-r6", date:"2026-06-28 11:53", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","像素格式0x55","颜色修复"], files:{merge:"v0628-lgfx-r6-merged.bin"}, size:"1.5MB",
     desc:"修复颜色错乱(紫色底): 加回0x3A=0x55(16位色)设定, ILI9488默认可能是18位模式导致LovyanGFX的16位数据被错误解析",

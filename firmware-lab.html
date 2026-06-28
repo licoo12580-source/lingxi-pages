@@ -642,7 +642,7 @@ function renderIssues(){
 }
 
 function renderFlash(ver){
-  if(!ver){const l=FW.filter(v=>v.files&&(v.files.merge||v.files.full||v.files.inc)).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];if(l)ver=l;}
+  if(!ver){const l=FW.filter(v=>v.files&&(v.files.merge||v.files.full||v.files.inc)).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];if(l){ver=l;selectedVer=l;}}
   if(!ver)return;
   const v=typeof ver==='string'?FW.find(f=>f.ver===ver):ver;
   if(!v)return;

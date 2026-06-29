@@ -7,6 +7,7 @@
 <style>
 /* ===== 设计系统（基于 Tasteskill + UI/UX Pro Max + Motion AI Kit） ===== */
 :root {
+  /* 三层深色调色板 */
   --bg: #080d1a;
   --bg-card: #0f172a;
   --bg-card2: #131c31;
@@ -17,6 +18,7 @@
   --text: #e2e8f0;
   --text-muted: #94a3b8;
   --text-dim: #475569;
+  /* 语义色 */
   --accent: #3b82f6;
   --accent-glow: rgba(59,130,246,.25);
   --green: #22c55e;
@@ -30,13 +32,24 @@
   --purple-bg: rgba(139,92,246,.1);
   --pink: #ec4899;
   --cyan: #06b6d4;
-  --space-xs: 4px; --space-sm: 8px; --space-md: 16px;
-  --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px;
-  --pad: 16px; --gap: 12px;
-  --radius: 12px; --radius-sm: 8px; --radius-xs: 6px;
+  /* 间距系统 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --pad: 16px;
+  --gap: 12px;
+  /* 几何 */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
   --shadow: 0 4px 20px rgba(0,0,0,.3);
   --shadow-sm: 0 2px 8px rgba(0,0,0,.2);
+  /* 侧栏 */
   --sidebar-w: 280px;
+  /* 动画 */
   --ease: cubic-bezier(.4,0,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -58,6 +71,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 .sidebar-header .sub{font-size:10px;color:var(--text-dim);margin-top:2px;line-height:1.4}
 .sidebar-tree{flex:1;overflow-y:auto;padding:var(--space-sm) 0}
 
+/* 版本树分组 */
 .tree-group-label{padding:var(--space-md) var(--space-md) var(--space-xs);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim)}
 .tree-node{position:relative;padding:5px var(--space-md);cursor:pointer;font-size:12px;display:flex;align-items:center;gap:var(--space-sm);transition:all .2s var(--ease);border-left:3px solid transparent;margin:1px 0}
 .tree-node:hover{background:var(--bg-hover);padding-left:calc(var(--space-md) + 4px)}
@@ -72,12 +86,14 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 /* ===== 主区域 ===== */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
+/* 顶栏标签 */
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 var(--space-md);background:var(--bg-card);flex-shrink:0;overflow-x:auto}
 .tab{padding:11px 18px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-dim);transition:all .2s var(--ease);white-space:nowrap;position:relative}
 .tab:hover{color:var(--text)}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .tab.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.5}
 
+/* 标签内容区 */
 .tab-content{flex:1;overflow-y:auto;padding:var(--space-md);display:none;animation:fadeIn .3s var(--ease)}
 .tab-content.active{display:block}
 
@@ -89,6 +105,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 .card .muted{color:var(--text-dim);font-size:11px}
 .card-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);display:block;margin-bottom:2px}
 
+/* ===== 统计卡片 ===== */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--gap);animation:fadeIn .4s var(--ease)}
 .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--space-md);text-align:center;position:relative;overflow:hidden;transition:all .25s var(--ease);animation:fadeInUp .4s var(--ease) both}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
@@ -98,18 +115,17 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 .stat-card:nth-child(4)::before{background:var(--yellow)}
 .stat-card:nth-child(5)::before{background:var(--green)}
 .stat-card:nth-child(6)::before{background:var(--yellow)}
-.stat-card:nth-child(7)::before{background:var(--purple)}
 .stat-card:nth-child(1){animation-delay:0s}
 .stat-card:nth-child(2){animation-delay:.06s}
 .stat-card:nth-child(3){animation-delay:.12s}
 .stat-card:nth-child(4){animation-delay:.18s}
 .stat-card:nth-child(5){animation-delay:.24s}
 .stat-card:nth-child(6){animation-delay:.3s}
-.stat-card:nth-child(7){animation-delay:.36s}
 .stat-card:hover{transform:translateY(-2px);border-color:var(--border-light);box-shadow:var(--shadow-sm)}
 .stat-card .num{font-size:30px;font-weight:700;letter-spacing:-1px;line-height:1.2}
 .stat-card .label{font-size:11px;color:var(--text-dim);margin-top:2px}
 
+/* ===== 问题卡片 ===== */
 .issue-card{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-md);margin-bottom:var(--space-sm);transition:all .2s var(--ease)}
 .issue-card:hover{border-color:var(--border-light)}
 .issue-card .title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
@@ -117,12 +133,96 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 .issue-card .meta span{white-space:nowrap}
 .issue-card .meta strong{color:var(--text-muted);font-weight:500}
 
+/* ===== 实验卡片 ===== */
 .exp-card{cursor:pointer;animation:fadeInUp .4s var(--ease) both}
 .exp-card:nth-child(1){animation-delay:0s}
 .exp-card:nth-child(2){animation-delay:.05s}
 .exp-card:nth-child(3){animation-delay:.1s}
 .exp-card:nth-child(4){animation-delay:.15s}
 .exp-card:nth-child(5){animation-delay:.2s}
+
+/* ===== 测试任务 ===== */
+.test-step{padding:var(--space-xs) 0;font-size:12px;display:flex;align-items:center;gap:var(--space-sm)}
+.test-step .step-num{width:22px;height:22px;border-radius:50%;background:var(--bg-card2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;border:1px solid var(--border);color:var(--text-muted)}
+
+/* ===== 按钮 ===== */
+.btn{padding:7px 14px;border:none;border-radius:var(--radius-xs);cursor:pointer;font-size:11px;font-weight:500;transition:all .2s var(--ease);display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 0 0 rgba(59,130,246,0)}
+.btn-primary:hover{background:#2563eb;box-shadow:0 0 20px var(--accent-glow)}
+.btn-success{background:#166534;color:var(--green)}
+.btn-success:hover{background:#15803d}
+.btn-danger{background:#7f1d1d;color:var(--red)}
+.btn-danger:hover{background:#991b1b}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text);background:var(--bg-hover)}
+.btn-sm{padding:4px 10px;font-size:10px}
+
+/* ===== 输入框 ===== */
+.input{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 12px;width:100%;color:var(--text);font-size:13px;outline:none;transition:border .2s var(--ease)}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none;background:var(--bg-card2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23475569'/%3E%3C/svg%3E") no-repeat right 10px center;padding-right:28px}
+
+/* ===== 命令行 ===== */
+.cmd-box{background:#050b15;border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:11px;line-height:1.6;overflow-x:auto;margin:var(--space-xs) 0;color:var(--green);position:relative}
+.cmd-box .prompt{color:var(--text-dim)}
+.cmd-box .cmd{color:var(--green)}
+
+/* ===== 滚回区域 ===== */
+.rollback-area{background:linear-gradient(135deg,var(--bg-elevated),var(--bg-card));border:1px solid var(--accent);border-radius:var(--radius);padding:var(--space-md);margin:var(--space-md) 0;position:relative;overflow:hidden}
+.rollback-area::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--purple),transparent)}
+.rollback-area .big-btn{padding:10px 24px;border:none;border-radius:var(--radius-xs);background:linear-gradient(135deg,var(--accent),#2563eb);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s var(--ease);display:inline-flex;align-items:center;gap:8px;box-shadow:0 0 20px var(--accent-glow)}
+.rollback-area .big-btn:hover{transform:translateY(-1px);box-shadow:0 0 30px var(--accent-glow)}
+.rollback-area .big-btn:active{transform:scale(.98)}
+
+/* ===== 上传区 ===== */
+.upload-area{border:1px dashed var(--border);border-radius:var(--radius-sm);padding:var(--space-lg);text-align:center;cursor:pointer;transition:all .2s var(--ease);margin:var(--space-sm) 0}
+.upload-area:hover{border-color:var(--accent);background:var(--bg-hover)}
+.upload-area .icon{font-size:28px;margin-bottom:var(--space-xs);opacity:.6}
+.upload-area .label{font-size:11px;color:var(--text-dim)}
+
+/* ===== 确认网格 ===== */
+.confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm);margin:var(--space-sm) 0}
+.confirm-group{font-size:12px}
+.confirm-group label{font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)}
+
+/* ===== 筛选按钮 ===== */
+.filter-bar{display:flex;gap:6px;margin-bottom:var(--space-sm);flex-wrap:wrap}
+
+/* ===== 动效 ===== */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+
+/* ===== 徽章 ===== */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500;gap:4px}
+.badge-verified{background:var(--green-bg);color:var(--green)}
+.badge-pending{background:var(--yellow-bg);color:var(--yellow)}
+.badge-fail{background:var(--red-bg);color:var(--red)}
+.badge-stable{background:var(--green-bg);color:var(--green)}
+.badge-test{background:var(--orange);color:#fff;background:rgba(249,115,22,.15);color:var(--orange)}
+
+/* ===== 弹窗 ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:var(--space-md);animation:fadeIn .2s var(--ease)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:var(--space-md);border-bottom:1px solid var(--border)}
+.modal-title{font-size:14px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}
+.modal-close:hover{background:var(--bg-hover);color:var(--text)}
+.modal-body{flex:1;overflow:auto;padding:var(--space-md)}
+.modal-body pre{margin:0;font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;word-break:break-all;color:var(--text)}
+.code-loading{text-align:center;padding:40px 0;color:var(--text-dim);font-size:13px}
+
+/* ===== 响应式 ===== */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .fw-lab{flex-direction:column}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .confirm-grid{grid-template-columns:1fr}
+  .tab{padding:10px 12px;font-size:11px}
+}
 
 /* ===== 上传工作流 ===== */
 .flow-steps{display:flex;flex-direction:column;gap:var(--space-md)}
@@ -135,9 +235,9 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 .flow-step .step-body{flex:1;min-width:0}
 .flow-step .step-title{font-size:13px;font-weight:600;margin-bottom:4px}
 .flow-step .step-desc{font-size:11px;color:var(--text-muted);line-height:1.5}
-.flow-step .step-cmd{background:#050b15;border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 10px;font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:11px;line-height:1.6;margin:6px 0;color:var(--green)}
+.flow-step .step-cmd{background:#050b15;border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 10px;font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:11px;line-height:1.6;margin:6px 0;color:var(--green);cursor:pointer;transition:all .15s}
+.flow-step .step-cmd:hover{background:#0a1628}
 .flow-connector{width:2px;height:16px;margin-left:18px;background:linear-gradient(180deg,var(--border),transparent)}
-
 /* 备份包卡片 */
 .backup-card{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-md);margin-bottom:var(--space-sm);display:flex;gap:var(--space-md);align-items:center;transition:all .2s var(--ease)}
 .backup-card:hover{border-color:var(--border-light)}
@@ -147,87 +247,11 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 .backup-card .info .meta{font-size:10px;color:var(--text-dim);margin-top:2px;display:flex;gap:var(--space-sm);flex-wrap:wrap}
 .backup-card .info .desc{font-size:11px;color:var(--text-muted);margin-top:4px}
 .backup-card .actions{display:flex;gap:6px;flex-shrink:0}
-
-/* ===== 进度条 ===== */
-.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:8px 0;position:relative}
-.progress-bar .fill{height:100%;border-radius:2px;transition:width 1s var(--ease);background:linear-gradient(90deg,var(--accent),var(--green))}
-.progress-bar .fill.paused{background:linear-gradient(90deg,var(--yellow),var(--orange))}
-
-/* ===== 上传区 ===== */
-.upload-area{border:1px dashed var(--border);border-radius:var(--radius-sm);padding:var(--space-lg);text-align:center;cursor:pointer;transition:all .2s var(--ease);margin:var(--space-sm) 0}
-.upload-area:hover{border-color:var(--accent);background:var(--bg-hover)}
-.upload-area .icon{font-size:28px;margin-bottom:var(--space-xs);opacity:.6}
-.upload-area .label{font-size:11px;color:var(--text-dim)}
-
-/* ===== 步骤按钮 ===== */
-.test-step{padding:var(--space-xs) 0;font-size:12px;display:flex;align-items:center;gap:var(--space-sm)}
-.test-step .step-num{width:22px;height:22px;border-radius:50%;background:var(--bg-card2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;border:1px solid var(--border);color:var(--text-muted)}
-
-.btn{padding:7px 14px;border:none;border-radius:var(--radius-xs);cursor:pointer;font-size:11px;font-weight:500;transition:all .2s var(--ease);display:inline-flex;align-items:center;gap:6px;text-decoration:none}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#2563eb;box-shadow:0 0 20px var(--accent-glow)}
-.btn-success{background:#166534;color:var(--green)}
-.btn-success:hover{background:#15803d}
-.btn-danger{background:#7f1d1d;color:var(--red)}
-.btn-danger:hover{background:#991b1b}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
-.btn-outline:hover{border-color:var(--accent);color:var(--text);background:var(--bg-hover)}
-.btn-sm{padding:4px 10px;font-size:10px}
-
-.input{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 12px;width:100%;color:var(--text);font-size:13px;outline:none;transition:border .2s var(--ease)}
-.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none;background:var(--bg-card2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23475569'/%3E%3C/svg%3E") no-repeat right 10px center;padding-right:28px}
-
-.cmd-box{background:#050b15;border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:11px;line-height:1.6;overflow-x:auto;margin:var(--space-xs) 0;color:var(--green);position:relative}
-.cmd-box .prompt{color:var(--text-dim)}
-.cmd-box .cmd{color:var(--green)}
-
-.rollback-area{background:linear-gradient(135deg,var(--bg-elevated),var(--bg-card));border:1px solid var(--accent);border-radius:var(--radius);padding:var(--space-md);margin:var(--space-md) 0;position:relative;overflow:hidden}
-.rollback-area::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--purple),transparent)}
-.rollback-area .big-btn{padding:10px 24px;border:none;border-radius:var(--radius-xs);background:linear-gradient(135deg,var(--accent),#2563eb);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s var(--ease);display:inline-flex;align-items:center;gap:8px;box-shadow:0 0 20px var(--accent-glow)}
-.rollback-area .big-btn:hover{transform:translateY(-1px);box-shadow:0 0 30px var(--accent-glow)}
-.rollback-area .big-btn:active{transform:scale(.98)}
-
-.confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm);margin:var(--space-sm) 0}
-.confirm-group{font-size:12px}
-.confirm-group label{font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)}
-
-.filter-bar{display:flex;gap:6px;margin-bottom:var(--space-sm);flex-wrap:wrap}
-
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-.pulse{animation:pulse 2s ease-in-out infinite}
-@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-.slide-in{animation:slideIn .3s var(--ease)}
-
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500;gap:4px}
-.badge-verified{background:var(--green-bg);color:var(--green)}
-.badge-pending{background:var(--yellow-bg);color:var(--yellow)}
-.badge-fail{background:var(--red-bg);color:var(--red)}
-.badge-stable{background:var(--green-bg);color:var(--green)}
-.badge-test{background:var(--orange);color:#fff;background:rgba(249,115,22,.15);color:var(--orange)}
 .badge-uploaded{background:rgba(6,182,212,.15);color:var(--cyan)}
 .badge-ready{background:rgba(59,130,246,.15);color:var(--accent)}
-
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:var(--space-md);animation:fadeIn .2s var(--ease)}
-.modal-overlay.show{display:flex}
-.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:720px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.4)}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:var(--space-md);border-bottom:1px solid var(--border)}
-.modal-title{font-size:14px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;padding:2px 8px;border-radius:4px;transition:all .15s}
-.modal-close:hover{background:var(--bg-hover);color:var(--text)}
-.modal-body{flex:1;overflow:auto;padding:var(--space-md)}
-.modal-body pre{margin:0;font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;word-break:break-all;color:var(--text)}
-.code-loading{text-align:center;padding:40px 0;color:var(--text-dim);font-size:13px}
-
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.slide-in{animation:slideIn .3s var(--ease)}
 @media(max-width:768px){
-  .sidebar{display:none}
-  .fw-lab{flex-direction:column}
-  .stat-grid{grid-template-columns:1fr 1fr}
-  .confirm-grid{grid-template-columns:1fr}
-  .tab{padding:10px 12px;font-size:11px}
   .backup-card{flex-direction:column;align-items:stretch}
 }
 </style>
@@ -269,25 +293,17 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
   <div class="tab-content" id="tab-upload">
     <div class="card">
       <h2>📦 备份包管理</h2>
-      <p style="font-size:11px;color:var(--text-muted);margin-bottom:var(--space-sm)">
-        通过 GitHub Releases 上传/下载大文件备份。单个文件上限 2GB。
-      </p>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:var(--space-sm)">通过 GitHub Releases 上传/下载大文件备份。单个文件上限 2GB。</p>
       <div id="backupPackages"></div>
     </div>
-
     <div class="card">
       <h2>🚀 上传工作流</h2>
-      <p style="font-size:11px;color:var(--text-muted);margin-bottom:var(--space-md)">
-        从本地备份到固件下载的完整流程。点击步骤查看对应命令。
-      </p>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:var(--space-md)">从本地备份到固件下载的完整流程。点击命令块可复制。</p>
       <div class="flow-steps" id="uploadWorkflow"></div>
     </div>
-
     <div class="card">
       <h2>📋 v307B 数据集成</h2>
-      <p style="font-size:11px;color:var(--text-muted);margin-bottom:var(--space-sm)">
-        上传完成后，备份数据会自动出现在固件列表中，可在烧录页下载对应 BIN 文件。
-      </p>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:var(--space-sm)">上传完成后，备份数据会自动出现在固件列表中，可在烧录页下载对应 BIN 文件。</p>
       <div id="backupIntegration"></div>
     </div>
   </div>
@@ -396,7 +412,13 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
         </div>
         <div style="margin:var(--space-sm) 0">
           <label style="font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)">📄 串口日志粘贴</label>
-          <textarea class="input" id="fb-log" rows="6" placeholder="在此粘贴串口输出日志...&#10;例如：&#10;rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)&#10;ESP-ROM:esp32s3-20210327&#10;Build:Mar 27 2021&#10;..." style="resize:vertical;font-family:monospace;font-size:11px;line-height:1.6"></textarea>
+          <textarea class="input" id="fb-log" rows="6" placeholder="在此粘贴串口输出日志...
+例如：
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+...
+" style="resize:vertical;font-family:monospace;font-size:11px;line-height:1.6"></textarea>
         </div>
         <div style="margin:var(--space-sm) 0">
           <label style="font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)">📝 备注</label>
@@ -449,36 +471,6 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
 
 <script>
 // =====================================================================
-// 数据 — 备份包（GitHub Releases 资产）
-// =====================================================================
-const BACKUPS = [
-  {name:"lingxi-v307b-firmware-full.zip", size:"700 MB", desc:"v307B 完整固件工程（含 PlatformIO 项目、依赖、配置文件）", icon:"📦", status:"ready",
-   releaseTag:"backup-v307b-firmware"},
-  {name:"lingxi-v307b-sources.zip", size:"300 MB", desc:"v307B 源码备份（含 main.cpp、ml307_driver.h 等全部源文件）", icon:"📄", status:"ready",
-   releaseTag:"backup-v307b-firmware"},
-  {name:"lingxi-v307b-tools-and-docs.zip", size:"160 MB", desc:"v307B 工具链与文档（烧录工具、配置说明、调试笔记）", icon:"📘", status:"ready",
-   releaseTag:"backup-v307b-firmware"},
-];
-
-// 上传工作流步骤定义
-const WORKFLOW_STEPS = [
-  {id:"pack", icon:"📦", title:"Step 1: 本地打包备份", desc:"将 v307B 代码和文件按分类打包为 3 个 zip 文件",
-   cmd:"# 打包示例\nzip -r lingxi-v307b-firmware-full.zip firmware/ platformio.ini\nzip -r lingxi-v307b-sources.zip src/\nzip -r lingxi-v307b-tools-and-docs.zip tools/ docs/"},
-  {id:"release", icon:"🚀", title:"Step 2: 创建 GitHub Release", desc:"在你的灵犀仓库创建 Release，上传 3 个备份包",
-   cmd:"gh release create backup-v307b-firmware \\\n  lingxi-v307b-firmware-full.zip \\\n  lingxi-v307b-sources.zip \\\n  lingxi-v307b-tools-and-docs.zip \\\n  --title \"v307B 备份\" \\\n  --notes \"小虾备份的 v307B 完整代码包\"\n\n# 或通过 GitHub Web:\n# → 仓库首页 → Releases → Draft a new release\n# → Tag: backup-v307b-firmware → 上传 3 个 zip"},
-  {id:"verify", icon:"🔍", title:"Step 3: 校验完整性", desc:"确认 Release 资产已发布，SHA256 校验通过",
-   cmd:"# 下载校验\ngh release download backup-v307b-firmware \\\n  --repo licoo12580-source/lingxi\nsha256sum *.zip\n\n# GitHub 会自动显示每个资产的 SHA256\n# 对比本地备份的 checksum"},
-  {id:"extract", icon:"🔧", title:"Step 4: 解包提取 BIN", desc:"从备份中提取 .bin 文件，合并为烧录文件",
-   cmd:"unzip -j lingxi-v307b-firmware-full.zip \\\n  '*/firmware/.pio/build/esp32-s3-devkitc-1/firmware.bin'\nmv firmware.bin v307B-merged.bin\n# 或从拆分文件合并：\nesptool merge_bin \\\n  --output v307B-merged.bin \\\n  0x0 bootloader.bin \\\n  0x10000 partitions.bin \\\n  0x20000 firmware.bin"},
-  {id:"integrate", icon:"🔗", title:"Step 5: 集成到 Firmware Lab", desc:"将 BIN 固件上传到 Pages 仓库的 firmware/ 目录，更新版本列表",
-   cmd:"cp v307B-merged.bin /path/to/lingxi-pages/firmware/\ncd /path/to/lingxi-pages\ngit add firmware/v307B-merged.bin\ngit commit -m \"feat: 集成 v307B 备份固件\"\ngit push origin main\n# 然后在 firmware-lab.html 的 FW 数据中加 v307B 条目"},
-  {id:"flash", icon:"⚡", title:"Step 6: 下载并烧录", desc:"在烧录页选择 v307B 版本，下载 BIN，用 esptool 写入设备",
-   cmd:"esptool --chip esp32s3 write_flash 0x0 \\\n  https://licoo12580-source.github.io/lingxi-pages/firmware/v307B-merged.bin"},
-  {id:"verify-flash", icon:"✅", title:"Step 7: 验证烧录", desc:"串口监视确认启动正常，OLED 显示 v307B 版本号",
-   cmd:"# 串口监视\nscreen /dev/ttyUSB0 115200\n# 或 esptool 校验\n# esptool --chip esp32s3 verify_flash 0x0 v307B-merged.bin"}
-];
-
-// =====================================================================
 // 数据 — 全部版本
 // =====================================================================
 const FW = [
@@ -489,8 +481,9 @@ const FW = [
    knownIssues:[], risk:"低",
    env:{board:"esp32-s3-devkitc-1",platform:"espressif32",framework:"arduino",lgfx:"1.2.24"},
    files:{merge:"display-baseline-merged.bin"},
-   desc:"✅ 黄金基线 · 用户确认\"所有全对了\"",
-   testSteps:["全擦除烧录","重启观察红屏3秒","观察绿屏3秒","观察蓝屏3秒","确认白字 LINGXI LCD OK"]},
+   desc:"✅ 黄金基线 · 用户确认"所有全对了"",
+   testSteps:["全擦除烧录","重启观察红屏3秒","观察绿屏3秒","观察蓝屏3秒","确认白字 LINGXI LCD OK"],
+  },
   {ver:"v0.6.28.1558-display-baseline-r2", date:"2026-06-28 15:58", status:"verified", tag:"display-baseline-rstfix", category:"baseline",
    changes:["pin_rst=48→4 (BUG-006)"],
    solves:["LCD_RST引脚不一致（BUG-006）"],
@@ -560,7 +553,7 @@ const FW = [
   {ver:"v0627-lgfx-native", status:"fail", category:"experiment", source:"v0627-lgfx-native", changes:["LovyanGFX+LVGL9.5"], solves:[""], knownIssues:["SPI3_HOST+FSPI冲突"]},
   {ver:"v0627-lgfx-ota", status:"fail", category:"experiment", changes:["OTA后台任务+TG0/TG1全部WDT禁用"], solves:[""], knownIssues:["LCD_RST值有歧义"]},
   {ver:"v0310A", status:"verified", tag:"old-base", category:"legacy", changes:["ILI9341诊断"], solves:[""], knownIssues:[], desc:"早期3.2寸屏验证基准"},
-  // v307B 备份条目 — 上传 Release 后激活
+  // v307B 备份条目 — 上传后激活
   {ver:"v307B（备份）", status:"pending", tag:"backup", category:"backup",
    fromBackup:"lingxi-v307b-firmware-full.zip",
    changes:["v307B 完整固件备份（小虾备份）"], solves:["历史版本存档"], knownIssues:["需要从备份中提取 BIN 文件"], risk:"低",
@@ -582,10 +575,6 @@ const ISSUES_KNOWLEDGE = [
   {id:11,title:"颜色颠倒(用户反馈v0621L)",cause:"厂家初始化序列覆盖了LovyanGFX启动的默认值",solution:"去掉自定义factory_init，用LGFX内置init",resolvedIn:"v0628-lgfx-r5"},
 ];
 
-// GitHub Release URL 模板
-const RELEASE_API = "https://api.github.com/repos/licoo12580-source/lingxi/releases";
-const RELEASE_DOWNLOAD = "https://github.com/licoo12580-source/lingxi/releases/download";
-
 const TEST_HISTORY = [];
 let selectedVer = null;
 let testFiles = [];
@@ -594,9 +583,39 @@ const BASE = location.hostname === 'licoo12580-source.github.io'
   ? 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware'
   : 'firmware';
 
-const RELEASES_BASE = 'https://github.com/licoo12580-source/lingxi/releases';
+// GitHub Release URL 模板
+const RELEASE_API = "https://api.github.com/repos/licoo12580-source/lingxi/releases";
+const RELEASE_DOWNLOAD = "https://github.com/licoo12580-source/lingxi/releases/download";
+const RELEASES_BASE = "https://github.com/licoo12580-source/lingxi/releases";
 
-// ===== 工具函数 =====
+// ===== 备份包数据（GitHub Releases 资产） =====
+const BACKUPS = [
+  {name:"lingxi-v307b-firmware-full.zip", size:"700 MB", desc:"v307B 完整固件工程（含 PlatformIO 项目、依赖、配置文件）", icon:"📦", status:"ready",
+   releaseTag:"backup-v307b-firmware"},
+  {name:"lingxi-v307b-sources.zip", size:"300 MB", desc:"v307B 源码备份（含 main.cpp、ml307_driver.h 等全部源文件）", icon:"📄", status:"ready",
+   releaseTag:"backup-v307b-firmware"},
+  {name:"lingxi-v307b-tools-and-docs.zip", size:"160 MB", desc:"v307B 工具链与文档（烧录工具、配置说明、调试笔记）", icon:"📘", status:"ready",
+   releaseTag:"backup-v307b-firmware"},
+];
+
+// 上传工作流步骤定义
+const WORKFLOW_STEPS = [
+  {id:"pack", icon:"📦", title:"Step 1: 本地打包备份", desc:"将 v307B 代码和文件按分类打包为 3 个 zip 文件",
+   cmd:"# 打包示例\nzip -r lingxi-v307b-firmware-full.zip firmware/ platformio.ini\nzip -r lingxi-v307b-sources.zip src/\nzip -r lingxi-v307b-tools-and-docs.zip tools/ docs/"},
+  {id:"release", icon:"🚀", title:"Step 2: 创建 GitHub Release", desc:"在灵犀仓库创建 Release，上传 3 个备份包",
+   cmd:"gh release create backup-v307b-firmware \\\n  lingxi-v307b-firmware-full.zip \\\n  lingxi-v307b-sources.zip \\\n  lingxi-v307b-tools-and-docs.zip \\\n  --title \"v307B 备份\" \\\n  --notes \"小虾备份的 v307B 完整代码包\"\n\n# 或通过 GitHub Web:\n# → 仓库首页 → Releases → Draft a new release\n# → Tag: backup-v307b-firmware → 上传 3 个 zip"},
+  {id:"verify", icon:"🔍", title:"Step 3: 校验完整性", desc:"确认 Release 资产已发布，SHA256 校验通过",
+   cmd:"# 下载校验\ngh release download backup-v307b-firmware \\\n  --repo licoo12580-source/lingxi\nsha256sum *.zip\n\n# GitHub 会自动显示每个资产的 SHA256\n# 对比本地备份的 checksum"},
+  {id:"extract", icon:"🔧", title:"Step 4: 解包提取 BIN", desc:"从备份中提取 .bin 文件，合并为烧录文件",
+   cmd:"unzip -j lingxi-v307b-firmware-full.zip \\\n  '*/firmware/.pio/build/esp32-s3-devkitc-1/firmware.bin'\nmv firmware.bin v307B-merged.bin\n# 或从拆分文件合并：\nesptool merge_bin \\\n  --output v307B-merged.bin \\\n  0x0 bootloader.bin \\\n  0x10000 partitions.bin \\\n  0x20000 firmware.bin"},
+  {id:"integrate", icon:"🔗", title:"Step 5: 集成到 Firmware Lab", desc:"将 BIN 固件上传到 Pages 仓库的 firmware/ 目录",
+   cmd:"cp v307B-merged.bin /path/to/lingxi-pages/firmware/\ncd /path/to/lingxi-pages\ngit add firmware/v307B-merged.bin\ngit commit -m \"feat: 集成 v307B 备份固件\"\ngit push origin main\n# 然后在本页的 FW 数据中加 v307B 条目"},
+  {id:"flash", icon:"⚡", title:"Step 6: 下载并烧录", desc:"在烧录页选择 v307B 版本，下载 BIN，用 esptool 写入设备",
+   cmd:"esptool --chip esp32s3 write_flash 0x0 \\\n  https://licoo12580-source.github.io/lingxi-pages/firmware/v307B-merged.bin"},
+  {id:"verify-flash", icon:"✅", title:"Step 7: 验证烧录", desc:"串口监视确认启动正常，OLED 显示 v307B 版本号",
+   cmd:"# 串口监视\nscreen /dev/ttyUSB0 115200\n# 或 esptool 校验\n# esptool --chip esp32s3 verify_flash 0x0 v307B-merged.bin"}
+];
+
 function statusColor(s){
   const m={verified:'var(--green)',stable:'var(--green)',golden:'var(--green)',pass:'var(--green)',
            pending:'var(--yellow)',fail:'var(--red)',test:'var(--orange)',deprecated:'var(--text-dim)',backup:'var(--cyan)'};
@@ -613,13 +632,12 @@ function statusLabel(s){
   return m[s]||s;
 }
 
-// ===== 渲染上传标签 =====
+// ===== 上传标签渲染 =====
 function renderUpload(){
   renderBackupPackages();
   renderUploadWorkflow();
   renderBackupIntegration();
 }
-
 function renderBackupPackages(){
   const el=document.getElementById('backupPackages');
   el.innerHTML=BACKUPS.map(b=>{
@@ -644,7 +662,6 @@ function renderBackupPackages(){
     </div>`;
   }).join('');
 }
-
 function renderUploadWorkflow(){
   const el=document.getElementById('uploadWorkflow');
   el.innerHTML=WORKFLOW_STEPS.map(s=>
@@ -657,7 +674,6 @@ function renderUploadWorkflow(){
       </div>
     </div>`
   ).join('');
-  // 添加连接线
   const steps=el.querySelectorAll('.flow-step');
   for(let i=0;i<steps.length-1;i++){
     const connector=document.createElement('div');
@@ -665,7 +681,6 @@ function renderUploadWorkflow(){
     steps[i].after(connector);
   }
 }
-
 function renderBackupIntegration(){
   const el=document.getElementById('backupIntegration');
   const backupFws=FW.filter(f=>f.category==='backup');
@@ -676,9 +691,7 @@ function renderBackupIntegration(){
         ${statusBadge(v.status)}
         <span style="font-size:10px;color:var(--text-dim);margin-left:auto">${v.fromBackup||''}</span>
       </div>
-      <div class="meta">
-        <span>📝 ${v.desc}</span>
-      </div>
+      <div class="meta"><span>📝 ${v.desc}</span></div>
       <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-primary btn-sm" onclick="selectVer('${v.ver}')">⚡ 去烧录页</button>
         <a class="btn btn-outline btn-sm" href="${RELEASES_BASE}" target="_blank">⬇ 去 GitHub Releases</a>
@@ -686,16 +699,13 @@ function renderBackupIntegration(){
     </div>`
   ).join('');
 }
-
 function showUploadHelp(){
   document.querySelector('.tab[data-tab="upload"]').click();
   document.getElementById('ws-pack').scrollIntoView({behavior:'smooth',block:'center'});
-  // 高亮第一步
   document.querySelectorAll('.flow-step').forEach(s=>s.classList.remove('active-step'));
   document.getElementById('ws-pack').classList.add('active-step');
   setTimeout(()=>document.getElementById('ws-pack').classList.remove('active-step'),3000);
 }
-
 function copyText(el){
   const text=el.textContent.replace(/^#.*\n?/gm,'').trim();
   navigator.clipboard.writeText(text).then(()=>{
@@ -704,23 +714,25 @@ function copyText(el){
     setTimeout(()=>el.innerHTML=orig,1000);
   });
 }
-
-// ===== GitHub Releases 自动检测 =====
+// 检测 GitHub Releases 资产状态
 async function checkReleases(){
   try{
     const r=await fetch(RELEASE_API+'/tags/backup-v307b-firmware');
     if(r.ok){
       const data=await r.json();
       const uploadedAssets=data.assets.map(a=>a.name);
-      BACKUPS.forEach(b=>{
-        if(uploadedAssets.includes(b.name)) b.status='uploaded';
-      });
+      BACKUPS.forEach(b=>{if(uploadedAssets.includes(b.name))b.status='uploaded';});
       renderUpload();
     }
   }catch(e){/* 跨域或网络问题，静默失败 */}
 }
 
-// ===== 渲染树 =====
+function render(){
+  renderTree(); renderDashboard(); renderBaselines();
+  renderExperiments('all'); renderIssues(); renderFlash(null);
+  renderUpload(); renderKnowledge(); renderTestHistory();
+}
+
 function renderTree(){
   const el=document.getElementById('treeView');
   const g={baseline:[],experiment:[],legacy:[],backup:[]};
@@ -765,12 +777,10 @@ function renderTree(){
   el.innerHTML=html;
 }
 
-// ===== Dashboard =====
 function renderDashboard(){
   const verified=FW.filter(v=>v.status==='verified'||v.status==='stable').length;
   const failed=FW.filter(v=>v.status==='fail').length;
   const pending=FW.filter(v=>v.status==='pending'||v.status==='test').length;
-  const backups=BACKUPS.filter(b=>b.status==='ready').length;
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card" onclick="showTab('experiments')" style="cursor:pointer" title="点击查看全部版本">
       <div class="num" style="color:var(--accent)">${FW.length}</div><div class="label">总版本数</div>
@@ -790,9 +800,6 @@ function renderDashboard(){
     <div class="stat-card" onclick="showTab('baselines')" style="cursor:pointer" title="点击查看所有基线">
       <div class="num" style="color:var(--text-muted)">${FW.filter(v=>v.category==='baseline').length}</div><div class="label">基线数</div>
     </div>
-    <div class="stat-card" onclick="showTab('upload')" style="cursor:pointer" title="点击查看备份上传">
-      <div class="num" style="color:var(--cyan)">${backups}</div><div class="label">待上传备份</div>
-    </div>
   `;
   const recent=FW.filter(v=>v.date).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,6);
   document.getElementById('recentActivity').innerHTML=recent.map(v=>
@@ -805,7 +812,6 @@ function renderDashboard(){
   ).join('');
 }
 
-// ===== 基线和实验渲染 =====
 function renderBaselines(){
   document.getElementById('baselinesList').innerHTML=FW.filter(v=>v.tag&&v.status==='verified').map(v=>
     `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:4px 8px;border-radius:6px;display:flex;align-items:center;gap:8px;transition:all .15s" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
@@ -842,7 +848,6 @@ function renderExperiments(filter){
   ).join('');
 }
 
-// ===== 问题库和知识库 =====
 function renderIssues(){
   const q=(document.getElementById('issueSearch').value||'').toLowerCase();
   const items=q?ISSUES_KNOWLEDGE.filter(i=>i.title.toLowerCase().includes(q)||i.cause.toLowerCase().includes(q)||i.solution.toLowerCase().includes(q)):ISSUES_KNOWLEDGE;
@@ -860,21 +865,7 @@ function renderIssues(){
     </div>`
   ).join('');
 }
-function renderKnowledge(){
-  document.getElementById('kbCount').textContent=ISSUES_KNOWLEDGE.length;
-  document.getElementById('knowledgeBase').innerHTML=ISSUES_KNOWLEDGE.map(i=>
-    `<div class="issue-card" style="animation:none">
-      <div class="title">✅ ${i.title}</div>
-      <div class="meta">
-        <span>🔍 <strong>原因：</strong>${i.cause}</span>
-        <span style="display:block;margin-top:4px">💊 <strong>解决：</strong><span style="color:var(--green)">${i.solution}</span></span>
-        <span style="display:block;margin-top:4px">📌 <strong>版本：</strong>${i.resolvedIn||'待定'}</span>
-      </div>
-    </div>`
-  ).join('');
-}
 
-// ===== Flash =====
 function renderFlash(ver){
   if(!ver){const l=FW.filter(v=>v.files&&(v.files.merge||v.files.full||v.files.inc)).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];if(l){ver=l;selectedVer=l;}}
   if(!ver)return;
@@ -890,6 +881,7 @@ function renderFlash(ver){
     </div>
     ${v.desc?`<div style="font-size:12px;color:var(--text-muted);margin-top:4px">${v.desc}</div>`:''}
   `;
+  // 变更摘要
   const changes=(v.changes||[]).map(c=>`<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;background:var(--bg-card2);color:var(--text-muted);border:1px solid var(--border);margin:2px 4px 2px 0">${c}</span>`).join('');
   const solved=(v.solves||[]).filter(s=>s).map(s=>`<span style="color:var(--green)">✅ ${s}</span>`).join('');
   document.getElementById('flashChanges').innerHTML=`
@@ -906,23 +898,31 @@ function renderFlash(ver){
     document.getElementById('downloadBtn').href=`${BASE}/${file}`;
     document.getElementById('downloadBtn').style.display='inline-flex';
   }else{
-    document.getElementById('flashCmd').innerHTML=`<span class="prompt">$</span> <span class="cmd"># 无可用 BIN 文件。请先上传备份包。</span>`;
+    document.getElementById('flashCmd').innerHTML=`<span class="prompt">$</span> <span class="cmd"># 无可用 BIN 文件</span>`;
     document.getElementById('downloadBtn').style.display='none';
-    // 显示上传指引
-    if(v.category==='backup'){
-      const backupInfo=BACKUPS.find(b=>b.name===v.fromBackup);
-      if(backupInfo){
-        document.getElementById('flashCmd').innerHTML=`<span class="prompt">$</span> <span class="cmd"># 📦 这是备份版本，需要从 Release 下载解包\n# 步骤：\n# 1. 去 GitHub Releases 下载 ${backupInfo.name}\n# 2. 解包提取 .bin 文件\n# 3. 上传到 firmware/ 目录\n# 详见 📤 上传 标签 → 上传工作流</span>`;
-      }
-    }
   }
+  // 预览按钮：有 source 字段才显示
   const pBtn=document.getElementById('previewBtn');
-  pBtn.style.display=v.source?'inline-flex':'none';
-  if(v.source)pBtn.dataset.source=v.source;
+  if(v.source){
+    pBtn.style.display='inline-flex';
+    pBtn.dataset.source=v.source;
+  }else{
+    pBtn.style.display='none';
+  }
+  // 反馈按钮：有版本就显示
   const fBtn=document.getElementById('feedbackBtn');
-  fBtn.style.display=v?'inline-flex':'none';
+  if(v){
+    fBtn.style.display='inline-flex';
+  }else{
+    fBtn.style.display='none';
+  }
+  // 基线按钮：已验证/稳定的版本才可标记
   const bBtn=document.getElementById('baselineBtn');
-  bBtn.style.display=v&&(v.status==='verified'||v.status==='stable'||v.status==='golden')?'inline-flex':'none';
+  if(v&&(v.status==='verified'||v.status==='stable'||v.status==='golden')){
+    bBtn.style.display='inline-flex';
+  }else{
+    bBtn.style.display='none';
+  }
   document.getElementById('rollbackVersions').innerHTML=FW.filter(f=>f.status==='verified'||f.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(v=>
     `<div onclick="selectVer('${v.ver}')" style="cursor:pointer;padding:6px 8px;border-radius:6px;transition:all .15s;border-bottom:1px solid rgba(30,41,59,.5)" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
       <div style="display:flex;align-items:center;gap:10px">
@@ -940,12 +940,13 @@ function renderFlash(ver){
   ).join('');
 }
 
-// ===== Feedback =====
-let fbVersion=null;
+// ===== 反馈弹窗 =====
+let fbVersion=null; // 打开弹窗时锁定的版本
 function openFeedback(){
   if(!selectedVer){alert('请先选择版本');return;}
-  fbVersion=selectedVer;
+  fbVersion=selectedVer; // 锁定当前版本
   document.getElementById('fbVer').textContent=fbVersion.ver+' ('+(fbVersion.date||'')+')';
+  // 重置表单
   ['fb-reproduced','fb-new','fb-solved','fb-rollback','fb-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fb-log').value='';
   document.getElementById('feedbackModal').classList.add('show');
@@ -955,6 +956,7 @@ function closeFeedback(){
 }
 function submitFeedback(result){
   if(!fbVersion){closeFeedback();return;}
+  // 检测版本是否被切换
   if(selectedVer!==fbVersion){
     if(!confirm(`⚠ 当前版本已从 ${fbVersion.ver} 切换到 ${selectedVer.ver}，确认仍为 ${fbVersion.ver} 提交反馈？`)){
       closeFeedback();
@@ -969,6 +971,7 @@ function submitFeedback(result){
       solved:document.getElementById('fb-solved').value,rollback:document.getElementById('fb-rollback').value}};
   TEST_HISTORY.push(r);
   renderTestHistory();
+  // 更新目标版本状态（非当前版本）
   const targetVer=FW.find(f=>f.ver===fbVersion.ver);
   if(targetVer)targetVer.status=result==='pass'?'verified':'fail';
   render();
@@ -1001,6 +1004,8 @@ ${log||'（无日志）'}
     setTimeout(()=>btn.textContent=orig,1500);
   });
 }
+
+// ===== 测试历史 =====
 function renderTestHistory(){
   const el=document.getElementById('testHistory');
   if(!el)return;
@@ -1012,6 +1017,21 @@ function renderTestHistory(){
     `<div class="issue-card" style="animation:none;padding:8px 10px;margin-bottom:4px">
       <div class="title" style="font-size:12px">${r.ver} — ${r.result==='pass'?'✅ 通过':'❌ 失败'}</div>
       <div class="meta" style="font-size:10px"><span>${r.time}</span>${r.note?`<span> · ${r.note}</span>`:''}</div>
+    </div>`
+  ).join('');
+}
+
+// ===== 知识库 =====
+function renderKnowledge(){
+  document.getElementById('kbCount').textContent=ISSUES_KNOWLEDGE.length;
+  document.getElementById('knowledgeBase').innerHTML=ISSUES_KNOWLEDGE.map(i=>
+    `<div class="issue-card" style="animation:none">
+      <div class="title">✅ ${i.title}</div>
+      <div class="meta">
+        <span>🔍 <strong>原因：</strong>${i.cause}</span>
+        <span style="display:block;margin-top:4px">💊 <strong>解决：</strong><span style="color:var(--green)">${i.solution}</span></span>
+        <span style="display:block;margin-top:4px">📌 <strong>版本：</strong>${i.resolvedIn||'待定'}</span>
+      </div>
     </div>`
   ).join('');
 }
@@ -1033,7 +1053,6 @@ function showTab(name){
   if(tab)tab.classList.add('active');
   const content=document.getElementById(`tab-${name}`);
   if(content)content.classList.add('active');
-  if(name==='upload') renderUpload();
 }
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>showTab(tab.dataset.tab));
@@ -1047,10 +1066,13 @@ function copyCmd(id){
     setTimeout(()=>btn.textContent=orig,1500);
   });
 }
+
+// ===== 回滚 =====
 function rollbackLatest(){
   const bl=FW.filter(v=>v.status==='verified'||v.status==='stable').sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
   if(bl)selectVer(bl.ver);
 }
+
 function riskLabel(r){
   const m={低:'🟢 低',中:'🟠 中',高:'🔴 高'};
   return m[r]||r;
@@ -1064,7 +1086,12 @@ function openPreview(){
   document.getElementById('sourceTitle').textContent=`📄 ${src}`;
   document.getElementById('sourceContent').innerHTML='⏳ 加载中...';
   document.getElementById('sourceModal').classList.add('show');
-  const paths=[`${BASE}/${src}-source.txt`,`${BASE}/${src}.txt`,`${BASE}/${src.split('/').pop()}`];
+  // 尝试多种路径获取源码
+  const paths=[
+    `${BASE}/${src}-source.txt`,
+    `${BASE}/${src}.txt`,
+    `${BASE}/${src.split('/').pop()}`
+  ];
   let tried=0;
   function tryPath(i){
     if(i>=paths.length){
@@ -1080,6 +1107,7 @@ function openPreview(){
 function closePreview(){
   document.getElementById('sourceModal').classList.remove('show');
 }
+// 复制源码
 function copySourceCode(){
   const code=document.getElementById('sourceContent').textContent;
   if(!code||code==='⏳ 加载中...')return;
@@ -1091,7 +1119,7 @@ function copySourceCode(){
   });
 }
 
-// 基线确认
+// ===== 基线确认 =====
 function openBaselineConfirm(){
   if(!selectedVer){alert('请先选择版本');return;}
   const v=selectedVer;
@@ -1143,11 +1171,15 @@ function confirmBaseline(){
   copyBaselineReport();
 }
 
-// ===== 初始化 =====
 render();
 
-// 页面加载后检测 Releases（不阻塞渲染）
+// 加载后检测 Releases 资产状态
 setTimeout(checkReleases, 2000);
+
+// 上传标签点击时重新渲染
+document.querySelectorAll('.tab').forEach(tab=>{
+  if(tab.dataset.tab==='upload') tab.addEventListener('click',()=>renderUpload());
+});
 </script>
 </body>
 </html>

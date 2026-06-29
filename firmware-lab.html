@@ -396,7 +396,7 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
         </div>
         <div style="margin:var(--space-sm) 0">
           <label style="font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)">📄 串口日志粘贴</label>
-          <textarea class="input" id="fb-log" rows="6" placeholder="在此粘贴串口输出日志..." style="resize:vertical;font-family:monospace;font-size:11px;line-height:1.6"></textarea>
+          <textarea class="input" id="fb-log" rows="6" placeholder="在此粘贴串口输出日志...&#10;例如：&#10;rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)&#10;ESP-ROM:esp32s3-20210327&#10;Build:Mar 27 2021&#10;..." style="resize:vertical;font-family:monospace;font-size:11px;line-height:1.6"></textarea>
         </div>
         <div style="margin:var(--space-sm) 0">
           <label style="font-size:11px;font-weight:500;display:block;margin-bottom:var(--space-xs);color:var(--text-muted)">📝 备注</label>
@@ -438,6 +438,7 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
       <h2>📖 已解决问题档案</h2>
       <p style="font-size:12px;color:var(--text-dim);margin-bottom:var(--space-md)">
         共 <span id="kbCount" style="color:var(--green);font-weight:600">0</span> 个已解决问题。
+        下次 AI 让你试已经试过的方案——直接拒绝。
       </p>
       <div id="knowledgeBase"></div>
     </div>
@@ -558,7 +559,7 @@ const FW = [
   {ver:"v0626-ui-nopsram", status:"verified", category:"experiment", changes:["关闭PSRAM"], solves:["诊断PSRAM→WDT"], knownIssues:["PSRAM关=性能降级"]},
   {ver:"v0627-lgfx-native", status:"fail", category:"experiment", source:"v0627-lgfx-native", changes:["LovyanGFX+LVGL9.5"], solves:[""], knownIssues:["SPI3_HOST+FSPI冲突"]},
   {ver:"v0627-lgfx-ota", status:"fail", category:"experiment", changes:["OTA后台任务+TG0/TG1全部WDT禁用"], solves:[""], knownIssues:["LCD_RST值有歧义"]},
-  {ver:"v0310A", status:"verified", tag:"old-base", category:"legacy", changes:["ILI9341诊断"], solves:[""], knownIssues:[]},
+  {ver:"v0310A", status:"verified", tag:"old-base", category:"legacy", changes:["ILI9341诊断"], solves:[""], knownIssues:[], desc:"早期3.2寸屏验证基准"},
   // v307B 备份条目 — 上传 Release 后激活
   {ver:"v307B（备份）", status:"pending", tag:"backup", category:"backup",
    fromBackup:"lingxi-v307b-firmware-full.zip",

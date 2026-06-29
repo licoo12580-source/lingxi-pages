@@ -552,6 +552,11 @@ const FW = [
   {ver:"v0626-ui-nopsram", status:"verified", category:"experiment", changes:["关闭PSRAM"], solves:["诊断PSRAM→WDT"], knownIssues:["PSRAM关=性能降级"]},
   {ver:"v0627-lgfx-native", status:"fail", category:"experiment", source:"v0627-lgfx-native", changes:["LovyanGFX+LVGL9.5"], solves:[""], knownIssues:["SPI3_HOST+FSPI冲突"]},
   {ver:"v0627-lgfx-ota", status:"fail", category:"experiment", changes:["OTA后台任务+TG0/TG1全部WDT禁用"], solves:[""], knownIssues:["LCD_RST值有歧义"]},
+  {ver:"v0307C", date:"2026-06-14", status:"verified", tag:"xiabing-baseline", category:"legacy",
+   source:"v0307C",
+   changes:["雷达V2.0(Signed Magnitude+区域过滤)", "哨兵V1(音频事件gzip)", "ML307C 4G透传MQTT", "OLED紧凑布局"],
+   solves:["小虾旧硬件完整固件基线"], knownIssues:["SH1106 OLED屏幕，非当前IPS屏硬件"], risk:"低",
+   desc:"🦞 虾兵旧版完整固件 · N16R8+LD2450+DHT11+OLED+INMP441+ML307C 4G · 完整源码可预览复制"},
   {ver:"v0310A", status:"verified", tag:"old-base", category:"legacy", changes:["ILI9341诊断"], solves:[""], knownIssues:[], desc:"早期3.2寸屏验证基准"},
   // 小虾全量备份 — 上传后激活
   {ver:"小虾全量备份", status:"pending", tag:"backup", category:"backup",

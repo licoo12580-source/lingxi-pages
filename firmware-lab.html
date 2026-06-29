@@ -553,11 +553,11 @@ const FW = [
   {ver:"v0627-lgfx-native", status:"fail", category:"experiment", source:"v0627-lgfx-native", changes:["LovyanGFX+LVGL9.5"], solves:[""], knownIssues:["SPI3_HOST+FSPI冲突"]},
   {ver:"v0627-lgfx-ota", status:"fail", category:"experiment", changes:["OTA后台任务+TG0/TG1全部WDT禁用"], solves:[""], knownIssues:["LCD_RST值有歧义"]},
   {ver:"v0310A", status:"verified", tag:"old-base", category:"legacy", changes:["ILI9341诊断"], solves:[""], knownIssues:[], desc:"早期3.2寸屏验证基准"},
-  // v307B 备份条目 — 上传后激活
-  {ver:"v307B（备份）", status:"pending", tag:"backup", category:"backup",
-   fromBackup:"lingxi-v307b-firmware-full.zip",
-   changes:["v307B 完整固件备份（小虾备份）"], solves:["历史版本存档"], knownIssues:["需要从备份中提取 BIN 文件"], risk:"低",
-   desc:"📦 从小虾本地备份恢复的 v307B 完整工程，含全部源文件和配置。上传 Release 后在此下载 BIN。"},
+  // 小虾全量备份 — 上传后激活
+  {ver:"小虾全量备份", status:"pending", tag:"backup", category:"backup",
+   fromBackup:"lingxi-小虾全量备份-01-工程完整包.zip",
+   changes:["小虾本地完整工程备份"], solves:["历史版本存档"], knownIssues:["需要从备份中提取 BIN 文件"], risk:"低",
+   desc:"📦 小虾本地全部备份，含工程文件、源码、工具链。上传 GitHub Release 后在此下载。"},
 ];
 
 // 问题知识库
@@ -590,30 +590,30 @@ const RELEASES_BASE = "https://github.com/licoo12580-source/lingxi/releases";
 
 // ===== 备份包数据（GitHub Releases 资产） =====
 const BACKUPS = [
-  {name:"lingxi-v307b-firmware-full.zip", size:"700 MB", desc:"v307B 完整固件工程（含 PlatformIO 项目、依赖、配置文件）", icon:"📦", status:"ready",
-   releaseTag:"backup-v307b-firmware"},
-  {name:"lingxi-v307b-sources.zip", size:"300 MB", desc:"v307B 源码备份（含 main.cpp、ml307_driver.h 等全部源文件）", icon:"📄", status:"ready",
-   releaseTag:"backup-v307b-firmware"},
-  {name:"lingxi-v307b-tools-and-docs.zip", size:"160 MB", desc:"v307B 工具链与文档（烧录工具、配置说明、调试笔记）", icon:"📘", status:"ready",
-   releaseTag:"backup-v307b-firmware"},
+  {name:"lingxi-小虾全量备份-01-工程完整包.zip", size:"700 MB", desc:"小虾本地完整工程备份（含 PlatformIO 项目、依赖、全部配置文件、编译缓存）", icon:"📦", status:"ready",
+   releaseTag:"backup-xiaoxia-full"},
+  {name:"lingxi-小虾全量备份-02-源码包.zip", size:"300 MB", desc:"小虾本地全部源码备份（含所有源文件、头文件、库文件）", icon:"📄", status:"ready",
+   releaseTag:"backup-xiaoxia-full"},
+  {name:"lingxi-小虾全量备份-03-工具与文档.zip", size:"160 MB", desc:"小虾本地工具链与文档备份（烧录工具、配置说明、调试笔记、硬件文档）", icon:"📘", status:"ready",
+   releaseTag:"backup-xiaoxia-full"},
 ];
 
 // 上传工作流步骤定义
 const WORKFLOW_STEPS = [
-  {id:"pack", icon:"📦", title:"Step 1: 本地打包备份", desc:"将 v307B 代码和文件按分类打包为 3 个 zip 文件",
-   cmd:"# 打包示例\nzip -r lingxi-v307b-firmware-full.zip firmware/ platformio.ini\nzip -r lingxi-v307b-sources.zip src/\nzip -r lingxi-v307b-tools-and-docs.zip tools/ docs/"},
+  {id:"pack", icon:"📦", title:"Step 1: 本地打包备份", desc:"将小虾本地完整工程、源码、工具链分别打包为 3 个 zip",
+   cmd:"# 打包示例（以实际文件名为准）\nzip -r lingxi-小虾全量备份-01-工程完整包.zip project/ platformio.ini\nzip -r lingxi-小虾全量备份-02-源码包.zip src/\nzip -r lingxi-小虾全量备份-03-工具与文档.zip tools/ docs/"},
   {id:"release", icon:"🚀", title:"Step 2: 创建 GitHub Release", desc:"在灵犀仓库创建 Release，上传 3 个备份包",
-   cmd:"gh release create backup-v307b-firmware \\\n  lingxi-v307b-firmware-full.zip \\\n  lingxi-v307b-sources.zip \\\n  lingxi-v307b-tools-and-docs.zip \\\n  --title \"v307B 备份\" \\\n  --notes \"小虾备份的 v307B 完整代码包\"\n\n# 或通过 GitHub Web:\n# → 仓库首页 → Releases → Draft a new release\n# → Tag: backup-v307b-firmware → 上传 3 个 zip"},
+   cmd:"gh release create backup-xiaoxia-full \\\n  lingxi-小虾全量备份-*.zip \\\n  --title \"小虾全量备份\" \\\n  --notes \"小虾本地全部工程/源码/工具文档备份\"\n\n# 或通过 GitHub Web:\n# → github.com/licoo12580-source/lingxi/releases\n# → Draft a new release\n# → Tag: backup-xiaoxia-full → 上传 3 个 zip"},
   {id:"verify", icon:"🔍", title:"Step 3: 校验完整性", desc:"确认 Release 资产已发布，SHA256 校验通过",
-   cmd:"# 下载校验\ngh release download backup-v307b-firmware \\\n  --repo licoo12580-source/lingxi\nsha256sum *.zip\n\n# GitHub 会自动显示每个资产的 SHA256\n# 对比本地备份的 checksum"},
-  {id:"extract", icon:"🔧", title:"Step 4: 解包提取 BIN", desc:"从备份中提取 .bin 文件，合并为烧录文件",
-   cmd:"unzip -j lingxi-v307b-firmware-full.zip \\\n  '*/firmware/.pio/build/esp32-s3-devkitc-1/firmware.bin'\nmv firmware.bin v307B-merged.bin\n# 或从拆分文件合并：\nesptool merge_bin \\\n  --output v307B-merged.bin \\\n  0x0 bootloader.bin \\\n  0x10000 partitions.bin \\\n  0x20000 firmware.bin"},
-  {id:"integrate", icon:"🔗", title:"Step 5: 集成到 Firmware Lab", desc:"将 BIN 固件上传到 Pages 仓库的 firmware/ 目录",
-   cmd:"cp v307B-merged.bin /path/to/lingxi-pages/firmware/\ncd /path/to/lingxi-pages\ngit add firmware/v307B-merged.bin\ngit commit -m \"feat: 集成 v307B 备份固件\"\ngit push origin main\n# 然后在本页的 FW 数据中加 v307B 条目"},
-  {id:"flash", icon:"⚡", title:"Step 6: 下载并烧录", desc:"在烧录页选择 v307B 版本，下载 BIN，用 esptool 写入设备",
-   cmd:"esptool --chip esp32s3 write_flash 0x0 \\\n  https://licoo12580-source.github.io/lingxi-pages/firmware/v307B-merged.bin"},
-  {id:"verify-flash", icon:"✅", title:"Step 7: 验证烧录", desc:"串口监视确认启动正常，OLED 显示 v307B 版本号",
-   cmd:"# 串口监视\nscreen /dev/ttyUSB0 115200\n# 或 esptool 校验\n# esptool --chip esp32s3 verify_flash 0x0 v307B-merged.bin"}
+   cmd:"# 下载校验\ngh release download backup-xiaoxia-full \\\n  --repo licoo12580-source/lingxi\nsha256sum *.zip\n\n# 对比本地备份的 checksum 确认一致"},
+  {id:"extract", icon:"🔧", title:"Step 4: 解包提取 BIN", desc:"从备份中提取固件 .bin 文件",
+   cmd:"unzip -j lingxi-小虾全量备份-01-工程完整包.zip \\\n  '*/firmware/.pio/build/esp32-s3-devkitc-1/firmware.bin'\nmv firmware.bin xiaoxia-backup-merged.bin\n# 或用 esptool 合并分拆文件\n# esptool merge_bin --output xiaoxia-backup-merged.bin \\\n#   0x0 bootloader.bin 0x10000 partitions.bin 0x20000 firmware.bin"},
+  {id:"integrate", icon:"🔗", title:"Step 5: 集成到 Firmware Lab", desc:"将提取的 BIN 上传到 Pages 仓库 firmware/ 目录",
+   cmd:"cp xiaoxia-backup-merged.bin /path/to/lingxi-pages/firmware/\ncd /path/to/lingxi-pages\ngit add firmware/xiaoxia-backup-merged.bin\ngit commit -m \"feat: 集成小虾备份固件\"\ngit push origin main"},
+  {id:"flash", icon:"⚡", title:"Step 6: 下载并烧录", desc:"在烧录页选择备份版本，下载 BIN，用 esptool 写入设备",
+   cmd:"esptool --chip esp32s3 write_flash 0x0 \\\n  https://licoo12580-source.github.io/lingxi-pages/firmware/xiaoxia-backup-merged.bin"},
+  {id:"verify-flash", icon:"✅", title:"Step 7: 验证烧录", desc:"串口监视确认启动正常",
+   cmd:"# 串口监视\nscreen /dev/ttyUSB0 115200\n# 或 esptool 校验\n# esptool --chip esp32s3 verify_flash 0x0 xiaoxia-backup-merged.bin"}
 ];
 
 function statusColor(s){
@@ -717,7 +717,7 @@ function copyText(el){
 // 检测 GitHub Releases 资产状态
 async function checkReleases(){
   try{
-    const r=await fetch(RELEASE_API+'/tags/backup-v307b-firmware');
+    const r=await fetch(RELEASE_API+'/tags/backup-xiaoxia-full');
     if(r.ok){
       const data=await r.json();
       const uploadedAssets=data.assets.map(a=>a.name);

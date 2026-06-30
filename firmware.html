@@ -3,454 +3,183 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>📡 灵犀固件下载 · 版本历史</title>
+<title>📡 灵犀固件 · 下载</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--fg:#e2e8f0;--m:#64748b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--pink:#ec4899}
-body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding:16px;max-width:1000px;margin:0 auto;font-size:14px}
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--fg:#e2e8f0;--m:#64748b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--purple:#8b5cf6}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;padding:16px;max-width:960px;margin:0 auto;font-size:14px}
 h1{font-size:22px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 .sub{color:var(--m);font-size:12px;margin-bottom:16px}
-.back{color:var(--accent);text-decoration:none;font-size:13px;display:inline-block;margin-bottom:12px}
-.back:hover{text-decoration:underline}
-
-/* 版本表头 */
-.ver-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px}
-.ver-table th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);color:var(--m);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
-.ver-table td{padding:10px;border-bottom:1px solid rgba(51,65,85,0.4);vertical-align:top}
-.ver-table tr:hover td{background:rgba(59,130,246,0.03)}
-.ver-table .ver{font-weight:600;font-size:14px;white-space:nowrap}
-.ver-table .date{color:var(--m);font-size:11px;white-space:nowrap}
-.ver-table .status{font-size:11px;white-space:nowrap}
-.ver-table .desc{font-size:12px;line-height:1.5;max-width:380px}
-.ver-table .changes{font-size:11px;color:var(--m);line-height:1.6;font-family:monospace;white-space:pre-wrap;max-width:300px}
-.ver-table .actions{white-space:nowrap}
-
-.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:500;margin-right:3px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--card);border-radius:10px;padding:3px;width:fit-content}
+.tab{padding:6px 16px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--m);border:none;background:transparent;transition:all .15s}
+.tab.active{background:var(--accent);color:#fff}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card h3{font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fw-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(51,65,85,.3)}
+.fw-item:last-child{border-bottom:none}
+.fw-info{flex:1}
+.fw-ver{font-weight:600;font-size:14px}
+.fw-date{color:var(--m);font-size:11px;margin-left:8px}
+.fw-desc{color:var(--m);font-size:12px;margin-top:2px}
+.fw-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:500}
 .tag-green{background:#14532d;color:var(--green)}
 .tag-blue{background:#1e3a5f;color:var(--accent)}
-.tag-red{background:#450a0a;color:var(--red)}
-.tag-gray{background:var(--border);color:var(--m)}
-.tag-orange{background:#451a03;color:var(--orange)}
-.tag-pink{background:#4a0e3b;color:var(--pink)}
-
-.btn{padding:4px 10px;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:500;text-decoration:none;display:inline-block;margin:1px}
+.tag-orange{background:#5c3d1a;color:var(--orange)}
+.fw-actions{display:flex;gap:6px;margin-left:12px;flex-shrink:0}
+.btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;border:none;cursor:pointer;text-decoration:none;display:inline-block;transition:all .15s}
 .btn-download{background:var(--accent);color:#fff}
-.btn-small{background:transparent;border:1px solid var(--border);color:var(--m)}
-.btn-small:hover{border-color:var(--accent);color:var(--fg)}
-
-/* 预览图区 */
-.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:8px 0}
-.preview-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center;cursor:pointer;transition:all 0.2s}
-.preview-item:hover{border-color:var(--accent)}
-.preview-item img{width:100%;border-radius:4px;display:block}
-.preview-item .plabel{font-size:10px;color:var(--m);margin-top:4px}
-
-/* 大图弹窗 */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
-.modal-overlay.show{display:flex}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;width:100%;max-width:600px;max-height:90vh;display:flex;flex-direction:column}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)}
-.modal-title{font-size:14px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--m);font-size:22px;cursor:pointer;padding:2px 8px}
-.modal-close:hover{color:var(--fg)}
-.modal-body{flex:1;overflow:auto;padding:16px;text-align:center}
-.modal-body img{max-width:100%;max-height:70vh;border-radius:8px}
-.modal-body .no-preview{color:var(--m);padding:40px;font-size:13px}
-
-/* 审查弹窗 */
-.code-modal .modal{max-width:800px}
-.code-modal pre{margin:0;padding:16px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:11px;line-height:1.6;white-space:pre-wrap;word-break:break-all}
-.code-modal .code-loading{text-align:center;padding:40px;color:var(--m);font-size:13px}
-
-/* 筛选 */
-.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.filter-btn{padding:4px 12px;border:1px solid var(--border);border-radius:16px;cursor:pointer;font-size:11px;background:transparent;color:var(--m)}
-.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-
-/* 折叠 */
-.collapse{max-height:0;overflow:hidden;transition:max-height 0.3s ease}
-.collapse.open{max-height:2000px}
-
-@media(max-width:640px){.ver-table,.ver-table tbody,.ver-table tr,.ver-table td{display:block}.ver-table td{padding:8px 10px}}
+.btn-download:hover{background:#2563eb}
+.btn-merge{background:var(--purple);color:#fff}
+.btn-merge:hover{background:#7c3aed}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#16a34a}
+.dropzone{border:2px dashed var(--border);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:rgba(59,130,246,.05)}
+.dropzone-icon{font-size:42px;color:var(--m);margin-bottom:6px}
+.dropzone-text{color:var(--m);font-size:13px}
+textarea{width:100%;background:#0f172a;border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--fg);font-family:monospace;font-size:12px;resize:vertical;min-height:120px;margin-bottom:8px}
+.upload-row{display:flex;gap:8px;margin-bottom:8px}
+.upload-row input{flex:1;background:#0f172a;border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--fg);font-size:13px}
+.upload-row input:focus{outline:none;border-color:var(--accent)}
+.status-msg{padding:8px 12px;border-radius:6px;font-size:12px;margin-top:8px;display:none}
+.status-ok{background:#14532d;color:var(--green);display:block}
+.status-err{background:#5c1a1a;color:var(--red);display:block}
+.hidden{display:none}
 </style>
 </head>
 <body>
 
-<a class="back" href="index.html">← 返回主页</a>
-<h1>📡 灵犀固件 · 版本历史</h1>
-<div class="sub">HW-678A N16R8 (ESP32-S3 · 16MB Flash · 8MB PSRAM) · ILI9488 4寸屏 · FT6336U触摸</div>
+<h1>📡 灵犀固件</h1>
+<div class="sub">ESP32-S3 · 显示屏固件 · 合并BIN一行烧录</div>
 
-<div class="filter-bar">
-  <button class="filter-btn active" onclick="filter('all')" id="f-all">全部</button>
-  <button class="filter-btn" onclick="filter('stable')" id="f-stable">已验证</button>
-  <button class="filter-btn" onclick="filter('test')" id="f-test">测试中</button>
-  <button class="filter-btn" onclick="filter('ui')" id="f-ui">中文UI</button>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('download')">⬇ 下载</button>
+  <button class="tab" onclick="switchTab('upload')">📤 上传</button>
 </div>
 
-<!-- 固件表格 -->
-<table class="ver-table" id="fw-table">
-<thead><tr>
-  <th>版本</th>
-  <th>类型</th>
-  <th>说明</th>
-  <th style="width:30%">更新日志</th>
-  <th>操作</th>
-</tr></thead>
-<tbody id="fw-body"></tbody>
-</table>
+<div id="tab-download">
+  <div id="fw-list"></div>
+</div>
 
-<!-- 大图弹窗 -->
-<div class="modal-overlay" id="previewModal" onclick="if(event.target===this)closePreview()">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title" id="previewTitle">预览</span>
-      <button class="modal-close" onclick="closePreview()">×</button>
+<div id="tab-upload" class="hidden">
+  <div class="card">
+    <h3>📤 上传新固件</h3>
+    <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <div class="dropzone-icon">📦</div>
+      <div class="dropzone-text">拖拽文件到此处，或点击选择文件</div>
     </div>
-    <div class="modal-body" id="previewBody">
-      <div class="no-preview">暂无预览图</div>
+    <input type="file" id="fileInput" style="display:none" multiple onchange="handleFiles(this.files)">
+    <div style="margin:8px 0"><span style="color:var(--m);font-size:12px">或手动粘贴内容：</span></div>
+    <div class="upload-row">
+      <input type="text" id="pasteFilename" placeholder="文件名 (如 v0628-demo-v5-merged.bin)">
     </div>
+    <textarea id="pasteContent" placeholder="在此粘贴固件BIN文件的Base64或源码内容..."></textarea>
+    <button class="btn btn-green" onclick="uploadPaste()">📤 提交上传</button>
+    <div id="uploadStatus" class="status-msg"></div>
   </div>
 </div>
 
 <script>
+const OWNER = 'licoo12580-source';
+const REPO = 'lingxi';
+const BRANCH = 'firmware-demo-screen';
+const BASE_RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/firmware`;
+
+// firmware列表 — 最新排最前
 const FW = [
-  // ==== display-baseline (最小红绿蓝验证, 无LVGL/触摸/OTA) ====
-  {ver:"display-baseline", date:"2026-06-28 14:45", type:"testing", tags:["LovyanGFX","仅LCD","红绿蓝","基线验证"], files:{merge:"display-baseline-merged.bin"}, size:"415KB",
-    desc:"🔥 最小验证工程: 独立工程,不依赖主固件. 红→绿→蓝各3秒循环. 无LVGL/触摸/WiFi/OTA/MQTT/雷达. 引脚: CS=45 DC=47 RST=48 MOSI=21 SCLK=20 BL=19 (仓库源文件一致,【待确认】)",
-    changes:"✅ 纯LovyanGFX驱动(SPI2_HOST,不与PSRAM冲突)\\\n✅ 红3秒→绿3秒→蓝3秒→循环\\\n✅ board=esp32-s3-devkitc-1 + qio_opi + PSRAM enable\\\n✅ 无LVGL/无触摸/无WiFi/无OTA/无MQTT/无雷达\\\n✅ RAM 6.3% Flash 10.8%\\\n⚠️ 引脚来自仓库源文件,【待确认】用户拍原理图后修正\\\n⚠️ 需全盘烧录(industrial分区)",
-    source:"display-baseline/ (独立工程)"},
-  // ==== v0628-demo-v2 (bitbang I2C+SPI2_HOST, 启动红色验证屏活着) ====
-  {ver:"v0628-demo-v2", date:"2026-06-28 14:20", type:"testing", tags:["LovyanGFX","bitbang触控","SPI2_HOST","无Wire","启动验证"], files:{merge:"v0628-demo-v2-merged.bin"}, size:"412KB",
-    desc:"🔧 v2修复: 硬件I2C(Wire)崩溃→bitbang I2C(直接GPIO操作,不依赖I2C外设)+SPI3→SPI2_HOST(不与PSRAM冲突). 启动时先全屏红色再切色块测试",
-    changes:"✅ 修复触摸: 放弃Wire库硬件I2C,改用bitbang I2C(GPIO位敲,SDA=35,SCL=36)\\\n✅ 修复显示: SPI3→SPI2_HOST(不与PSRAM的FSPI总线冲突)\\\n✅ 启动验证: 先全屏红色500ms,确认背光和驱动活着,再切黑色显示色块\\\n✅ 无Wire库依赖(板子I2C硬件初始化不会再崩)\\\n✅ 7色块+触摸切换像素格式(0x55/0x66/0x77)+invert\\\n⚠️ 需全盘烧录\\\n⚠️ 触摸ID读出来打印在串口,可以确认触摸通信",
-    source:"firmware-demo-screen分支 test_demo.cpp v2"},
-  // ==== v0628-lgfx-r8 (颜色修复: dlen_16bit=true 修复字节序) ====
-  {ver:"v0628-lgfx-r8", date:"2026-06-28 12:02", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","dlen_16bit","字节序修复"], files:{merge:"v0628-lgfx-r8-merged.bin"}, size:"1.5MB",
-    desc:"修复紫色(字节交换): LovyanGFX设dlen_16bit=true,像素数据以16位字发送而非2个8位字节,避免ESP32-S3 SPI字节序反转",
-    changes:"✅ dlen_16bit=true: ILI9488像素数据以16位字发送(非2字节拆分)\\n✅ 紫色背景→正确绿色\\n✅ 基于r5(LovyanGFX回退+cfg.invert=false)\\n✅ RST=48+SPI.begin+背光HIGH\\n✅ LVGL9.5中文三页+触摸+OTA+WDT禁用",
-    source:"test_lgfx.cpp v0628-lgfx-r8"},
-  // ==== v0628-lgfx-r7 (颜色修复: 0x3A=0x55移至tft.begin()后立即执行) ====
-  {ver:"v0628-lgfx-r7", date:"2026-06-28 11:56", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","像素格式0x55","颜色修复v2","MADCTL"], files:{merge:"v0628-lgfx-r7-merged.bin"}, size:"1.5MB",
-    desc:"修复颜色错乱v2: 0x3A=0x55(16位色)从LVGL前移到tft.begin()后立即执行,在fillScreen之前设好像素格式",
-    changes:"✅ 颜色修复v2: 0x3A=0x55+MADCTL=0x08移至tft.begin()后紧跟着执行(在fillScreen之前)\\n✅ 基于r6(其他全部不变)\\n✅ RST=48+SPI.begin+背光HIGH\\n✅ LVGL9.5中文三页+触摸+OTA+WDT禁用",
-    source:"test_lgfx.cpp v0628-lgfx-r7"},
-  // ==== v0628-lgfx-r6 (颜色修复: 加回0x3A=0x55像素格式设定) ====
-  {ver:"v0628-lgfx-r6", date:"2026-06-28 11:53", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","像素格式0x55","颜色修复"], files:{merge:"v0628-lgfx-r6-merged.bin"}, size:"1.5MB",
-    desc:"修复颜色错乱(紫色底): 加回0x3A=0x55(16位色)设定, ILI9488默认可能是18位模式导致LovyanGFX的16位数据被错误解析",
-    changes:"✅ 颜色修复: 在LVGL初始化前强制设定0x3A=0x55(16位像素格式)\\n✅ 紫色背景→正确绿色\\n✅ 基于r5(LovyanGFX回退+去掉factory_init+cfg.invert=false)\\n✅ RST=48+SPI.begin+背光HIGH\\n✅ LVGL9.5中文三页+触摸+OTA+WDT禁用",
-    source:"test_lgfx.cpp v0628-lgfx-r6"},
-  // ==== v0628-lgfx-r5 (LovyanGFX回退: 去掉factory_init+cfg.invert=false) ====
-  {ver:"v0628-lgfx-r5", date:"2026-06-28 11:44", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","WDT禁用","RST=48","SPI.begin","背光HIGH"], files:{merge:"v0628-lgfx-r5-merged.bin"}, size:"1.5MB",
-    desc:"回退到LovyanGFX(能启动的版本)+去掉factory_init(避免与LovyanGFX内置init冲突)+cfg.invert=false(不再叠加反转)",
-    changes:"✅ 回退到LovyanGFX驱动(能启动,不崩溃)\\n✅ 去掉factory_init()调用(LovyanGFX自带ILI9488初始化序列)\\n✅ cfg.invert=false(不再额外反转,避免黑色假象)\\n✅ RST=48+SPI.begin+背光HIGH(与cs_port一致)\\n✅ LVGL9.5中文三页+触摸+OTA+WDT禁用",
-    source:"test_lgfx.cpp v0628-lgfx-r5"},
-  // ==== v0628-lgfx-r4 (TFT_eSPI - StoreProhibited崩溃) ====
-  {ver:"v0628-lgfx-r4", date:"2026-06-28 11:32", type:"testing", tags:["TFT_eSPI","LVGL9.5","中文UI","WDT禁用","指针构造"], files:{merge:"v0628-lgfx-r4-merged.bin"}, size:"1.4MB",
-    desc:"🔥 修复GuruMeditation: 去掉重复#include <SPI.h> + TFT_eSPI全局对象改指针(setup中new), 避免static init阶段StoreProhibited",
-    changes:"✅ 修复崩潰: 去掉#include <SPI.h>(TFT_eSPI.h已内包含,重复导致全局构造函数冲突)\\n✅ 修复崩溃2: TFT_eSPI从全局对象改指针+setup中new TFT_eSPI()(避免static init崩溃)\\n✅ TFT_eSPI驱动+显式SPI.begin(20,-1,21,-1)\\n✅ 背光强制HIGH+RST=48+setRotation(3)\\n✅ LVGL9.5 UI+触摸+OTA+WDT禁用",
-    source:"test_lgfx.cpp v0628-lgfx-r4"},
-  // ==== v0628-lgfx-r3 (TFT_eSPI替换LovyanGFX) ====
-  {ver:"v0628-lgfx-r3", date:"2026-06-28 11:23", type:"testing", tags:["TFT_eSPI","LVGL9.5","中文UI","WDT禁用","RST=48","SPI.begin","背光HIGH"], files:{merge:"v0628-lgfx-r3-merged.bin"}, size:"1.4MB",
-    desc:"🔥 核心修复: LovyanGFX→TFT_eSPI (cs_port同款硬件已验证的ILI9488驱动)",
-    changes:"✅ 更换驱动: 从LovyanGFX(Panel_ILI9488)切到TFT_eSPI(ILI9488_DRIVER,同款硬件已验证可亮)\\n✅ SPI: SPI.begin(20,-1,21,-1) 显式初始化\\n✅ 背光: pinMode(19,OUTPUT)+digitalWrite(19,HIGH) 强制拉高\\n✅ RST: GPIO48 (cs_port已验证配置)\\n✅ setRotation(3): 竖屏320x480\\n✅ LVGL9.5 UI/触摸/OTA功能不变\\n⚠️ 去掉了factory_init()(TFT_eSPI自带ILI9488初始化序列)",
-    source:"test_lgfx.cpp v0628-lgfx-r3"},
-  // ==== v0628-lgfx-r2 (SPI.begin+背光HIGH+RST=48) ====
-  {ver:"v0628-lgfx-r2", date:"2026-06-28 11:08", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","WDT全部禁用","RST=48","SPI.begin","背光HIGH"], files:{merge:"v0628-lgfx-r2-merged.bin"}, size:"1.5MB",
-    desc:"🛠 修复屏全黑: 三个修改——显式SPI.begin(20,-1,21,-1)+背光强制GPIO HIGH+LCD_RST从4改回48(同cs_port验证配置)",
-    changes:"✅ 修复1: 加SPI.begin(20,-1,21,-1)显式初始化SPI总线(ESP32-S3上隐式init经常翻车)\\n✅ 修复2: 背光从PWM改pinMode(19,OUTPUT)+digitalWrite(19,HIGH)(强制拉高,不依赖PWM)\\n✅ 修复3: LCD_RST从GPIO4改回GPIO48(同款硬件cs_port已验证的配置)\\n✅ 诊断延迟从3秒缩短到0.8秒\\n✅ 其余同v0628-lgfx(OTA+LovyanGFX+LVGL9.5+中文三页+触摸+WDT禁用)",
-    source:"test_lgfx.cpp v0628-lgfx-r2"},
-  // ==== v0628-lgfx (I2C超时缩短+版本更新+编译修复) ====
-  {ver:"v0628-lgfx", date:"2026-06-28 10:56", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","WDT全部禁用","OTA","I2C缩短","编译修复"], files:{merge:"v0628-lgfx-merged.bin"}, size:"1.5MB",
-    desc:"🛠 修复版: lingxi-ota.cpp加入编译+ArduinoJson依赖+I2C超时从50ms缩短到10ms+版本号统一v0628",
-    changes:"✅ 编译修复: src_filter添加lingxi-ota.cpp, lib_deps添加ArduinoJson\\n✅ I2C扫描超时: 50ms→10ms, 127地址扫描从6.3s降至1.3s\\n✅ 版本号统一: v0628-lgfx\\n✅ 基于v0627-lgfx-ota全部代码(OTA+LovyanGFX+LVGL9.5+中文三页+触摸)\\n✅ TG1WDT构造函数级禁用(0x50D83AA1解锁)\\n✅ 屏显自检: 版本号→WiFi AP→I2C扫描→触摸状态→LCD序列\\n⚠️ 仍需WiFi STA连接才可联MQTT/backend OTA",
-    source:"test_lgfx.cpp v0628-lgfx"},
-  // ==== v0627-lgfx-ota (OTA后台任务+TG0/1WDT+引脚修正) ====
-  {ver:"v0627-lgfx-ota", date:"2026-06-27 04:13", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","WDT全部禁用","OTA后台任务","LCD_RST=4","触摸I2C"], files:{merge:"v0627-lgfx-ota-merged.bin"}, size:"1.5MB",
-    desc:"OTA下载走独立FreeRTOS任务+64K缓冲区+TG0/TG1全部WDT禁用+LCD_RST从48修正为4(按hw-678a原理图)+AirJoy OTA模块接入",
-    source:"test_lgfx.cpp + lingxi-ota.cpp"},
-
-  // ==== v0627-lgfx-native (LovyanGFX + TG1WDT禁用) ====
-  {ver:"v0627-lgfx-native", date:"2026-06-27 03:20", type:"testing", tags:["LovyanGFX","LVGL9.5","中文UI","TG1WDT禁用","OTA"], files:{merge:"v0627-lgfx-native-merged.bin"}, size:"1.2MB",
-    desc:"🔥 LovyanGFX+LVGL9.5+中文三页+触摸(硬件I2C)+屏显自检, board=esp32-s3-devkitc-1+qio_opi",
-    changes:"✅ 基于test_lgfx.cpp(已验证显示+触摸正确)\n✅ board=esp32-s3-devkitc-1 + qio_opi(过TG1WDT)\n✅ setup最前禁用TG1WDT(TIMERG1.wdtconfig0=0)\n✅ SPI3_HOST(FSPI与PSRAM各走各的,不冲突)\n✅ 中文三页(节能/感知/系统)\n✅ 触摸改用硬件I2C(Wire),100kHz+50ms超时\n✅ 启动屏显自检:版本号→WiFi→I2C扫描→触摸状态→LCD序列\n✅ WiFi AP + ArduinoOTA\n✅ 16MB OTA分区\n✅ 正确合并(bootloader@0x0+partitions@0x8000+app@0x10000)",
-    source:"test_lgfx.cpp v0627-lgfx-native"},
-  // ==== v0626-CS-Port (ConstStrings模板移植) ====
-  {ver:"v0626-cs-port", date:"2026-06-27 02:30", type:"testing", tags:["CS模板","TFT_eSPI","LVGL8.3","OTA"], files:{merge:"v0626-cs-port-merged.bin"}, size:"1006KB",
-    desc:"🧪 ConstStrings模板移植: TFT_eSPI+LVGL8.3.9+ILI9488+FT6336U+OTA,引脚适配CS=45,DC=47,MOSI=21,SCLK=20,BL=19",
-    changes:"✅ 基于ConstStrings/ESP32-S3-LVGL-Board(已验证同款N16R8硬件)\\n✅ TFT_eSPI驱动(非LovyanGFX)\\n✅ LVGL 8.3.9(非9.5)\\n✅ 软件I2C bitbang触摸(SDA=35,SCL=36,RST=37)\\n✅ WiFi AP + ArduinoOTA\\n✅ board=esp32-s3-devkitc-1 + qio_opi + BOARD_HAS_PSRAM\\n✅ OTA分区(partitions_16mb_ota.csv)",
-    source:"v0626-cs-port"},
-  // ==== v0626-CS-Port-r2 (SPI.begin修复 + 版本号) ====
-  {ver:"v0626-cs-port-r2", date:"2026-06-27 02:22", type:"testing", tags:["CS模板","SPI修复","LVGL8.3","OTA"], files:{merge:"v0626-cs-port-r2-merged.bin"}, size:"1011KB",
-    desc:"🔧 r2: 修复SPI空指针崩溃 + 显示版本号",
-    changes:"✅ 修复: tft.begin()前显式调用SPI.begin(20,-1,21,-1)\\n✅ 屏显: 灵犀 + v0626-cs-port-r2\\n✅ 其余同r1(ConstStrings移植+TFT_eSPI+LVGL8.3.9+OTA\\n✅ board=esp32-s3-devkitc-1 + qio_opi + OTA分区",
-    source:"v0626-cs-port"},
-  // ==== v0626-CS-Port-r3 (USE_HSPI_PORT: 避免与PSRAM的FSPI冲突) ====
-  {ver:"v0626-cs-port-r3", date:"2026-06-27 02:25", type:"testing", tags:["CS模板","HSPI","PSRAM兼容","OTA"], files:{merge:"v0626-cs-port-r3-merged.bin"}, size:"1017KB",
-    desc:"🔧 r3: USE_HSPI_PORT—PSRAM占用FSPI,冲突导致SPI空指针。切到SPI3_HOST(HSPI)",
-    changes:"✅ 修复: build_flags加-DUSE_HSPI_PORT,使用SPI3_HOST(HSPI)\\n✅ PSRAM与SPI各走各的,不再冲突\\n✅ 屏显: 灵犀 + v0626-cs-port-r3\\n✅ 其余同r1",
-    source:"v0626-cs-port"},
-  {ver:"v0626-ui-nopsram", date:"2026-06-27 01:33", type:"testing", tags:["中文UI","测试","PSRAM关闭","TG1WDT"], files:{full:"v0626-ui-nopsram.bin",merge:"v0626-ui-nopsram-merged.bin"}, size:"1.1MB / 1.2MB",
-    desc:"🧪 验证版: 关PSRAM,其他同v0626-ui。如果此版能启动→PSRAM初始化超时触发TG1WDT",
-    changes:"✅ PSRAM关闭(跳过PSRAM初始化,节省~270ms)\n✅ 其余同v0626-ui(中文三页+触摸+OTA)\n⚠️ 用于诊断TG1WDT循环是否为PSRAM初始化超时导致",
-    source:"v0626-ui"},
-  // ==== v0626-UI (含OTA+TG1WDT禁用) ====
-  {ver:"v0626-ui", date:"2026-06-27 01:41", type:"stable", tags:["中文UI","触摸","三页","FT6336U修复","自动轮播","OTA"], files:{full:"v0626-ui.bin",merge:"v0626-ui-merged.bin"}, size:"1.1MB / 1.2MB",
-    desc:"🎯 改用官方板配置: board=esp32-s3-devkitc-1 + memory_type=qio_opi, 正确bootloader配PSRAM",
-    changes:"✅ board=esp32-s3-devkitc-1 (不再用freenove板定义)\n✅ memory_type=qio_opi (QIO flash + OPI PSRAM,正确预编译bootloader)\n✅ 中文三页UI + 触摸翻页 + OTA\n✅ TG1WDT构造函数级禁用(备用)\n✅ FT6336U类成员修复\n✅ 16MB OTA分区",
-    source:"v0626-ui"},
-  // ==== v0626 系列 (MQTT + 中文UI) ====
-  {ver:"v0626", date:"2026-06-26", type:"stable", tags:["中文UI","MQTT","触摸","三页"], files:{full:"v0626-screen-ui.bin"}, size:"815KB",
-    desc:"🌐 MQTT实时通信 + 中文三页UI + 触摸翻页，客房屏固件",
-    changes:"✅ MQTT客户端(lingxi/v1/+ 订阅)\\n✅ 中文三页(节能/感知/系统)\\n✅ 触摸翻页+5秒自动轮播\\n✅ PubSubClient + ArduinoJson\\n✅ LovyanGFX + LVGL 驱动\\n✅ ILI9488 + FT6336U",
-    source:"v0626-screen-ui"},
-  // ==== v0622 系列 (诊断测试) ====
-  {ver:"v0622A-mini", date:"2026-06-21", type:"diagnostic", tags:["最简","裸LCD","颜色轮换"], files:{full:"v0622A-mini.bin"}, size:"407KB",
-    desc:"⚡ 最简亮屏测试：只开LCD+颜色轮换(红绿蓝白黑灵犀色)，无LVGL/触摸/字库/PSRAM",
-    changes:"✅ 纯LovyanGFX驱动LCD\\n✅ PSRAM禁用\\n✅ 无LVGL/无触摸/无字库\\n✅ 2秒切换红→绿→蓝→白→黑→灵犀背景色\\n✅ SPI2_HOST+正确的MADCTL/invert/rgb_order",
-    source:"test_minimal.cpp"},
-  // ==== v0621 系列 (LovyanGFX + LVGL) ====
-  {ver:"v0621Z", date:"2026-06-21", type:"testing", tags:["中文UI","软件I2C","WDT禁用"], files:{full:"v0621Z-lingxi-ui-full.bin"}, size:"744KB",
-    desc:"🔥 软件I2C bitbang触摸 + TGIWDT彻底禁用 + 中文三页",
-    changes:"✅ 彻底放弃硬件I2C(Wire)→改用软件I2C bitbang\\n✅ 纯GPIO操作(无esp32-hal-i2c,不会panic)\\n✅ GPIO内部上拉+开漏输出\\n✅ 厂家RST时序:20ms LOW+300ms HIGH\\n✅ 完整STOP协议\\n✅ 50ms超时保护\\n✅ setup第一行禁用TG1WDT(wdt_config0=0)\\n✅ 构建级禁用:CONFIG_ESP_INT_WDT=0\\n✅ 完整中文三页(节能/感知/系统)\\n✅ 触摸可用→触摸翻页 不可用→5秒自动翻页",
-    source:"test_lgfx.cpp FT6336U.cpp platformio.ini v0621Z-rebuild"},
-  {ver:"v0621Y", date:"2026-06-21", type:"testing", tags:["中文UI","触摸","厂家协议"], files:{full:"v0621Y-lingxi-ui-full.bin",inc:"v0621Y-lingxi-ui.bin"}, size:"748KB / 684KB",
-    desc:"🔥 完整中文三页UI + 厂家协议触摸驱动(全STOP读写+RST时序)",
-    changes:"✅ FT6336U驱动完全重写(参考FocalTech datasheet)\n✅ I2C读写改用完整STOP(非repeated start)\n✅ Wire.setPins()+Wire.begin()分离\n✅ RST 20ms LOW+300ms HIGH(厂家时序)\n✅ 不做ID校验(仅日志,兼容不同批次芯片)\n✅ 中文完整字库(NotoSansSC 20px)\n✅ TG1WDT喂狗+SPI2_HOST+PSRAM\n✅ 触摸可用→触摸翻页 触摸不可用→5秒自动翻页",
-    source:"test_lgfx.cpp v0621Y"},
-  {ver:"v0621X", date:"2026-06-21", type:"testing", tags:["中文UI","无触摸","自动翻页"], files:{full:"v0621X-lingxi-ui-full.bin",inc:"v0621X-lingxi-ui.bin"}, size:"733KB / 670KB",
-    desc:"🔥 完整中文三页UI(无触摸)+5秒自动翻页,纯显示验证版",
-    changes:"✅ 去掉所有触摸/I2C代码\n✅ 完整LVGL中文三页:节能/感知/系统\n✅ 5秒自动翻页(0→1→2→0)\n✅ 底栏导航按钮(不可点击,纯显示)\n✅ TG1WDT喂狗+SPI2_HOST+PSRAM\n✅ 厂家初始化序列+颜色正确",
-    source:"test_lgfx.cpp v0621X"},
-  {ver:"v0621W", date:"2026-06-21", type:"testing", tags:["中文UI","触摸","厂家时序"], files:{full:"v0621W-lingxi-ui-full.bin",inc:"v0621W-lingxi-ui.bin"}, size:"756KB / 691KB",
-    desc:"🔥 厂家时序修正:触摸RST 20ms LOW→300ms HIGH + TG1喂狗 + 中文三页",
-    changes:"✅ 触摸RST:20ms LOW+300ms HIGH(厂家参考)\n✅ RST处理移至FT6336U内部(stable)\n✅ 去掉test_lgfx.cpp中的重复RST\n✅ TG1WDT喂狗\n✅ SPI2_HOST+PSRAM\n✅ I2C超时50ms\n✅ 触摸失败→自动降级",
-    source:"test_lgfx.cpp FT6336U.cpp v0621W"},
-  {ver:"v0621V", date:"2026-06-21 04:49", type:"testing", tags:["中文UI","触摸","WDT喂狗"], files:{full:"v0621V-lingxi-ui-full.bin",inc:"v0621U-lingxi-ui.bin"}, size:"756KB / 691KB",
-    desc:"🔥 TG1WDT喂狗修复 + I2C超时保护(较新)",
-    changes:"✅ 主动喂狗函数 tg1_feed() (6个喂狗点)\n✅ loop()中每轮喂狗\n✅ Wire.begin()提前到touch.begin()之前\n✅ Wire.setTimeout(50)在FT6336U内部设\n✅ begin(-1,-1)不复位I2C\n✅ 触摸RST延时缩短(10+300→5+20ms)\n✅ begin()内delay缩短(200→50ms)\n✅ 失败不重试(省500ms)\n⚠️ TG1WDT仍需手动喂狗(813ms重启)",
-    source:"test_lgfx.cpp v0621V"},
-  {ver:"v0621U", date:"2026-06-21 04:46", type:"testing", tags:["中文UI","触摸","SPI2_HOST"], files:{full:"v0621U-lingxi-ui-full.bin",inc:"v0621U-lingxi-ui.bin"}, size:"756KB / 691KB",
-    desc:"SPI2_HOST修复 + PSRAM兼容 + 中文三页 + 触摸降级",
-    changes:"✅ SPI3_HOST→SPI2_HOST (PSRAM不冲突)\n✅ TG1WDT寄存器写禁用\n✅ 颜色:cfg.invert=true+cfg.rgb_order=true\n✅ MADCTL=0x08(方向正确)\n✅ 中文20px字库(font_cjk_20.c)\n✅ 触摸失败→dummy_read降级\n⚠️ TG1WDT写禁用未生效(1128ms重启)",
-    source:"test_lgfx.cpp v0621U"},
-  {ver:"v0621T", date:"2026-06-21 04:25", type:"testing", tags:["中文UI","触摸"], files:{inc:"v0621T-lingxi-ui.bin"}, size:"692KB",
-    desc:"统一版本号 + 触摸失败降级dummy_read",
-    changes:"✅ FT6336U.h中定义SDA=35 SCL=36 RST=37\n✅ 统一所有文件版本号\n✅ 触摸失败切to dummy_read\n⚠️ 旧芯片OK，新芯片PSRAM下SPI3_HOST冲突",
-    source:"test_lgfx.cpp v0621T"},
-  {ver:"v0621S", date:"2026-06-21 04:18", type:"testing", tags:["中文UI","WDT"], files:{full:"v0621S-lingxi-ui-full.bin",inc:"v0621S-lingxi-ui.bin"}, size:"756KB / 692KB",
-    desc:"I2C超时 + WDT禁用 + 代码自审修复",
-    changes:"✅ disableCore0WDT/1WDT/loopWDT\n✅ Wire.setTimeout(50)\n✅ 电池管理RTC_CNTL_BROWN_OUT_REG=0\n✅ 触摸RST引脚拉低→拉高时序\n✅ FT6336U支持显式引脚参数\n⚠️ 新芯片I2C初始化卡死+TG1WDT",
-    source:"test_lgfx.cpp v0621S"},
-  {ver:"v0621R", date:"2026-06-21 04:14", type:"testing", tags:["中文UI","PSRAM"], files:{full:"v0621R-lingxi-ui-full.bin",inc:"v0621R-lingxi-ui.bin"}, size:"756KB / 691KB",
-    desc:"PSRAM开启版本 + I2C初始化修正",
-    changes:"✅ board_build.psram=true\n✅ Wire.begin只调一次\n✅ 触摸失败降级处理\n⚠️ PSRAM开启后TG1WDT触发",
-    source:"test_lgfx.cpp v0621R"},
-  {ver:"v0621Q", date:"2026-06-21 03:56", type:"stable", tags:["中文UI","已验证"], files:{full:"v0621Q-lingxi-ui-full.bin",inc:"v0621Q-lingxi-ui.bin"}, size:"755KB / 691KB",
-    desc:"🔥 中文三页UI + 中文20px字库(font_cjk_20.c) + 触摸导航(旧芯片)",
-    changes:"✅ 中文显示:节能/感知/系统三页\n✅ font_cjk_20.c字库(20px,90KB)\n✅ 颜色/方向同v0621N\n✅ 触摸导航翻页\n⚠️ 需全盘烧录(新芯片空flash)",
-    source:"test_lgfx.cpp v0621Q"},
-  {ver:"v0621P", date:"2026-06-21 03:48", type:"stable", tags:["英文UI","触摸","已验证"], files:{full:"v0621P-lingxi-ui-full.bin",inc:"v0621P-lingxi-ui.bin"}, size:"16MB / 750KB",
-    desc:"英文三页 SENSE+SETUP + 触摸导航",
-    changes:"✅ 三页:ENERGY/SENSE/SETUP\n✅ FT6336U触摸+I2C(SDA=35,SCL=36)\n✅ 底部导航栏+小圆点指示\n✅ 颜色/方向同v0621N",
-    source:"test_lgfx.cpp v0621P"},
-  {ver:"v0621O", date:"2026-06-21 03:35", type:"test", tags:["setRotation"], files:{inc:"v0621O-lingxi-ui.bin"}, size:"691KB",
-    desc:"setRotation API替换寄存器覆写",
-    changes:"✅ tft.setRotation(1)替代MADCTL覆写\n✅ 颜色配置同v0621J",
-    source:"test_lgfx.cpp v0621O"},
-  {ver:"v0621N", date:"2026-06-21 03:33", type:"stable", tags:["验证通过","基准"], files:{inc:"v0621N-lingxi-ui.bin"}, size:"691KB",
-    desc:"✅ MADCTL=0x08 — 颜色+方向全对(用户确认)",
-    changes:"✅ cfg.invert=true+cfg.rgb_order=true\n✅ MADCTL=0x08\n✅ 用户确认:所有全对了\n📌 后续版本的颜色配置基准",
-    source:"test_lgfx.cpp v0621N"},
-  {ver:"v0621M", date:"2026-06-21 03:29", type:"test", tags:["MADCTL"], files:{inc:"v0621M-lingxi-ui.bin"}, size:"691KB",
-    desc:"MADCTL=0x88镜像测试 + 颜色同v0621J",
-    changes:"✅ MADCTL=0x88\n✅ 颜色同v0621J\n⚠️ 用户:颜色对但上下左右颠倒",
-    source:"test_lgfx.cpp v0621M"},
-  {ver:"v0621L", date:"2026-06-21 03:27", type:"test", tags:["厂家初始化"], files:{inc:"v0621L-lingxi-ui.bin"}, size:"691KB",
-    desc:"恢复厂家初始化序列 + 像素格式0x55",
-    changes:"✅ 恢复原始test_lgfx.cpp厂家序列\n✅ 像素格式0x55=16位(tft.writeCommand(0x3A)+0x55)\n⚠️ 用户:颜色又颠倒了",
-    source:"test_lgfx.cpp v0621L"},
-  {ver:"v0621K", date:"2026-06-21 03:25", type:"test", tags:["校准"], files:{inc:"v0621K-color-calibration.bin"}, size:"350KB",
-    desc:"色块校准固件(用户未烧录)",
-    changes:"✅ 红/绿/蓝/白/黑/黄/青/紫8色块\n✅ 每个色块标RGB值",
-    source:"test_lgfx.cpp v0621K"},
-  {ver:"v0621J", date:"2026-06-21 03:24", type:"stable", tags:["颜色修正","已验证"], files:{inc:"v0621J-lingxi-ui.bin"}, size:"691KB",
-    desc:"🔥 颜色修正v2:cfg.invert=true + cfg.rgb_order=true + startWrite包裹",
-    changes:"✅ cfg.invert=true+cfg.rgb_order=true\n✅ startWrite()+writeCommand(0x36)+writeData(0x48)+writeCommand(0x21)+endWrite()\n✅ 颜色对",
-    source:"test_lgfx.cpp v0621J"},
-  {ver:"v0621I", date:"2026-06-21 03:20", type:"test", tags:["颜色"], files:{inc:"v0621I-lingxi-ui.bin"}, size:"691KB",
-    desc:"寄存器覆写(MADCTL=0x48+INVON)颜色修正",
-    changes:"✅ MADCTL=0x48(RGB→BGR)+INVON\n⚠️ 颜色未变",
-    source:"test_lgfx.cpp v0621I"},
-  {ver:"v0621H", date:"2026-06-21 03:13", type:"stable", tags:["灵犀UI","已验证"], files:{inc:"v0621H-lingxi-ui.bin"}, size:"691KB",
-    desc:"🔥 首个灵犀UI!中文能量仪表盘(英文)+深蓝主题",
-    changes:"✅ 自写灵犀UI(非官方demo)\n✅ SAVED TODAY/MONTHLY/ECO MODE/TEMP\n✅ 深蓝主题(#0b0e17+#131725)\n✅ 英文Montserrat字体\n⚠️ 颜色翻转(蓝变橙等)",
-    source:"test_lgfx.cpp v0621H"},
-  {ver:"v0621G", date:"2026-06-21 03:05", type:"stable", tags:["LovyanGFX","LG widgets","已验证"], files:{inc:"v0621G-lgfx-widgets.bin"}, size:"819KB",
-    desc:"MADCTL=0x48+INVON寄存器覆写(颜色正确)",
-    changes:"✅ 写寄存器:MADCTL=0x48+INVON\n✅ 颜色正确(用户确认\可以了)\n✅ LVGL官方widgets demo",
-    source:"test_lgfx.cpp v0621G"},
-  {ver:"v0621F", date:"2026-06-21 03:01", type:"test", tags:["LovyanGFX"], files:{inc:"v0621F-lgfx-widgets.bin"}, size:"819KB",
-    desc:"cfg.invert=true + cfg.rgb_order=true + 寄存器覆写",
-    changes:"✅ 像素格式0x55=16位\n✅ MADCTL覆写\n⚠️ 颜色仍颠倒",
-    source:"test_lgfx.cpp v0621F"},
-  {ver:"v0621E", date:"2026-06-21 02:55", type:"test", tags:["LovyanGFX"], files:{inc:"v0621E-lgfx-widgets.bin"}, size:"819KB",
-    desc:"cfg.invert=true + cfg.rgb_order=true + 寄存器覆写",
-    changes:"✅ cfg.invert=true+cfg.rgb_order=true\n✅ 写寄存器覆写MADCTL\n⚠️ 颜色仍不对",
-    source:"test_lgfx.cpp v0621E"},
-  {ver:"v0621D", date:"2026-06-21 02:52", type:"test", tags:["LVGL","颜色"], files:{inc:"v0621D-lingxi-ui.bin"}, size:"730KB",
-    desc:"cfg.invert=true + cfg.rgb_order + 写寄存器0x36/0x21",
-    changes:"✅ cfg.invert=true\n✅ cfg.rgb_order=true\n✅ 写MADCTL寄存器\n⚠️ 颜色仍不对",
-    source:"test_lgfx.cpp v0621D"},
-  {ver:"v0621C", date:"2026-06-21 02:44", type:"test", tags:["LVGL","自写UI"], files:{inc:"v0621C-lingxi-ui.bin"}, size:"730KB",
-    desc:"自写灵犀UI(非LVGL demo) + 深蓝主题",
-    changes:"✅ 自写UI(非官方widgets)\n✅ 深蓝主题\n⚠️ 颜色不对(蓝橙色互换)",
-    source:"test_lgfx.cpp v0621C"},
-  {ver:"v0621B", date:"2026-06-21 02:37", type:"test", tags:["LovyanGFX","LG widgets"], files:{inc:"v0621B-lgfx-widgets.bin"}, size:"819KB",
-    desc:"LovyanGFX驱动+LVGL官方widgets(标准配置)",
-    changes:"✅ 标准LovyanGFX配置\n✅ LVGL官方widgets\n⚠️ 初始化序列不同(厂家vs标准)",
-    source:"test_lgfx.cpp v0621B"},
-
-  // ==== 早期版本 (v0620系列) ====
-  {ver:"v0620C", date:"2026-06-20 22:52", type:"test", tags:["早期","TFT_eSPI"], files:{inc:"v0620C.bin"}, size:"730KB",
-    desc:"TFT_eSPI颜色修正版本",
-    changes:"✅ TFT_eSPI驱动\n⚠️ PSRAM冲突",
-    source:"test_lgfx.cpp v0620C"},
-  {ver:"v0620C-r5", date:"2026-06-20", type:"test", tags:["早期"], files:{inc:"v0620C-r5.bin"}, size:"730KB"},
-  {ver:"lvgl-r1", date:"2026-06-20 22:06", type:"test", tags:["早期","LVGL"], files:{inc:"lvgl-r1.bin"}, size:"744KB",
-    desc:"LVGL+Touch首次整合"},
-  {ver:"v0312T", date:"2026-06-20 04:52", type:"stable", tags:["中文UI","已验证"], files:{inc:"v0312T.bin"}, size:"288KB",
-    desc:"全中文UI + 88字库 + 三页空间感知(bit-bang)","source":"v0312T-source.txt"},
-  {ver:"v0312S", date:"2026-06-20 03:40", type:"stable", tags:["中文UI"], files:{inc:"v0312S.bin"}, size:"287KB"},
-  {ver:"v0312O-P", date:"2026-06-20 03:15", type:"test", tags:["早期"], files:{inc:"merged-v0312P-v2.bin"}, size:"16MB"},
-  {ver:"v0312N", date:"2026-06-20 02:45", type:"stable", tags:["RST=48"], files:{inc:"v0312N.bin"}, size:"355KB"},
-  {ver:"v0312M", date:"2026-06-20 02:30", type:"stable", tags:["引脚测试"], files:{inc:"v0312M.bin"}, size:"354KB"},
-  {ver:"v0312L", date:"2026-06-20 02:15", type:"test", tags:["bit-bang"], files:{inc:"v0312L.bin"}, size:"350KB"},
-  {ver:"v0312K", date:"2026-06-20 02:00", type:"test", tags:["板型修正"], files:{inc:"v0312K.bin"}, size:"386KB"},
-  {ver:"v0312J", date:"2026-06-20 01:45", type:"test", tags:["厂家序列"], files:{inc:"v0312J.bin"}, size:"382KB"},
-  {ver:"v0312H", date:"2026-06-20 01:15", type:"test", tags:["硬件SPI"], files:{inc:"v0312H.bin"}, size:"376KB"},
-  {ver:"v0312G", date:"2026-06-20 01:00", type:"test", tags:["裸SPI"], files:{inc:"v0312G.bin"}, size:"380KB"},
-  {ver:"v0312F", date:"2026-06-20", type:"test", tags:["裸SPI"], files:{inc:"v0312F.bin"}, size:"372KB"},
-  {ver:"v0312E", date:"2026-06-20", type:"test", tags:["自检"], files:{inc:"v0312E.bin"}, size:"420KB"},
-  {ver:"v0312D", date:"2026-06-20", type:"test", tags:["ST7796"], files:{inc:"v0312D.bin"}, size:"420KB"},
-  {ver:"v0312C", date:"2026-06-20", type:"test", tags:["16-bit"], files:{inc:"v0312C.bin"}, size:"416KB"},
-  {ver:"v0312B", date:"2026-06-20", type:"test", tags:["DIO"], files:{inc:"v0312B.bin"}, size:"416KB"},
-  {ver:"v0311A", date:"2026-06-19", type:"test", tags:["最小化"], files:{inc:"v0311A-corrected.bin"}, size:"352KB"},
-  {ver:"v0310D", date:"2026-06-19", type:"test", tags:["UI","触摸"], files:{inc:"v0310D-merged.bin"}, size:"393KB"},
-  {ver:"v0310A", date:"2026-06-19", type:"stable", tags:["已验证","基准"], files:{inc:"v0310A-test-all-merged.bin"}, size:"435KB",
-    desc:"ILI9341诊断固件(3.2寸屏) - 唯一验证可启动","source":"v0310A-source.txt"},
-
-  // ==== 测试版 (v0621V-mini) ====
-  {ver:"v0621V-mini", date:"2026-06-21 04:53", type:"test", tags:["只亮屏","无触摸"], files:{full:"v0621V-mini.bin"}, size:"417KB",
-    desc:"🧪 最小测试:只亮屏显示文字,不碰I2C/触摸/LVGL",
-    changes:"✅ 去掉所有触摸/I2C代码\n✅ 只用LovyanGFX画文字\n✅ 判断硬件是否正常\n✅ 用户验证:LCD OK",
-    source:"test_lgfx.cpp mini"},
-  {ver:"v0621V-touchtest", date:"2026-06-21", type:"test", tags:["触控诊断","喂狗"], files:{full:"v0621V-touchtest.bin"}, size:"416KB",
-    desc:"🧪 触控诊断:mini基础上加上触摸I2C初始化,看是否触控导致重启",
-    changes:"✅ 先亮屏显示LCD OK\n✅ 再初始化FT6336U触摸\n✅ I2C超时50ms+喂狗\n✅ 成功→绿色OK 失败→红色提示\n✅ 无论结果都继续运行",
-    source:"test_lgfx.cpp touchtest"}
+  {ver:"display-baseline", date:"2026-06-28", tags:["基线","LovyanGFX","红绿蓝"], files:{merge:"display-baseline-merged.bin"}, desc:"🔥 最小验证工程: 独立工程,不依赖主固件. 红→绿→蓝循环"},
+  {ver:"v0628-demo-v4", date:"2026-06-28", tags:["LovyanGFX","LVGL9.5","中文UI","功能完整"], files:{merge:"v0628-demo-v4-merged.bin"}, desc:"演示版v4: 中文三页+触摸+OTA+WDT禁用"},
+  {ver:"v0628-demo-v3", date:"2026-06-28", tags:["LovyanGFX","LVGL9.5","中文UI"], files:{merge:"v0628-demo-v3-merged.bin"}, desc:"演示版v3: 修复触摸+色块"},
+  {ver:"v0628-demo-v2", date:"2026-06-28", tags:["LovyanGFX","bitbang I2C","启动验证"], files:{merge:"v0628-demo-v2-merged.bin"}, desc:"v2修复: bitbang I2C替代硬件I2C(不崩溃)"},
+  {ver:"v0628-demo-v1", date:"2026-06-28", tags:["LovyanGFX","bitbang I2C","启动验证"], files:{merge:"v0628-demo-v1-merged.bin"}, desc:"最小可用: bitbang I2C触控+SPI2_HOST显示"},
+  {ver:"v0628-cs-port-r3", date:"2026-06-28", tags:["cs_port","串口屏","纯文本"], files:{merge:"v0628-cs-port-r3-merged.bin"}, desc:"cs_port移植r3: 串口+屏幕输入输出"},
+  {ver:"v0628-cs-port-r2", date:"2026-06-28", tags:["cs_port","串口屏"], files:{merge:"v0628-cs-port-r2-merged.bin"}, desc:"cs_port移植r2: 重构输入处理"},
+  {ver:"v0628-cs-port-r1", date:"2026-06-28", tags:["cs_port","串口屏"], files:{merge:"v0628-cs-port-r1-merged.bin"}, desc:"cs_port移植r1: 首次可用版本"},
 ];
 
-function render(verList) {
-  const tbody = document.getElementById('fw-body');
-  tbody.innerHTML = '';
-  for (const f of (verList || FW)) {
-    const typeClass = f.type === 'stable' ? 'tag-green' : f.type === 'testing' ? 'tag-orange' : 'tag-gray';
-    const typeLabel = f.type === 'stable' ? '已验证' : f.type === 'testing' ? '测试中' : '历史';
-    const tagsHtml = (f.tags||[]).map(t => {
-      const c = t.includes('中文')?'green':t.includes('触摸')?'blue':t.includes('WDT')?'orange':t.includes('PSRAM')?'pink':'gray';
-      return `<span class="tag tag-${c}">${t}</span>`;
-    }).join(' ');
+function render() {
+  const container = document.getElementById('fw-list');
+  container.innerHTML = FW.map(f => {
+    let tags = (f.tags||[]).map(t => {
+      let cls = 'tag-green';
+      if(t.includes('基线')) cls = 'tag-orange';
+      else if(t.includes('cs_port')) cls = 'tag-blue';
+      return `<span class="tag ${cls}">${t}</span>`;
+    }).join('');
 
-    const changesHtml = f.changes ? `<div class="changes">${f.changes}</div>` : '';
-    const descHtml = f.desc ? `<span class="desc">${f.desc}</span>` : '';
-    
-const BASE = location.hostname === 'licoo12580-source.github.io' 
-  ? 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware'
-  : 'firmware';
     let actions = '';
-    if (f.files.full) actions += `<a class="btn btn-download" href="${BASE}/${f.files.full}" download>全盘</a> `;
-    if (f.files.inc) actions += `<a class="btn btn-download" href="${BASE}/${f.files.inc}" download>增量</a> `;
-    if (f.files.merge) actions += `<a class="btn btn-download" style="background:#8b5cf6" href="${BASE}/${f.files.merge}" download>合并</a> `;
-    if (f.source) actions += `<button class="btn btn-small" onclick="openSource('${f.source}')">源码</button>`;
+    if (f.files.merge) actions += `<a class="btn btn-merge" href="${BASE_RAW}/${f.files.merge}" download>合并</a>`;
 
-    tbody.innerHTML += `<tr class="fw-row" data-type="${f.type}">
-      <td>
-        <div class="ver">${f.ver}</div>
-        <div class="date">${f.date}</div>
-        <div style="font-size:10px;color:var(--m)">${f.size||''}</div>
-      </td>
-      <td><span class="tag ${typeClass}">${typeLabel}</span><br>${tagsHtml}</td>
-      <td>${descHtml}</td>
-      <td>${changesHtml}</td>
-      <td class="actions">${actions}</td>
-    </tr>`;
-  }
-}
-
-function filter(type) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('f-' + type).classList.add('active');
-  if (type === 'all') render(FW);
-  else if (type === 'stable') render(FW.filter(f => f.type === 'stable'));
-  else if (type === 'test') render(FW.filter(f => f.type === 'testing' || f.type === 'test'));
-  else if (type === 'ui') render(FW.filter(f => f.tags && f.tags.some(t => t.includes('中文'))));
-}
-
-// 源码审查弹窗
-function openSource(src) {
-  const modal = document.getElementById('sourceModal') || (()=>{
-    const d = document.createElement('div');
-    d.id = 'sourceModal';
-    d.className = 'modal-overlay code-modal';
-    d.onclick = function(e){if(e.target===this)closeSource()};
-    d.innerHTML = `<div class="modal">
-      <div class="modal-header">
-        <span class="modal-title" id="sourceTitle">源码审查</span>
-        <button class="modal-close" onclick="closeSource()">×</button>
+    return `<div class="fw-item">
+      <div class="fw-info">
+        <span class="fw-ver">${f.ver}</span>
+        <span class="fw-date">${f.date}</span>
+        <div class="fw-desc">${f.desc}</div>
+        <div class="fw-tags">${tags}</div>
       </div>
-      <div class="modal-body" id="sourceBody"><div class="code-loading">⏳ 加载中...</div></div>
+      <div class="fw-actions">${actions}</div>
     </div>`;
-    document.body.appendChild(d);
-    return d;
-  })();
-  modal.classList.add('show');
-  document.getElementById('sourceTitle').textContent = '📝 ' + src;
+  }).join('');
+}
 
-  // 尝试几个路径
-  const paths = [
-    `firmware/${src.split(' ')[0]}-source.txt`,
-    `firmware/${src}.txt`,
-    `docs/src/${src.split(' ')[0].replace(/^(.+?)\.cpp.*$/,'$1')}.cpp`
-  ];
-  
-  function tryPath(i) {
-    if (i >= paths.length) {
-      document.getElementById('sourceBody').innerHTML = '<div class="code-loading" style="color:var(--red)">❌ 未找到源码文件</div>';
-      return;
-    }
-    fetch(paths[i]).then(r => r.ok ? r.text() : Promise.reject()).then(code => {
-      document.getElementById('sourceBody').innerHTML = `<pre>${code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`;
-    }).catch(() => tryPath(i+1));
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-download').classList.toggle('hidden', name !== 'download');
+  document.getElementById('tab-upload').classList.toggle('hidden', name !== 'upload');
+}
+
+// Upload
+const UPLOAD_API = 'http://localhost:3000/api/upload-paste';
+
+function handleFiles(files) {
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('pasteFilename').value = file.name;
+      document.getElementById('pasteContent').value = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadPaste() {
+  const filename = document.getElementById('pasteFilename').value.trim();
+  const content = document.getElementById('pasteContent').value.trim();
+  const status = document.getElementById('uploadStatus');
+
+  if (!filename || !content) {
+    status.className = 'status-msg status-err';
+    status.textContent = '请填写文件名和内容';
+    return;
   }
-  tryPath(0);
+
+  try {
+    const resp = await fetch(UPLOAD_API, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({filename, content})
+    });
+    if (resp.ok) {
+      status.className = 'status-msg status-ok';
+      status.textContent = `✅ ${filename} 上传成功`;
+      document.getElementById('pasteFilename').value = '';
+      document.getElementById('pasteContent').value = '';
+    } else {
+      throw new Error(`HTTP ${resp.status}`);
+    }
+  } catch(e) {
+    // fallback: 复制到聊天
+    const text = `【文件名】${filename}\n【内容】\n${content.substring(0,500)}...`;
+    await navigator.clipboard.writeText(text);
+    status.className = 'status-msg status-err';
+    status.innerHTML = `❌ 后端不可用。已复制到剪贴板，请直接发到聊天。<br><span style="font-size:11px;color:var(--m)">${e.message}</span>`;
+  }
 }
 
-function closeSource() {
-  const m = document.getElementById('sourceModal');
-  if (m) m.classList.remove('show');
-}
-
-// 预览
-function openPreview(ver) {
-  document.getElementById('previewTitle').textContent = ver + ' 预览';
-  document.getElementById('previewModal').classList.add('show');
-  document.getElementById('previewBody').innerHTML = '<div class="no-preview">暂无预览图<br>请烧录后拍照上传</div>';
-}
-function closePreview() {
-  document.getElementById('previewModal').classList.remove('show');
-}
-
-// 按数组定义顺序渲染（最新到最旧）
 render();
 </script>
 </body>

@@ -272,6 +272,7 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
 <div class="main">
   <nav class="tabs" id="tabBar">
     <div class="tab active" data-tab="dashboard">📊 总览</div>
+    <div class="tab" data-tab="download">⬇ 下载</div>
     <div class="tab" data-tab="upload">📤 上传</div>
     <div class="tab" data-tab="baselines">📌 基线</div>
     <div class="tab" data-tab="experiments">🧪 实验</div>
@@ -286,6 +287,15 @@ select.input{padding:6px 8px;font-size:11px;cursor:pointer;-webkit-appearance:no
     <div class="card" style="margin-top:var(--space-md)">
       <h2>⏱ 最近活动</h2>
       <div id="recentActivity" style="font-size:12px;line-height:2"></div>
+    </div>
+  </div>
+
+  <!-- ====== 下载标签 ====== -->
+  <div class="tab-content" id="tab-download">
+    <div class="card">
+      <h2>⬇ 固件下载</h2>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:var(--space-sm)">合并BIN一行烧录，直连 GitHub raw。</p>
+      <div id="fwDownloadList"></div>
     </div>
   </div>
 
@@ -588,6 +598,9 @@ const BASE = location.hostname === 'licoo12580-source.github.io'
   ? 'https://raw.githubusercontent.com/licoo12580-source/lingxi-pages/main/firmware'
   : 'firmware';
 
+// 固件BIN直链（lingxi仓库）
+const BASE_FW = 'https://raw.githubusercontent.com/licoo12580-source/lingxi/firmware-demo-screen/firmware';
+
 // GitHub Release URL 模板
 const RELEASE_API = "https://api.github.com/repos/licoo12580-source/lingxi/releases";
 const RELEASE_DOWNLOAD = "https://github.com/licoo12580-source/lingxi/releases/download";
@@ -703,6 +716,30 @@ function renderBackupIntegration(){
       </div>
     </div>`
   ).join('');
+}
+function renderDownloadList(){
+  const DL = [
+    {ver:"display-baseline", date:"2026-06-28", tags:["基线","红绿蓝"], file:"display-baseline-merged.bin", desc:"🔥 最小验证 · 红→绿→蓝循环"},
+    {ver:"v0628-demo-v4", date:"2026-06-28", tags:["功能完整","中文UI"], file:"v0628-demo-v4-merged.bin", desc:"演示版v4 · 中文三页+触摸+OTA"},
+    {ver:"v0628-demo-v3", date:"2026-06-28", tags:["触摸","色块"], file:"v0628-demo-v3-merged.bin", desc:"演示版v3"},
+    {ver:"v0628-demo-v2", date:"2026-06-28", tags:["bitbang I2C"], file:"v0628-demo-v2-merged.bin", desc:"bitbang I2C替代硬件I2C"},
+    {ver:"v0628-demo-v1", date:"2026-06-28", tags:["最小可用"], file:"v0628-demo-v1-merged.bin", desc:"最小可用 · bitbang+SPI2_HOST"},
+    {ver:"v0628-cs-port-r3", date:"2026-06-28", tags:["cs_port"], file:"v0628-cs-port-r3-merged.bin", desc:"串口屏r3"},
+    {ver:"v0628-cs-port-r2", date:"2026-06-28", tags:["cs_port"], file:"v0628-cs-port-r2-merged.bin", desc:"串口屏r2"},
+    {ver:"v0628-cs-port-r1", date:"2026-06-28", tags:["cs_port"], file:"v0628-cs-port-r1-merged.bin", desc:"串口屏r1 · 首次可用"},
+  ];
+  let tagColor = t => t.includes('基线')?'tag-orange':t.includes('cs_port')?'tag-blue':'tag-green';
+  document.getElementById('fwDownloadList').innerHTML = DL.map(f => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <strong style="font-size:14px">${f.ver}</strong>
+        <span style="color:var(--text-dim);font-size:11px;margin-left:8px">${f.date}</span>
+        <div style="color:var(--text-muted);font-size:12px;margin-top:2px">${f.desc}</div>
+        <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${(f.tags||[]).map(t=>`<span class="tag ${tagColor(t)}">${t}</span>`).join('')}</div>
+      </div>
+      <a class="btn btn-merge" href="${BASE_FW}/${f.file}" download style="flex-shrink:0">合并</a>
+    </div>
+  `).join('');
 }
 function showUploadHelp(){
   document.querySelector('.tab[data-tab="upload"]').click();
@@ -1058,6 +1095,8 @@ function showTab(name){
   if(tab)tab.classList.add('active');
   const content=document.getElementById(`tab-${name}`);
   if(content)content.classList.add('active');
+  if(name==='dashboard') renderDashboard();
+  if(name==='download') renderDownloadList();
 }
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>showTab(tab.dataset.tab));

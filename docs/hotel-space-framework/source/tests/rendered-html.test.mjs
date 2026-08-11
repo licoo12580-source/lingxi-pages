@@ -61,7 +61,9 @@ test("keeps observation and control claims fail-closed", async () => {
     "按采样窗口重建",
     "未下发真实命令",
     "设备确认执行",
-    "现实效果已验证",
+    "现实效果验证",
+    "批量控制门",
+    "逐目标检查",
   ]) {
     assert.match(page, new RegExp(required));
   }

@@ -2275,6 +2275,99 @@ summary:focus-visible {
   border-radius: 4px;
 }
 
+.batch-control-bar {
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: minmax(250px, 0.7fr) minmax(440px, 1.4fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 11px;
+  padding: 13px 15px;
+  border: 1px solid #cfd3d6;
+  background: #ffffff;
+}
+
+.batch-control-bar > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.batch-control-bar > div:first-child > span {
+  color: #66717b;
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+}
+
+.batch-control-bar > div:first-child > b {
+  font-size: 13px;
+}
+
+.batch-control-bar > div:first-child > small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.batch-control-bar ul {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(88px, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.batch-control-bar li {
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 13px;
+  border-left: 1px solid #e0e3e5;
+}
+
+.batch-control-bar li b {
+  font-size: 12px;
+}
+
+.batch-control-bar li span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.batch-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+
+.batch-actions button {
+  min-width: 170px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #aeb7bf;
+  border-radius: 4px;
+  background: #ffffff;
+  font-size: 10px;
+  font-weight: 720;
+}
+
+.batch-actions button:last-child {
+  color: #ffffff;
+  border-color: #182c42;
+  background: #182c42;
+}
+
+.batch-actions button:disabled {
+  color: #7c8791;
+  border-color: #d2d7db;
+  background: #eef0f1;
+  cursor: not-allowed;
+}
+
 .ledger-table-wrap {
   border: 1px solid #cfd3d6;
   background: #ffffff;
@@ -3844,6 +3937,30 @@ summary:focus-visible {
 
   .ledger-detail {
     margin-top: 10px;
+  }
+
+  .batch-control-bar {
+    display: block;
+    padding: 13px;
+  }
+
+  .batch-control-bar ul {
+    grid-template-columns: 1fr 1fr;
+    margin: 12px 0;
+    border-top: 1px solid #e0e3e5;
+  }
+
+  .batch-control-bar li {
+    border-bottom: 1px solid #e0e3e5;
+  }
+
+  .batch-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .batch-actions button {
+    min-width: 0;
+    min-height: 44px;
   }
 
   .ledger-detail-grid {

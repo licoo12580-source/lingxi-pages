@@ -341,7 +341,7 @@ function StatusSummary() {
       <div><span>需要先处理</span><b>3</b><small>中断、离线、故障分开</small></div>
       <div><span>当前有界候选</span><b>5</b><small>不包含 MS24 活动候选</small></div>
       <div><span>控制待验证</span><b>1</b><small>设备确认不等于现实生效</small></div>
-      <div><span>身份已追溯</span><b>4 / 10</b><small>其余设备不自动编号</small></div>
+      <div><span>可批量检查</span><b>2</b><small>同型号且能力已匹配</small></div>
     </div>
   );
 }
@@ -558,7 +558,7 @@ function EvidenceRail({ compact = false }: { compact?: boolean }) {
     ["已经下发", "09:36:13", "done"],
     ["设备确认执行", "09:36:14", "done"],
     ["状态被观察", "等待新证据", "current"],
-    ["现实效果已验证", "尚未完成", "pending"],
+    ["现实效果验证", "未验证，不可称成功", "pending"],
     ["纠错或归档", "等待结果", "pending"],
   ];
   return (
@@ -570,6 +570,40 @@ function EvidenceRail({ compact = false }: { compact?: boolean }) {
         </li>
       ))}
     </ol>
+  );
+}
+
+function BatchControlBar() {
+  const [selected, setSelected] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  const toggleSelection = () => {
+    setSelected((current) => !current);
+    setChecked(false);
+  };
+
+  return (
+    <section className="batch-control-bar" aria-label="批量控制门样本">
+      <div>
+        <span>批量控制门</span>
+        <b>按设备型号与能力胶囊筛选</b>
+        <small>批量范围不会继承单房授权或验证结果</small>
+      </div>
+      <ul aria-label="批量样本范围">
+        <li><b>{selected ? "2" : "0"}</b><span>已选空间</span></li>
+        <li><b>LD2450</b><span>型号筛选</span></li>
+        <li><b>空调</b><span>能力类型</span></li>
+        <li><b>逐目标</b><span>G5 / G6 / G8</span></li>
+      </ul>
+      <div className="batch-actions">
+        <button type="button" onClick={toggleSelection}>
+          {selected ? "清除样本范围" : "选择兼容样本"}
+        </button>
+        <button type="button" disabled={!selected || checked} onClick={() => setChecked(true)}>
+          {checked ? "检查单已创建 · 未下发真实命令" : "逐目标检查"}
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -698,6 +732,7 @@ function LedgerDirection(props: DirectionProps) {
           <StatusSummary />
         </div>
         <FilterLine />
+        <BatchControlBar />
         <div className="ledger-table-wrap">
           <table className="ledger-table">
             <thead><tr><th>空间</th><th>当前候选</th><th>状态开始</th><th>最近变化</th><th>证据更新</th><th>环境来源</th><th>控制能力</th><th>下一步</th></tr></thead>

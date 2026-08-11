@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "validatedAt": "2026-08-12T01:41:09+08:00",
+  "publicUrl": "https://lingxi-hotel-space-frame-0811.licoo12580.chatgpt.site/?release=6",
+  "sitesVersion": 6,
+  "runtimeCommit": "e37970bb2dac4b011871bd5d608a4cad635065c1",
+  "fixtureOnly": true,
+  "formalCloudModified": false,
+  "unattendedControlEnabled": false,
+  "build": {
+    "eslint": "passed",
+    "productionBuild": "passed",
+    "nodeTests": {"passed": 3, "failed": 0},
+    "diffCheck": "passed"
+  },
+  "desktop": {
+    "directionsCapturedAt1440x900": [1, 2, 3, 4, 5, 6],
+    "captureRelease": 5,
+    "release6Delta": "mobile-breakpoint touch-target sizing only",
+    "release6At1280x720": {
+      "innerWidth": 1280,
+      "innerHeight": 721,
+      "bodyClientWidth": 1265,
+      "bodyScrollWidth": 1265,
+      "documentClientWidth": 1265,
+      "documentScrollWidth": 1265,
+      "horizontalOverflow": false
+    }
+  },
+  "mobile": {
+    "captures": [
+      {"direction": 1, "viewport": "390x844", "release": 5},
+      {"direction": 2, "viewport": "390x844", "release": 5},
+      {"direction": 3, "viewport": "390x844", "release": 5},
+      {"direction": 2, "viewport": "320x568", "release": 5},
+      {"direction": 2, "viewport": "360x800", "release": 6}
+    ],
+    "release6At360x800": {
+      "innerWidth": 361,
+      "innerHeight": 801,
+      "bodyClientWidth": 346,
+      "bodyScrollWidth": 346,
+      "documentClientWidth": 346,
+      "documentScrollWidth": 346,
+      "horizontalOverflow": false,
+      "minimumVisibleHistoryTargetPx": 44,
+      "targetsBelow44px": 0
+    }
+  },
+  "interactions": {
+    "historyWindow6h": "passed",
+    "historyNode0908": "passed",
+    "nativeRangePresent": "passed",
+    "playPauseAndSkipPresent": "passed",
+    "ms24NoCoordinatesBoundary": "passed",
+    "localIntentOnly": "演示意图已创建 · 未下发真实命令",
+    "batchCompatibleFixtureCount": 2,
+    "batchResult": "检查单已创建 · 未下发真实命令",
+    "consoleErrors": []
+  },
+  "screenshots": [
+    {"file": "desktop-01.png", "sha256": "6B3573E73D3F61D9957AE826266B8107FC699CA4C3B65B193DC52A5503A420A9"},
+    {"file": "desktop-02.png", "sha256": "590C318A802F6EA3E6888DCB2BCEDD1ADAF6D31306ED1DD298E0EB19B7436514"},
+    {"file": "desktop-03.png", "sha256": "527C37D8524795965AE79D6387B06178010E1014F3C1367D53B7C3B145745141"},
+    {"file": "desktop-04.png", "sha256": "AB39DD4FFBDDFC544D628CE54A35429CA57B7905F750B1E93CD3AFC2BB409F64"},
+    {"file": "desktop-05.png", "sha256": "16C2205E57A99DF2AC43BD7D179DE0DF8EA63B18F5FB0F4A3317B59710945F74"},
+    {"file": "desktop-06.png", "sha256": "048FEC543937FBB6F01050D18962DA43CC3DEBB89E27F15E9856FC7850D2707C"},
+    {"file": "mobile-01-390x844.png", "sha256": "B08C3412B86D5A13CF7F17C7BE60E06A0D0ADF241CE735DCEAAB0D2FA8BA9968"},
+    {"file": "mobile-02-390x844.png", "sha256": "200EEB38322C829AAE9DA4276F0606B2632EE504A591F81C4CAA7FC6ECEB0382"},
+    {"file": "mobile-03-390x844.png", "sha256": "4DB7518EF363CFBA4B802A600169017F6B4E0D8249CF39879EC69AFA8B5169D1"},
+    {"file": "mobile-02-360x800.png", "sha256": "E046CBE4C37AA83D85960D9723A5A7508349CB36B42363972D1E72866D62E154"},
+    {"file": "mobile-02-320x568.png", "sha256": "6C55DA327724A5FA350E091320A54E2C3DBB7AE368AFFC6C5421DE6C9DCEFB63"}
+  ],
+  "knownLimits": [
+    "Selection prototype uses isolated fixtures and is not a live-data proof.",
+    "No real device command is sent.",
+    "Automated pointer dragging of the native range was not claimed; node clicks and controls were browser-verified."
+  ]
+}

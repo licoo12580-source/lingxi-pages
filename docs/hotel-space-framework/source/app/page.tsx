@@ -518,10 +518,14 @@ function HistoryControl({
           </button>
           <button type="button" aria-label="向后跳转" onClick={() => onIndex(Math.min(history.length - 1, index + 1))}>›</button>
         </div>
-        <div className="step-track" aria-hidden="true">
+        <div className="step-track" aria-label="历史变化节点">
           {history.map((item, itemIndex) => (
-            <i
+            <button
+              type="button"
               key={item.time}
+              aria-label={`${item.time} ${item.label}：${item.note}`}
+              aria-pressed={itemIndex === index}
+              onClick={() => onIndex(itemIndex)}
               className={
                 "step-segment segment-" +
                 item.kind +
@@ -529,7 +533,7 @@ function HistoryControl({
               }
             >
               <span>{kindLabel[item.kind]}</span>
-            </i>
+            </button>
           ))}
         </div>
         <input
